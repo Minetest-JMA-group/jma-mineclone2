@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8' />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{{ title }} • WorldEditAdditions</title>
+		
+		<link rel="stylesheet" href="/theme.css" />
+		
+		<link rel="icon" href="{% image_urlpass '../worldeditadditions-64.png' %}" type="image/png" sizes="64x64" />
+		<link rel="icon" href="{% image_urlpass '../worldeditadditions.png' %}" type="image/png" sizes="540x540" />
+		
+		<meta name="theme-color" content="#61b4f4" />
+		
+		<!-- OpenGraph -->
+		<meta property="og:title" content="WorldEditAdditions" />
+		<meta property="og:type" content="website" />
+		<!-- We wanted pepperminty.wiki, but it's too expensive :-( -->
+		<meta property="og:url" content="https://worldeditadditions.mooncarrot.space/" />
+		<meta property="og:image" content="https://worldeditadditions.mooncarrot.space{% image_url 'images/banner-main.jpeg' %}" />
+		<meta property="og:description" content="Extra tools and commands to extend WorldEdit for Minetest. If you can dream of it, it probably belongs here!" />
+		
+		<!-- Twitter Cards -->
+		<meta property="twitter:card" content="summary" />
+		<meta property="twitter:site" content="@SBRLabs" />
+		<meta property="twitter:title" content="WorldEditAdditions" />
+		<meta property="twitter:description" content="Extra tools and commands to extend WorldEdit for Minetest. If you can dream of it, it probably belongs here!" />
+		<meta property="twitter:image" content="https://worldeditadditions.mooncarrot.space{% image_urlpass '../worldeditadditions.png' %}" />
+	</head>
+	<body>
+		<nav class="shadow-bottom">
+			<h1><a href="/" class="invisilink">
+				<img src="{% image_urlpass '../worldeditadditions.png' %}" alt="" class="icon logo" />
+				WorldEditAdditions
+			</a></h1>
+			<ul>
+			{% for navitem in collections.navigable %}
+				<li {% if page.url == navitem.url %}aria-current="page"{% endif %}>
+					<a href="{{ navitem.url }}" class="nav">{{ navitem.data.title }}</a>
+				</li>
+			{% endfor %}
+				<li><a href="https://github.com/sbrl/Minetest-WorldEditAdditions/" class="nav image"><img src="{% image_urlpass 'images/github.svg' %}" alt="GitHub" title="GitHub" /></a></li>
+			</ul>
+		</nav>
+		
+		{{ content | safe }}
+		
+		<footer class="shadow-top">
+			<p>WorldEditAdditions is built with ❤️ by these awesome people:</p>
+			<ul class="contributor-list">
+				{% for contributor in contributors %}
+				<li><a href="{{ contributor.profile_url }}">
+					<img class="icon large" src="{{ contributor.avatar_url | fetch_file }}" alt="{{ contributor.name }}" />
+					<span>{{ contributor.name }}</span>
+				</a></li>
+				{% endfor %}
+			</ul>
+			
+			<p>Tech: <a href="https://www.11ty.dev/">Eleventy</a> (this website), <a href="https://www.heropatterns.com/">Hero Patterns</a> (background patterns), <a href="https://github.com/shssoichiro/oxipng">Oxipng</a> (PNG image compression), <a href="https://www.minetest.net/">Minetest</a> (of course)</p>
+			<p>Licensed under the <a href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public Licence 2.0</a> (<a href="https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2)">tldr</a>)</p>
+		</footer>
+	</body>
+</html>
