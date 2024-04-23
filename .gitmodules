@@ -1,0 +1,3 @@
+[submodule "mods/extras"]
+	path = mods/extras
+	url = git@github.com:markopetrovi/jma-mineclone2-extras
