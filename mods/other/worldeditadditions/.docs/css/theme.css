@@ -1,0 +1,473 @@
+/* Base CSS */
+
+/*
+ * This CSS file contains (for me) logical style defaults that are easy to read.
+ * 
+ * This file is quite often used as a starting point for other projects.
+ * 
+ * Todo:
+	* <button>
+	* <inputs>
+	* <progress>
+	* <meter>
+ */
+
+:root {
+	--bg-main: hsl(206, 87%, 67%);
+	/* --bg-bright: #57b43f; */
+	--bg-bright: #7ac767;
+	--bg-alt: #3F57B4;
+	--bg-transcluscent-slight: rgba(255, 255, 255, 0.1);
+	--bg-transcluscent: rgba(255, 255, 255, 0.85);
+	--bg-transcluscent-alt: hsla(226, 59%, 38%, 0.8);
+	--bg-transcluscent-alt-vdark: hsla(226, 59%, 8%, 0.8);
+	--bg-transcluscent-alt-slight: hsla(196, 91%, 62%, 0.23);
+	
+	/* --text-main: #3F57B4; */
+	--text-main: hsl(227, 70%, 35%);
+	--text-bright: #efefef;
+	--text-alt: #38871e;
+	
+	--shadow: hsla(0, 0%, 25%, 0.25);
+	--shadow-dark: hsla(0, 0%, 25%, 0.5);
+	
+	--highlight: hsl(353, 100%, 36%);
+	
+	--bg-image: url('{% image_urlpass "images/clouds.png" %}');
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-main: #020B18;
+		--bg-bright: hsl(108, 46%, 34%);
+		--bg-alt: hsl(228, 68%, 68%);
+		
+		--bg-transcluscent: hsla(224, 20%, 16%, 0.85);
+		--bg-transcluscent-alt: hsla(226, 79%, 70%, 0.8);
+		
+		--text-main: hsl(227, 80%, 95%);
+		
+		--bg-image: url('{% image_urlpass "images/clouds-night.png" %}');
+	}
+	
+	a { color: #7c7cff; }
+	a:active { color: #ee0000; }
+	a:not(.nav):not(.bigbutton):visited { color: hsl(296, 84%, 75%); }
+}
+
+/* rem is relative to the html element, and em is relative to the current element. */
+html { font-size: 100%; scroll-behavior: smooth; }
+
+body
+{
+	margin: 0;
+	font-family: sans-serif; /* Serif is awful :( */
+	
+	background: var(--bg-image) center / cover fixed,
+		var(--bg-main); /* Don't forget to update the @page one too for paged media */
+	color: var(--text-main);
+}
+
+title { string-set: page-title content(text); }
+
+/* Special tweaks for paged media (e.g. PDFs) */
+@page {
+	font-family: sans-serif;
+	background: var(--bg-main); /* Set the background colour to cover the whole page */
+	
+	@top-right {
+		content: "By Starbeamrainbowlabs";
+		opacity: 0.6;
+	}
+	@bottom-right {
+		content: "Page " counter(page) " of " counter(pages);
+		opacity: 0.6;
+	}
+}
+h1, h2, h3, h4, h5, h6 {
+	text-align: center;
+	word-wrap: break-word;
+}
+
+.linked-section-heading {
+	display: flex;
+}
+.linked-section-heading > a.section-link {
+	opacity: 0.75;
+	text-decoration: none;
+	transition: 0.25s opacity;
+}
+.linked-section-heading > a.section-link:hover {
+	opacity: 1;
+}
+.linked-section-heading > span.title {
+	flex: 1;
+	word-wrap: anywhere;
+}
+.linked-section-heading > span.category {
+	font-size: 0.75em;
+	border-radius: 1em;
+	background: var(--cat-colour);
+	padding: 0 0.5em;
+	line-height: 1.5;
+	align-self: flex-start;
+}
+h3 {
+	margin-top: 2em;
+	padding-bottom: 0.2em;
+	border-bottom: 0.1em solid var(--cat-colour);
+}
+h3, h3 > code {
+	font-size: 1.1em;
+	text-align: left;
+}
+h3 > code {
+	background: transparent;
+}
+
+nav {
+	background: var(--bg-bright);
+	display: flex;
+	align-items: baseline;
+	font-size: 1.1em;
+	margin: 0;
+}
+nav h1 {
+	background: var(--text-bright);
+	margin: 0;
+	padding: 0.2em 0.5em 0.2em 0.2em;
+	font-size: 1.2em;
+	color: var(--bg-alt);
+}
+nav ul {
+	flex: 1;
+	list-style-type: none;
+	margin: 0; padding: 0;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+nav > ul a {
+	background: var(--bg-transcluscent-slight);
+	display: inline-block;
+	padding: 1.45em 2em;
+	text-decoration: none;
+	font-weight: bold;
+	color: var(--text-main);
+}
+nav li[aria-current=page] a {
+	color: var(--bg-bright);
+	background: var(--text-main);
+}
+
+nav a.image {
+	padding: 0.75em 1em 0.5em 1em;
+}
+nav img { max-height: 2em; }
+
+
+/* A small tweak to things more responsive */
+iframe, object, embed, img, table
+{
+	max-width: 100%;
+}
+picture img { height: initial; }
+
+/* Turn the user's cursor into a hand when over things they can click */
+button, summary
+{
+	cursor: pointer;
+}
+
+th, td
+{
+	margin: 4px 6px;
+	padding: 4px 6px;
+}
+
+a { font-weight: bold; }
+/* a:not(.nav) { color: hsl(208, 67%, 40%); }
+a:not(.nav):hover { color: hsl(214, 67%, 50%); }
+a:not(.nav):active, a:focus { color: hsl(214, 87%, 60%); } */
+a:not(.nav):not(.bigbutton):visited { color: hsl(240, 77%, 60%); }
+pre {
+	page-break-inside: avoid;
+	break-inside: avoid;
+	padding: 0.6em;
+	border: 0.2em solid var(--bg-transcluscent-alt);
+	border-radius: 0.25em;
+	background: var(--bg-transcluscent-alt);
+	box-shadow: inset 0 0 0.5em 0.1em var(--shadow-dark);
+	line-height: 1.75em;
+	color: var(--text-bright);
+}
+pre, code {
+	text-align: left;
+	font-size: 1rem;
+	font-family: "Source Code Pro", "Ubuntu Mono", monospace;
+	white-space: pre-wrap;
+	-moz-tab-size: 4;
+	tab-size: 4;
+}
+pre > code { background: transparent; padding: 0; }
+code {
+	background: var(--bg-transcluscent-alt-slight);
+	border-radius: 0.25em;
+	padding: 0.15em;
+}
+/* pre.language-weacmd {
+	background: var(--bg-transcluscent-alt-vdark);
+} */
+
+label {
+	font-weight: bold;
+	cursor: pointer;
+	padding: 0.25em 0.45em;
+}
+
+
+/* todo add the rest of the textbox like inputs here */
+input[type=text], input[type=number], textarea
+{
+	margin: 3px 5px;
+	padding: 5px 8px;
+	
+	background: var(--bg-bright);
+	border: 0;
+	border-radius: 5px;
+}
+
+.form-item {
+	display: flex;
+	margin: 0.5em 0;
+}
+.form-item.checkbox:not(.centre) > label { flex: 1; }
+.form-item:not(.checkbox):not(.centre) > input { flex: 1; }
+.form-item.centre { justify-content: center; }
+.bigsearch {
+	flex-direction: row;
+}
+.bigsearch > input[type=search] {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+footer {
+	margin: 3em 0 0 0;
+	padding: 1em;
+	text-align: center;
+	background: var(--pattern-jigsaw-green),
+		var(--bg-bright);
+	/* color: var(--text-bright); */
+}
+
+.text-left		{ text-align: left;		}
+.text-centre	{ text-align: center;	}
+.text-right		{ text-align: right;	}
+
+.invisilink		{ text-decoration: none; color: inherit;			}
+.invisilist		{ list-style-type: none; margin: 5px; padding: 5px; }
+
+.icon			{ vertical-align: middle;					}
+.icon.tiny		{ max-width: 1em; max-height: 1em;			}
+.icon.small		{ max-width: 1.25em; max-height: 1.25em;	}
+.icon.medium	{ max-width: 2em; max-height: 2em;			}
+.icon.large		{ max-width: 5em; max-height: 5em;			}
+.icon.logo		{
+	max-width: 3em;
+	max-height: 3em;
+}
+.icon.logo-large {
+	max-width: 8em;
+	max-height: 8em;
+}
+
+.shadow-top		{ box-shadow: 0 -0.25em	0.5em			var(--shadow);	}
+.shadow-bottom	{ box-shadow: 0 0.25em	0.5em			var(--shadow);	}
+.shadow-vertical{ box-shadow: 0 0		0.5em	0.25em	var(--shadow);	}
+.shadow-text	{ text-shadow: 0.15em 0.15em 0.15em		var(--shadow);	}
+
+.hidden			{ display: none;							}
+
+.bigbox {
+	display: flex;
+	flex-direction: column;
+	align-items: center; justify-content: center;
+	text-align: center; /* If any text wraps in a <p>, then this makes sure it's still centred */
+	background: content-box linear-gradient(var(--bg-transcluscent), var(--bg-transcluscent)),
+		var(--bg) center / cover;
+	
+	height: max(30em, 80vh);
+	padding: 0 5em 0 5em;
+	box-sizing: border-box;
+}
+.bigbox h1 {
+	margin: 0;
+	font-size: 3em;
+	/* color: var(--text-alt); */
+	color: var(--bg-alt);
+}
+
+.features-large {
+	margin: 3em 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+}
+.features-large > :where(figure, .features-item) {
+	background: var(--bg-transcluscent);
+	background-image: var(--pattern-bricks);
+	margin: 1em 0.1em;
+	padding: 1em;
+	max-width: 15em;
+	box-shadow: 0.25em 0.25em 0.5em var(--shadow);
+}
+.features-item.wide {
+	flex: 1;
+	max-width: initial;
+	margin: 0.5em 2em;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+/* .features-item.wide > :last-child {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    align-items: center;
+} */
+
+.panel-generic {
+	background: var(--bg-transcluscent);
+	background-image: var(--pattern-bricks);
+	margin: 2em;
+	padding: 1em;
+	box-shadow: 0.25em 0.25em 0.5em var(--shadow);
+}
+
+.bigbutton-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 1em 0;
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+}
+
+.bigbutton {
+	display: inline-block;
+	
+	margin: 0.25em 0;
+	padding: 0.35em 0.45em;
+	border: 0;
+	border-radius: 0.25em;
+	
+	background: var(--bg-alt);
+	
+	color: var(--text-bright);
+	font-size: 1.25em;
+	text-decoration: none;
+	text-align: center;
+	
+	box-shadow: 0 0 0.5em var(--shadow);
+	
+	cursor: pointer;
+	transition: box-shadow 0.25s, transform 0.25s;
+}
+.bigbutton:hover {
+	box-shadow: 0 0.25em 0.65em var(--shadow);
+	transform: translateY(-0.25em);
+}
+.bigbutton:active {
+	box-shadow: 0 0 0.25em var(--shadow);
+	transform: translateY(0.1em);
+}
+.bigbutton.disabled {
+	filter: saturate(25%);
+	opacity: 0.75;
+	cursor: default;
+}
+
+.gallerybox {
+	background: var(--pattern-hex), var(--bg-transcluscent);
+}
+
+.command-ordering-tabs {
+	display: flex;
+	gap: 1em;
+	margin-bottom: 2em;
+}
+.command-ordering-tabs button {
+	flex: 1;
+	font-size: 1.1em;
+	padding: 0.5em;
+}
+.command-ordering-tabs button.active { font-weight: bold; }
+
+.command-list {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	word-wrap: anywhere;
+}
+.command-list > li > a {
+	text-decoration: none;
+}
+.command-list.coloured code { background: var(--cat-colour); }
+.command-list code {
+	display: block;
+	padding: 0.5em;
+	box-sizing: border-box;
+	margin: 0.5em 0;
+}
+
+.filterable {
+	border: 0.2em solid var(--cat-colour);
+}
+
+
+.contributor-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+.contributor-list li {
+	padding: 0.5em;
+}
+.contributor-list a {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+@keyframes move-diagonal {
+	from {
+		background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+	}
+	to {
+		background-position: -52px -52px, -52px -52px, -51px -51px, -51px -51px;
+	}
+}
+
+
+#dropzone {
+	border: 0.3em dashed #aaaaaa;
+	transition: border 0.2s;
+	justify-content: flex-start;
+}
+#dropzone.dropzone-active {
+	border: 0.3em dashed hsl(203, 79%, 55%);
+	
+	/* Ref https://www.magicpattern.design/tools/css-backgrounds */
+	background-image:  linear-gradient(var(--bg-bright) 2px, transparent 2px), linear-gradient(90deg, var(--bg-bright) 2px, transparent 2px), linear-gradient(var(--bg-bright) 1px, transparent 1px), linear-gradient(90deg, var(--bg-bright) 1px, var(--bg-transcluscent) 1px);
+	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+	
+	animation: move-diagonal 5s linear infinite;
+}
+#brushimg-preview { flex: 1; }

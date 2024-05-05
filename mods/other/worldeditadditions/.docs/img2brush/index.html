@@ -1,0 +1,44 @@
+---
+layout: theme.njk
+title: Image to brush converter
+---
+
+<section class="panel-generic">
+	<h1>Image to sculpting brush converter</h1>
+	
+	<p>Convert any image to a sculpting brush here!</p>
+	<p>
+		<strong>Use this channel to convert:</strong>
+		<select name="img2brush-channel" id="img2brush-channel">
+			<option value="alpha" selected>Alpha (opacity)</option>
+			<option value="red">Red</option>
+			<option value="green">Green</option>
+			<option value="blue">Blue</option>
+		</select> 
+	</p>
+	<p>Only the selected channel is used to determine the weight of the brush - <strong>all other channels are ignored</strong>! Change the channel option <strong>before</strong> you drag + drop the image onto this page.</p>
+</section>
+
+<section id="dropzone" class="bigbox panel-generic">
+	<h2>Input</h2>
+	<p>Drop your image here.</p>
+	
+	<img id="brushimg-preview" alt="" />
+	
+	<output id="brushimg-stats"></output>
+</section>
+
+
+<section class="panel-generic">
+	<h2>Output</h2>
+	
+	<p>Paste the output below into a text file in <code>worldeditadditions/lib/sculpt/brushes</code> with the file extension <code>.brush.tsv</code> and restart your Minetest server for the brush to be recognised.</p>
+	
+	<p class="text-centre">
+		<button id="brushimg-copy" class="bigbutton">Copy</button>
+	</p>
+	
+	<pre><output id="brushimg-tsv"><em>(your output will appear here as soon as you drop an image above)</em></output></pre>
+</section>
+
+<script src="./img2brush.js"></script>

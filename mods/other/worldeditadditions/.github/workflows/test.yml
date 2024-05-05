@@ -1,0 +1,52 @@
+name: "CI Tests"
+on: [push]
+jobs:
+  Syntax-Check:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the git repo
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install apt dependencies
+        run: sudo apt-get --quiet install lua5.1
+      
+      - name: Environment info
+        run: uname -a; lua -v
+        
+      - name: Perform Check
+        run: find . -type f -name '*.lua' -not -path '*luarocks*' -not -path '*.git/*' -print0 | xargs -0 -n1 -P "$(nproc)" luac -p;
+  Busted:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the git repo
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install apt dependencies
+        run: sudo apt-get --quiet install lua5.1 luarocks
+      
+      - name: Environment info
+        run: uname -a; lua -v
+        
+      - name: Set up tests
+        run: ./tests.sh run
+        
+      - name: Run Tests
+        run: ./tests.sh run
+  LuaCheck:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the git repo
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install apt dependencies
+        run: sudo apt-get --quiet install lua5.1 lua-check
+      
+      - name: Environment info
+        run: uname -a; lua -v
+      
+      - name: Run luacheck
+        run: luacheck .
+      

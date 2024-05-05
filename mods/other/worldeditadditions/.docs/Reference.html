@@ -1,0 +1,220 @@
+<main>
+	<section class="panel-generic">
+		<h1 id="#reference">Reference</h1>
+		<p>This is the full chat command reference for WorldEditAdditions. It has 2 parts:</p>
+		
+		<ol>
+			<li>A contents list of commands and their syntax</li>
+			<li>A full reference, with detailed explanations for each command</li>
+		</ol>
+		
+		<p>There is also a <a href="#filter">filter box</a> for filtering everything to quickly find the one you're after.</p>
+		
+	</section>
+	
+	<section id="filter" class="panel-generic">
+		<div class="form-item bigsearch">
+			<label for="input-filter">Filter:</label>
+			<input type="search" id="input-filter" placeholder="Start typing to filter." autofocus />
+		</div>
+		<div class="form-item centre checkbox">
+			<input type="checkbox" id="input-searchall" />
+			<label for="input-searchall" title="If unchecked, only the title will be searched.">Search content</label>
+		</div>
+	</section>
+	
+	<section class="panel-generic">
+		<h2 id="contents" class="linked-section-heading">
+			<a class="section-link" href="#{{ section.slug }}">&#x1f517; <!-- Link Symbol --></a>
+			<span class="title">Contents</span>
+		</h2>
+		<div class="command-ordering-tabs">
+			<button class="active" data-mode="alphabetical">Alphabetical</button>
+			<button data-mode="categorical">Categorical</button>
+		</div>
+		<input type="hidden" id="category-names" value="{{ categories }}" />
+		<div class="command-container">
+			<h3>Alphabetical</h3>
+			<ul class="command-list">
+				{% for section in sections_help %}
+				<li data-filtermode-force="all" data-category="{{ section.category }}" style="--cat-colour: {{ section.category_colour }};"><a href="#{{ section.slug }}">
+					<code>{{ section.title }}</code>
+				</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</section>
+	
+	<script>
+		function search_text(query, text) {
+			return text.toLocaleLowerCase().includes(query);
+		}
+		
+		function handle_display_mode(event) {
+			set_display_mode(event.target.dataset.mode);
+			
+			localStorage.setItem("commandlist-displaymode", event.target.dataset.mode);
+		}
+		
+		function sort_command_list(list) {
+			list.sort((a, b) =>
+				a.querySelector("a").href.localeCompare(b.querySelector("a").href))
+		}
+		function nodelist2array(list) {
+			const result = [];
+			for(let i = 0; i < list.length; i++) result.push(list[i]);
+			return result;
+		}
+		
+		function set_display_mode(mode) {
+			console.info(`SET DISPLAYMODE ${mode}`)
+			
+			const commands = nodelist2array(document.querySelectorAll(`.command-list li`));
+			const container = document.querySelector(`.command-container`);
+			
+			switch(mode) {
+				case "categorical":
+					const sections = Object.create(null);
+					for(const command of [...commands]) {
+						const cat = command.dataset.category;
+						if(!(sections[cat] instanceof Array))
+							sections[cat] = [];
+						sections[cat].push(command);
+					}
+					
+					const section_names = document.querySelector("#category-names").value
+						.split("|");
+					
+					const fragment = new DocumentFragment();
+					
+					for(const section_name of section_names) {
+						sort_command_list(sections[section_name]);
+						
+						const header = document.createElement("h3");
+						header.appendChild(document.createTextNode(section_name));
+						fragment.appendChild(header);
+						const list = document.createElement("ul");
+						list.classList.add("command-list", "coloured");
+						for(const item of sections[section_name])
+							list.appendChild(item);
+						fragment.appendChild(list);
+					}
+					container.replaceChildren(fragment);
+					break;
+				
+				case "alphabetical":
+					const alpha_fragment = new DocumentFragment();
+					const alpha_header = document.createElement("h3");
+					alpha_header.appendChild(document.createTextNode("Alphabetical"));
+					alpha_fragment.appendChild(alpha_header);
+					const alpha_list = document.createElement("ul");
+					alpha_list.classList.add("command-list");
+					alpha_list.classList.add("command-alpha_list");
+					sort_command_list(commands);
+					for(let i = 0; i < commands.length; i++)
+						alpha_list.appendChild(commands[i]);
+					alpha_fragment.appendChild(alpha_list);
+					container.replaceChildren(alpha_fragment);
+					break;
+			}
+			
+			const el_alpha = document.querySelector(".command-ordering-tabs [data-mode=alphabetical]");
+			const el_cats = document.querySelector(".command-ordering-tabs [data-mode=categorical]");
+			
+			el_alpha.classList.toggle("active");
+			el_cats.classList.toggle("active");
+		}
+		
+		function do_filter() {
+			let el_search = document.querySelector("#input-filter");
+			let el_searchall = document.querySelector("#input-searchall");
+			localStorage.setItem("commandlist-searchall", el_searchall.checked);
+			/* Filterable items
+			 - Sections
+			 - Commands in the command list
+			 */
+			let els_filterable = document.querySelectorAll("section.filterable, .command-list > li");
+			
+			let query = el_search.value.toLocaleLowerCase();
+			
+			let mode = el_searchall.checked ? "all" : "header";
+			console.log(`SEARCH | mode`, mode, `query`, query);
+			
+			for(let i = 0; i < els_filterable.length; i++) {
+				let el_next = els_filterable[i];
+				
+				let mode_this = mode;
+				if(typeof el_next.dataset.filtermodeForce == "string")
+					mode_this = el_next.dataset.filtermodeForce;
+				
+				let show = true;
+				if(query.length > 0) {
+					switch(mode_this) {
+						case "all":
+							show = search_text(query,
+								el_next.textContent + ` ` + el_next.dataset.category
+							);
+							break;
+						case "header":
+							show = search_text(query,
+								el_next.querySelector(".linked-section-heading").textContent
+							);
+							break;
+					}
+				}
+				
+				el_next.classList.remove("visible", "hidden");
+				el_next.classList.add(show ? "visible" : "hidden");
+			}
+			
+			let commandlist_is_categorical = document.querySelector("button.active[data-mode=categorical]") !== null;
+			if(commandlist_is_categorical) {
+				let container = document.querySelector(".command-container");
+				for(let i = 0; i < container.children.length; i++) {
+					if(container.children[i].nodeName.toLowerCase() === "ul") {
+						let class_name = "visible";
+						if(container.children[i].querySelector("li.visible") === null)
+							class_name = "hidden";
+						if(i > 0) {
+							container.children[i-1].classList.remove("visible", "hidden");
+							container.children[i-1].classList.add(class_name);
+						}
+					}
+				}
+			}
+		}
+		
+		window.addEventListener("load", (_event) => {
+			let el_search = document.querySelector("#input-filter");
+			let el_searchall = document.querySelector("#input-searchall");
+			let els_cats = document.querySelectorAll(".command-ordering-tabs button");
+			
+			el_search.addEventListener("input", do_filter);
+			el_search.addEventListener("search", do_filter);
+			el_searchall.addEventListener("change", do_filter);
+			
+			for(let i = 0; i < els_cats.length; i++) {
+				els_cats[i].addEventListener("click", handle_display_mode);
+				els_cats[i].addEventListener("touchend", handle_display_mode);
+			}
+			
+			if(localStorage.getItem("commandlist-searchall") !== null)
+				el_searchall.checked = localStorage.getItem("commandlist-searchall") === "true";
+			
+			if(localStorage.getItem("commandlist-displaymode") !== null)
+				set_display_mode(localStorage.getItem("commandlist-displaymode"))
+		});
+	</script>
+	
+	{% for section in sections_help %}
+		<section class="panel-generic filterable" style="--cat-colour: {{ section.category_colour_dark }};">
+			<h2 id="{{ section.slug }}" class="linked-section-heading">
+				<a class="section-link" href="#{{ section.slug }}">&#x1f517; <!-- Link Symbol --></a>
+				<span class="title">{{ section.title }}</span>
+				<span class="category">{{ section.category }}</span>
+			</h2>
+			
+			{{ section.content }}
+		</section>
+	{% endfor %}
+</main>
