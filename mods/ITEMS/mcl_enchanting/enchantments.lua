@@ -10,6 +10,145 @@ local function increase_damage(damage_group, factor)
 	end
 end
 
+mcl_enchanting.enchantments.drill = {
+	name = S("Drill"),
+	max_level = 1,
+	primary = {pickaxe = true, shovel = true, axe = true, hoe = true},
+	secondary = {shears = true},
+	disallow = {},
+	incompatible = {},
+	weight = 5,
+	description = S("Increases digging range."),
+	curse = false,
+	on_enchant = function() end,
+	requires_tool = false,
+	treasure = true,
+	power_range_table = {{15, 61}},
+	inv_combat_tab = false,
+	inv_tool_tab = true,
+}
+
+steelHammerDigs={}
+minetest.register_on_dignode(
+  function(pos, oldnode, digger)
+    if digger == nil then return end 
+	local wielded = digger:get_wielded_item()
+	if digger:get_player_control().sneak or wielded:get_name() == ":" or mcl_enchanting.get_enchantment(wielded, "drill") < 1 then return end
+    local playerName = digger:get_player_name()
+    if playerName == ""  or steelHammerDigs[playerName] then return end
+    steelHammerDigs[playerName] = true
+    local posDiff = pos.y - digger:get_pos().y
+	local node
+    if(posDiff < 2 and posDiff > 1) then
+      if
+        digger:get_look_horizontal() > math.pi / 4 and digger:get_look_horizontal() < 3 * math.pi / 4 or
+        digger:get_look_horizontal() > 5 * math.pi / 4 and digger:get_look_horizontal() < 7 * math.pi / 4
+      then
+        pos.y = pos.y -1
+        pos.z = pos.z -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end end
+
+        pos.y = pos.y +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.z = pos.z +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.z = pos.z +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.z = pos.z -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+      else
+        pos.y = pos.y -1
+        pos.x = pos.x -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.x = pos.x +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.x = pos.x +1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.y = pos.y -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+        pos.x = pos.x -1
+		node = minetest.get_node(pos)
+        if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+      end
+    else
+      pos.x = pos.x -1
+      pos.z = pos.z -1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.x = pos.x +1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.x = pos.x +1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.z = pos.z +1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.z = pos.z +1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.x = pos.x -1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.x = pos.x -1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+      pos.z = pos.z -1
+	  node = minetest.get_node(pos)
+      if node.name ~= "mcl_core:bedrock" then minetest.node_dig(pos, minetest.get_node(pos), digger) end
+
+    end
+    steelHammerDigs[playerName] = nil
+  end
+)
+
 -- implemented via on_enchant and additions in mobs_mc; Slowness IV part unimplemented
 mcl_enchanting.enchantments.bane_of_arthropods = {
 	name = S("Bane of Arthropods"),
