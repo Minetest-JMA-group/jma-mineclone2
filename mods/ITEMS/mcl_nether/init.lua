@@ -407,7 +407,7 @@ minetest.register_craft({
 	output = "mcl_nether:netherite_ingot 9",
 	recipe = {
 		{"mcl_nether:netheriteblock", "", ""},
-		{"", "", ""}
+		{"", "", ""},
 		{"", "", ""}
 	}
 })
