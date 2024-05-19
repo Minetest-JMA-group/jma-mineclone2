@@ -1,39 +1,42 @@
 local EF = {}
-EF.invisible = {}
-EF.poisoned = {}
-EF.regenerating = {}
-EF.strong = {}
-EF.weak = {}
+EF.invisibility = {}
+EF.poisoning = {}
+EF.regeneration = {}
+EF.strength = {}
+EF.weakness = {}
 EF.water_breathing = {}
 EF.leaping = {}
-EF.swift = {} -- for swiftness AND slowness
+EF.swiftness = {}
+EF.slowness = {}
 EF.night_vision = {}
-EF.fire_proof = {}
+EF.fire_resistance = {}
 EF.bad_omen = {}
+EF.slow_falling = {}
 EF.withering = {}
+EF.resistance = {}
 
-local EFFECT_TYPES = 0
-for _,_ in pairs(EF) do
-	EFFECT_TYPES = EFFECT_TYPES + 1
-end
+local EFFECT_TYPES = 13
 
 local icon_ids = {}
 
 local function potions_set_hudbar(player)
-	if EF.withering[player] and EF.regenerating[player] then
-		hb.change_hudbar(player, "health", nil, nil, "mcl_potions_icon_regen_wither.png", nil, "hudbars_bar_health.png")
-	elseif EF.withering[player] then
-		hb.change_hudbar(player, "health", nil, nil, "mcl_potions_icon_wither.png", nil, "hudbars_bar_health.png")
-	elseif EF.poisoned[player] and EF.regenerating[player] then
-		hb.change_hudbar(player, "health", nil, nil, "hbhunger_icon_regen_poison.png", nil, "hudbars_bar_health.png")
-	elseif EF.poisoned[player] then
-		hb.change_hudbar(player, "health", nil, nil, "hbhunger_icon_health_poison.png", nil, "hudbars_bar_health.png")
-	elseif EF.regenerating[player] then
-		hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_regenerate.png", nil, "hudbars_bar_health.png")
+	if EF.regeneration[player] then
+		if EF.poisoning[player] then
+			hb.change_hudbar(player, "health", nil, nil, "hbhunger_icon_regen_poison.png", nil, "hudbars_bar_health.png")
+		elseif EF.withering[player] then
+			hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_regen_withering.png", nil, "hudbars_bar_health.png")
+		else
+			hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_regenerate.png", nil, "hudbars_bar_health.png")
+		end
 	else
-		hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_health.png", nil, "hudbars_bar_health.png")
+		if EF.poisoning[player] then 
+			hb.change_hudbar(player, "health", nil, nil, "hbhunger_icon_health_poison.png", nil, "hudbars_bar_health.png")
+		elseif EF.withering[player] then
+			hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_withering.png", nil, "hudbars_bar_health.png")
+		else
+			hb.change_hudbar(player, "health", nil, nil, "hudbars_icon_health.png", nil, "hudbars_bar_health.png")
+		end
 	end
-
 end
 
 local function potions_init_icons(player)
@@ -41,7 +44,7 @@ local function potions_init_icons(player)
 	icon_ids[name] = {}
 	for e=1, EFFECT_TYPES do
 		local x = -52 * e - 2
-		local id = player:hud_add({
+		local icon = player:hud_add({
 			hud_elem_type = "image",
 			text = "blank.png",
 			position = { x = 1, y = 0 },
@@ -50,8 +53,22 @@ local function potions_init_icons(player)
 			alignment = { x = 1, y = 1 },
 			z_index = 100,
 		})
-		table.insert(icon_ids[name], id)
+		local timer = player:hud_add({
+			hud_elem_type = "text",
+			text = "",
+			number=0xFFFFFF,
+			position = { x = 1, y = 0 },
+			offset = { x = x+3.75, y = 45 },
+			scale = { x = 0.375, y = 0.375},
+			alignment = { x = 1, y = 1 },
+			z_index = 100,
+		})
+		table.insert(icon_ids[name], {icon, timer})
 	end
+end
+
+local function _ParseTime(total, gone)
+	return os.date("%X", total-gone):sub(4)
 end
 
 local function potions_set_icons(player)
@@ -67,15 +84,18 @@ local function potions_set_icons(player)
 	end
 
 	for i=1, EFFECT_TYPES do
-		local icon = icon_ids[name][i]
+		local icon, timer = unpack(icon_ids[name][i])
 		local effect_name = active_effects[i]
-		if effect_name == "swift" and EF.swift[player].is_slow then
-			effect_name = "slow"
+		if effect_name == "swiftness" and EF.swiftness[player].is_slow then
+			effect_name = "slowness"
 		end
 		if effect_name == nil then
 			player:hud_change(icon, "text", "blank.png")
+			player:hud_change(timer, "text", "")
 		else
-			player:hud_change(icon, "text", "mcl_potions_effect_"..effect_name..".png^[resize:128x128")
+			player:hud_change(icon, "text", "mcl_potions_"..effect_name..".png^[resize:128x128")
+			local data = EF[effect_name][player]
+			player:hud_change(timer, "text", _ParseTime(data.dur, data.timer))
 		end
 	end
 
@@ -104,119 +124,98 @@ end
 -- ░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝
 
 local is_player, entity, meta
-
+local timer = 0
 minetest.register_globalstep(function(dtime)
 
 	-- Check for invisible players
-	for player, vals in pairs(EF.invisible) do
+	for player, vals in pairs(EF.invisibility) do
 
-		EF.invisible[player].timer = EF.invisible[player].timer + dtime
+		EF.invisibility[player].timer = EF.invisibility[player].timer + dtime
 
 		if player:get_pos() then mcl_potions._add_spawner(player, "#7F8392") end
 
-		if EF.invisible[player].timer >= EF.invisible[player].dur then
+		if EF.invisibility[player].timer >= EF.invisibility[player].dur then
 			mcl_potions.make_invisible(player, false)
-			EF.invisible[player] = nil
+			EF.invisibility[player] = nil
 			if player:is_player() then
 				meta = player:get_meta()
-				meta:set_string("_is_invisible", minetest.serialize(EF.invisible[player]))
+				meta:set_string("_has_invisibility", minetest.serialize(EF.invisibility[player]))
 			end
-			potions_set_hud(player)
-
 		end
-
 	end
 
-	-- Check for withering players
-	for player, vals in pairs(EF.withering) do
-
-		is_player = player:is_player()
-		entity = player:get_luaentity()
-
-		EF.withering[player].timer = EF.withering[player].timer + dtime
-		EF.withering[player].hit_timer = (EF.withering[player].hit_timer or 0) + dtime
-
-		if player:get_pos() then mcl_potions._add_spawner(player, "#000000") end
-
-		if EF.withering[player].hit_timer >= EF.withering[player].step then
-			if is_player or entity then mcl_util.deal_damage(player, 1, {type = "magic"}) end
-			if EF.withering[player] then EF.withering[player].hit_timer = 0 end
-		end
-
-		if EF.withering[player] and EF.withering[player].timer >= EF.withering[player].dur then
-			EF.withering[player] = nil
-			if is_player then
-				meta = player:get_meta()
-				meta:set_string("_is_withering", minetest.serialize(EF.withering[player]))
-				potions_set_hud(player)
+	-- Check for resistant players
+	for player, vals in pairs(EF.resistance) do
+		EF.resistance[player].timer = EF.resistance[player].timer + dtime
+		if player:get_pos() then mcl_potions._add_spawner(player, "#7F8392") end
+		if EF.resistance[player].timer >= EF.resistance[player].dur then
+			EF.resistance[player] = nil
+			if player:is_player() then
+				player:get_meta():set_string("_has_resistance", {})
 			end
 		end
-
 	end
 
 	-- Check for poisoned players
-	for player, vals in pairs(EF.poisoned) do
+	for player, vals in pairs(EF.poisoning) do
 
 		is_player = player:is_player()
 		entity = player:get_luaentity()
 
-		EF.poisoned[player].timer = EF.poisoned[player].timer + dtime
-		EF.poisoned[player].hit_timer = (EF.poisoned[player].hit_timer or 0) + dtime
+		EF.poisoning[player].timer = EF.poisoning[player].timer + dtime
+		EF.poisoning[player].hit_timer = (EF.poisoning[player].hit_timer or 0) + dtime
 
 		if player:get_pos() then mcl_potions._add_spawner(player, "#4E9331") end
 
-		if EF.poisoned[player].hit_timer >= EF.poisoned[player].step then
+		if EF.poisoning[player].hit_timer >= EF.poisoning[player].step then
 			if mcl_util.get_hp(player) - 1 > 0 then
 				mcl_util.deal_damage(player, 1, {type = "magic"})
 			end
-			EF.poisoned[player].hit_timer = 0
+			EF.poisoning[player].hit_timer = 0
 		end
 
-		if EF.poisoned[player] and EF.poisoned[player].timer >= EF.poisoned[player].dur then
-			EF.poisoned[player] = nil
+		if EF.poisoning[player] and EF.poisoning[player].timer >= EF.poisoning[player].dur then
+			EF.poisoning[player] = nil
 			if is_player then
 				meta = player:get_meta()
-				meta:set_string("_is_poisoned", minetest.serialize(EF.poisoned[player]))
-				potions_set_hud(player)
+				meta:set_string("_has_poisoning", minetest.serialize(EF.poisoning[player]))
 			end
 		end
 
 	end
 
-	-- Check for regenerating players
-	for player, vals in pairs(EF.regenerating) do
+	-- Check for regnerating players
+	for player, vals in pairs(EF.regeneration) do
 
 		is_player = player:is_player()
 		entity = player:get_luaentity()
 
-		EF.regenerating[player].timer = EF.regenerating[player].timer + dtime
-		EF.regenerating[player].heal_timer = (EF.regenerating[player].heal_timer or 0) + dtime
+		EF.regeneration[player].timer = EF.regeneration[player].timer + dtime
+		EF.regeneration[player].heal_timer = (EF.regeneration[player].heal_timer or 0) + dtime
 
 		if player:get_pos() then mcl_potions._add_spawner(player, "#CD5CAB") end
 
-		if EF.regenerating[player].heal_timer >= EF.regenerating[player].step then
+		if EF.regeneration[player].heal_timer >= EF.regeneration[player].step then
 
 			if is_player then
 				player:set_hp(math.min(player:get_properties().hp_max or 20, player:get_hp() + 1), { type = "set_hp", other = "regeneration" })
-				EF.regenerating[player].heal_timer = 0
+				EF.regeneration[player].heal_timer = 0
 			elseif entity and entity.is_mob then
 				entity.health = math.min(entity.hp_max, entity.health + 1)
-				EF.regenerating[player].heal_timer = 0
+				EF.regeneration[player].heal_timer = 0
 			else -- stop regenerating if not a player or mob
-				EF.regenerating[player] = nil
+				EF.regeneration[player] = nil
 			end
 
 		end
 
-		if EF.regenerating[player] and EF.regenerating[player].timer >= EF.regenerating[player].dur then
-			EF.regenerating[player] = nil
+		if EF.regeneration[player] and EF.regeneration[player].timer >= EF.regeneration[player].dur then
+			EF.regeneration[player] = nil
 			if is_player then
 				meta = player:get_meta()
-				meta:set_string("_is_regenerating", minetest.serialize(EF.regenerating[player]))
-				potions_set_hud(player)
+				meta:set_string("_has_regeneration", minetest.serialize(EF.regeneration[player]))
 			end
 		end
-
 	end
 
 	-- Check for water breathing players
@@ -235,11 +234,9 @@ minetest.register_globalstep(function(dtime)
 
 			if EF.water_breathing[player].timer >= EF.water_breathing[player].dur then
 				meta = player:get_meta()
-				meta:set_string("_is_water_breathing", minetest.serialize(EF.water_breathing[player]))
+				meta:set_string("_has_water_breathing", minetest.serialize(EF.water_breathing[player]))
 				EF.water_breathing[player] = nil
 			end
-			potions_set_hud(player)
-
 		else
 			EF.water_breathing[player] = nil
 		end
@@ -259,10 +256,8 @@ minetest.register_globalstep(function(dtime)
 				playerphysics.remove_physics_factor(player, "jump", "mcl_potions:leaping")
 				EF.leaping[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_leaping", minetest.serialize(EF.leaping[player]))
+				meta:set_string("_has_leaping", minetest.serialize(EF.leaping[player]))
 			end
-			potions_set_hud(player)
-
 		else
 			EF.leaping[player] = nil
 		end
@@ -270,26 +265,51 @@ minetest.register_globalstep(function(dtime)
 	end
 
 	-- Check for swift players
-	for player, vals in pairs(EF.swift) do
-
+	for player, vals in pairs(EF.swiftness) do
 		if player:is_player() then
-
-			EF.swift[player].timer = EF.swift[player].timer + dtime
-
+			EF.swiftness[player].timer = EF.swiftness[player].timer + dtime
 			if player:get_pos() then mcl_potions._add_spawner(player, "#7CAFC6") end
-
-			if EF.swift[player].timer >= EF.swift[player].dur then
+			if EF.swiftness[player].timer >= EF.swiftness[player].dur then
 				playerphysics.remove_physics_factor(player, "speed", "mcl_potions:swiftness")
-				EF.swift[player] = nil
+				EF.swiftness[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_swift", minetest.serialize(EF.swift[player]))
+				meta:set_string("_has_swiftness", minetest.serialize(EF.swiftness[player]))
 			end
-			potions_set_hud(player)
-
 		else
-			EF.swift[player] = nil
+			EF.swiftness[player] = nil
 		end
+	end
 
+	-- Check for slow players
+	for player, _ in pairs(EF.slowness) do
+		if player:is_player() then
+			EF.slowness[player].timer = EF.slowness[player].timer + dtime
+			if player:get_pos() then mcl_potions._add_spawner(player, "#7CAFC6") end
+			if EF.slowness[player].timer >= EF.slowness[player].dur then
+				playerphysics.remove_physics_factor(player, "speed", "mcl_potions:swiftness")
+				EF.slowness[player] = nil
+				meta = player:get_meta()
+				meta:set_string("_has_slowness", minetest.serialize(EF.slowness[player]))
+			end
+		else
+			EF.slowness[player] = nil
+		end
+	end
+
+	-- Check for slow falling players
+	for player, vals in pairs(EF.slow_falling) do
+		if player:is_player() then
+			EF.slow_falling[player].timer = EF.slow_falling[player].timer + dtime
+			if player:get_pos() then mcl_potions._add_spawner(player, "#7CAFC6") end
+			if EF.slow_falling[player].timer >= EF.slow_falling[player].dur then
+				playerphysics.remove_physics_factor(player, "gravity", "mcl_potions:slow_falling")
+				EF.slow_falling[player] = nil
+				meta = player:get_meta()
+				meta:set_string("_has_slow_falling", minetest.serialize(EF.slow_falling[player]))
+			end
+		else
+			EF.slow_falling[player] = nil
+		end
 	end
 
 	-- Check for Night Vision equipped players
@@ -304,12 +324,10 @@ minetest.register_globalstep(function(dtime)
 			if EF.night_vision[player].timer >= EF.night_vision[player].dur then
 				EF.night_vision[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_cat", minetest.serialize(EF.night_vision[player]))
+				meta:set_string("_has_night_vision", minetest.serialize(EF.night_vision[player]))
 				meta:set_int("night_vision", 0)
 			end
 			mcl_weather.skycolor.update_sky_color({player})
-			potions_set_hud(player)
-
 		else
 			EF.night_vision[player] = nil
 		end
@@ -317,72 +335,90 @@ minetest.register_globalstep(function(dtime)
 	end
 
 	-- Check for Fire Proof players
-	for player, vals in pairs(EF.fire_proof) do
+	for player, vals in pairs(EF.fire_resistance) do
 
 		if player:is_player() then
 
 			player = player or player:get_luaentity()
 
-			EF.fire_proof[player].timer = EF.fire_proof[player].timer + dtime
+			EF.fire_resistance[player].timer = EF.fire_resistance[player].timer + dtime
 
 			if player:get_pos() then mcl_potions._add_spawner(player, "#E49A3A") end
 
-			if EF.fire_proof[player].timer >= EF.fire_proof[player].dur then
-				EF.fire_proof[player] = nil
+			if EF.fire_resistance[player].timer >= EF.fire_resistance[player].dur then
+				EF.fire_resistance[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_fire_proof", minetest.serialize(EF.fire_proof[player]))
+				meta:set_string("_has_fire_resistance", minetest.serialize(EF.fire_resistance[player]))
 			end
-			potions_set_hud(player)
-
 		else
-			EF.fire_proof[player] = nil
+			EF.fire_resistance[player] = nil
 		end
 
 	end
 
 	-- Check for Weak players
-	for player, vals in pairs(EF.weak) do
+	for player, vals in pairs(EF.weakness) do
 
 		if player:is_player() then
 
-			EF.weak[player].timer = EF.weak[player].timer + dtime
+			EF.weakness[player].timer = EF.weakness[player].timer + dtime
 
 			if player:get_pos() then mcl_potions._add_spawner(player, "#484D48") end
 
-			if EF.weak[player].timer >= EF.weak[player].dur then
-				EF.weak[player] = nil
+			if EF.weakness[player].timer >= EF.weakness[player].dur then
+				EF.weakness[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_weak", minetest.serialize(EF.weak[player]))
+				meta:set_string("_has_weakness", minetest.serialize(EF.weakness[player]))
 			end
-
 		else
-			EF.weak[player] = nil
+			EF.weakness[player] = nil
 		end
 
 	end
 
 	-- Check for Strong players
-	for player, vals in pairs(EF.strong) do
+	for player, vals in pairs(EF.strength) do
 
 		if player:is_player() then
 
-			EF.strong[player].timer = EF.strong[player].timer + dtime
+			EF.strength[player].timer = EF.strength[player].timer + dtime
 
 			if player:get_pos() then mcl_potions._add_spawner(player, "#932423") end
 
-			if EF.strong[player].timer >= EF.strong[player].dur then
-				EF.strong[player] = nil
+			if EF.strength[player].timer >= EF.strength[player].dur then
+				EF.strength[player] = nil
 				meta = player:get_meta()
-				meta:set_string("_is_strong", minetest.serialize(EF.strong[player]))
+				meta:set_string("_has_strength", minetest.serialize(EF.strength[player]))
 			end
 
 		else
-			EF.strong[player] = nil
+			EF.strength[player] = nil
 		end
 
 	end
 
-		-- Check for Bad Omen
+
+	-- Check for Withered players
+	for player, vals in pairs(EF.withering) do
+		is_player = player:is_player()
+		entity = player:get_luaentity()
+		EF.withering[player].timer = EF.withering[player].timer + dtime
+		EF.withering[player].hit_timer = (EF.withering[player].hit_timer or 0) + dtime
+		if player:get_pos() then mcl_potions._add_spawner(player, "#000000") end
+		if EF.withering[player].hit_timer >= EF.withering[player].step then
+			if is_player or entity then mcl_util.deal_damage(player, 1, {type = "magic"}) end
+			if EF.withering[player] then EF.withering[player].hit_timer = 0 end
+		end
+		if EF.withering[player].timer >= EF.withering[player].dur then
+			EF.withering[player] = nil
+			if is_player then
+				meta = player:get_meta()
+				meta:set_string("_is_withering", minetest.serialize(EF.withering[player]))
+			end
+		end
+	end
+
+	-- Check for Bad Omen
 	for player, vals in pairs(EF.bad_omen) do
 
 		is_player = player:is_player()
@@ -396,17 +432,23 @@ minetest.register_globalstep(function(dtime)
 			if is_player then
 				meta = player:get_meta()
 				meta:set_string("_has_bad_omen", minetest.serialize(EF.bad_omen[player]))
-				potions_set_hud(player)
 			end
 		end
 
 	end
-
+        
+    if timer > 22 then
+		for _, player in ipairs(minetest.get_connected_players()) do
+			potions_set_hud(player)
+		end
+		timer = 0
+	end
+	timer = timer + 1
 end)
 
 -- Prevent damage to player with Fire Resistance enabled
 mcl_damage.register_modifier(function(obj, damage, reason)
-	if EF.fire_proof[obj] and not reason.flags.bypasses_magic and reason.flags.is_fire then
+	if EF.fire_resistance[obj] and not reason.flags.bypasses_magic and reason.flags.is_fire then
 		return 0
 	end
 end, -50)
@@ -427,123 +469,44 @@ end, -50)
 -- ███████╗╚█████╔╝██║░░██║██████╔╝██╔╝░░░██████╔╝██║░░██║░░╚██╔╝░░███████╗
 -- ╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░╚═╝░░░░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
 
-function mcl_potions._clear_cached_player_data(player)
-	EF.invisible[player] = nil
-	EF.poisoned[player] = nil
-	EF.regenerating[player] = nil
-	EF.strong[player] = nil
-	EF.weak[player] = nil
-	EF.water_breathing[player] = nil
-	EF.leaping[player] = nil
-	EF.swift[player] = nil
-	EF.night_vision[player] = nil
-	EF.fire_proof[player] = nil
-	EF.bad_omen[player] = nil
-	EF.withering[player] = nil
+local effects_list = {"invisibility", "poisoning", "regeneration", "strength", "weakness", "water_breathing", "leaping", "swiftness", "night_vision", "fire_resistance", "bad_omen", "slow_falling", "resistance", "slowness"}
 
+function mcl_potions._clear_cached_player_data(player)
+	for _, effect in ipairs(effects_list) do
+		EF[effect][player] = nil
+	end
 	meta = player:get_meta()
 	meta:set_int("night_vision", 0)
 end
 
 function mcl_potions._reset_player_effects(player, set_hud)
-
-	if not player:is_player() then
-		return
-	end
-
+	if not player:is_player() then return end
 	mcl_potions.make_invisible(player, false)
-
 	playerphysics.remove_physics_factor(player, "jump", "mcl_potions:leaping")
-
 	playerphysics.remove_physics_factor(player, "speed", "mcl_potions:swiftness")
-
+	playerphysics.remove_physics_factor(player, "gravity", "mcl_potions:slow_falling")
 	mcl_weather.skycolor.update_sky_color({player})
-
 	mcl_potions._clear_cached_player_data(player)
-
-	if set_hud ~= false then
-		potions_set_hud(player)
-	end
 end
 
 function mcl_potions._save_player_effects(player)
-
-	if not player:is_player() then
-		return
-	end
+	if not player:is_player() then return end
 	meta = player:get_meta()
-
-	meta:set_string("_is_invisible", minetest.serialize(EF.invisible[player]))
-	meta:set_string("_is_poisoned", minetest.serialize(EF.poisoned[player]))
-	meta:set_string("_is_regenerating", minetest.serialize(EF.regenerating[player]))
-	meta:set_string("_is_strong", minetest.serialize(EF.strong[player]))
-	meta:set_string("_is_weak", minetest.serialize(EF.weak[player]))
-	meta:set_string("_is_water_breathing", minetest.serialize(EF.water_breathing[player]))
-	meta:set_string("_is_leaping", minetest.serialize(EF.leaping[player]))
-	meta:set_string("_is_swift", minetest.serialize(EF.swift[player]))
-	meta:set_string("_is_cat", minetest.serialize(EF.night_vision[player]))
-	meta:set_string("_is_fire_proof", minetest.serialize(EF.fire_proof[player]))
-	meta:set_string("_has_bad_omen", minetest.serialize(EF.bad_omen[player]))
-	meta:set_string("_is_withering", minetest.serialize(EF.withering[player]))
-
+	for _, effect in ipairs(effects_list) do
+		meta:set_string("_has_" .. effect, minetest.serialize(EF[effect][player]))
+	end
 end
 
 function mcl_potions._load_player_effects(player)
-
-	if not player:is_player() then
-		return
-	end
+	if not player:is_player() then return end
 	meta = player:get_meta()
-
-	if minetest.deserialize(meta:get_string("_is_invisible")) then
-		EF.invisible[player] = minetest.deserialize(meta:get_string("_is_invisible"))
-		mcl_potions.make_invisible(player, true)
+	for _, effect in ipairs(effects_list) do
+		local data = minetest.deserialize(meta:get_string("_has_" .. effect))
+		if data then
+			EF[effect][player] = data
+			if effect == "invisibility" then mcl_potions.make_invisible(player, true) end
+		end
 	end
-
-	if minetest.deserialize(meta:get_string("_is_poisoned")) then
-		EF.poisoned[player] = minetest.deserialize(meta:get_string("_is_poisoned"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_regenerating")) then
-		EF.regenerating[player] = minetest.deserialize(meta:get_string("_is_regenerating"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_strong")) then
-		EF.strong[player] = minetest.deserialize(meta:get_string("_is_strong"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_weak")) then
-		EF.weak[player] = minetest.deserialize(meta:get_string("_is_weak"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_water_breathing")) then
-		EF.water_breathing[player] = minetest.deserialize(meta:get_string("_is_water_breathing"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_leaping")) then
-		EF.leaping[player] = minetest.deserialize(meta:get_string("_is_leaping"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_swift")) then
-		EF.swift[player] = minetest.deserialize(meta:get_string("_is_swift"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_cat")) then
-		EF.night_vision[player] = minetest.deserialize(meta:get_string("_is_cat"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_fire_proof")) then
-		EF.fire_proof[player] = minetest.deserialize(meta:get_string("_is_fire_proof"))
-	end
-
-	if minetest.deserialize(meta:get_string("_has_bad_omen")) then
-		EF.bad_omen[player] = minetest.deserialize(meta:get_string("_has_bad_omen"))
-	end
-
-	if minetest.deserialize(meta:get_string("_is_withering")) then
-		EF.withering[player] = minetest.deserialize(meta:get_string("_is_withering"))
-	end
-
 end
 
 -- Returns true if player has given effect
@@ -566,15 +529,14 @@ function mcl_potions.player_clear_effect(player,effect)
 	potions_set_icons(player)
 end
 
-minetest.register_on_leaveplayer( function(player)
+minetest.register_on_leaveplayer(function(player)
 	mcl_potions._save_player_effects(player)
 	mcl_potions._clear_cached_player_data(player) -- clearout the buffer to prevent looking for a player not there
 	icon_ids[player:get_player_name()] = nil
 end)
 
-minetest.register_on_dieplayer( function(player)
+minetest.register_on_dieplayer(function(player)
 	mcl_potions._reset_player_effects(player)
-	potions_set_hud(player)
 end)
 
 minetest.register_on_joinplayer( function(player)
@@ -587,7 +549,6 @@ minetest.register_on_joinplayer( function(player)
 	-- FIXME: Remove minetest.after
 	minetest.after(3, function(player)
 		if player and player:is_player() then
-			potions_set_hud(player)
 		end
 	end, player)
 end)
@@ -636,23 +597,24 @@ function mcl_potions.is_obj_hit(self, pos)
 	return false
 end
 
-
 function mcl_potions.make_invisible(obj_ref, hide)
 	if obj_ref:is_player() then
 		if hide then
 			mcl_player.player_set_visibility(obj_ref, false)
-			obj_ref:set_nametag_attributes({ color = { a = 0 } })
+			obj_ref:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text=" "})
+            obj_ref:set_properties({show_on_minimap = false})
 		else
 			mcl_player.player_set_visibility(obj_ref, true)
-			obj_ref:set_nametag_attributes({ color = { r = 255, g = 255, b = 255, a = 255 } })
+            obj_ref:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}, text=obj_ref:get_player_name()})
+            obj_ref:set_properties({show_on_minimap = true})
 		end
 	else
 		if hide then
 			local luaentity = obj_ref:get_luaentity()
-			EF.invisible[obj_ref].old_size = luaentity.visual_size
+			EF.invisibility[obj_ref].old_size = luaentity.visual_size
 			obj_ref:set_properties({ visual_size = { x = 0, y = 0 } })
 		else
-			obj_ref:set_properties({ visual_size = EF.invisible[obj_ref].old_size })
+			obj_ref:set_properties({ visual_size = EF.invisibility[obj_ref].old_size })
 		end
 	end
 end
@@ -727,258 +689,110 @@ end
 -- ██║░░░░░╚██████╔╝██║░╚███║╚█████╔╝░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
 -- ╚═╝░░░░░░╚═════╝░╚═╝░░╚══╝░╚════╝░░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
 
-
-function mcl_potions.healing_func(player, hp)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local obj = player:get_luaentity()
-
-	if obj and obj.harmed_by_heal then hp = -hp end
-
-	if hp > 0 then
-		-- at least 1 HP
-		if hp < 1 then
-			hp = 1
-		end
-
-		if obj and obj.is_mob then
-			obj.health = math.max(obj.health + hp, obj.hp_max)
-		elseif player:is_player() then
-			player:set_hp(math.min(player:get_hp() + hp, player:get_properties().hp_max), { type = "set_hp", other = "healing" })
-		end
-
-	elseif hp < 0 then
-		if hp > -1 then
-			hp = -1
-		end
-
-		mcl_util.deal_damage(player, -hp, {type = "magic"})
-	end
-
-end
-
-function mcl_potions.swiftness_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not player:get_meta() then
-		return false
-	end
-
-	if not EF.swift[player] then
-
-		EF.swift[player] = {dur = duration, timer = 0, is_slow = factor < 1}
-		playerphysics.add_physics_factor(player, "speed", "mcl_potions:swiftness", factor)
-
+function mcl_potions.swiftness_func(player, level, duration)
+	if not player:get_meta() then return false end
+	if not EF.swiftness[player] then
+		EF.swiftness[player] = {dur = duration, timer = 0}
 	else
-
-		local victim = EF.swift[player]
-
-		playerphysics.add_physics_factor(player, "speed", "mcl_potions:swiftness", factor)
+		local victim = EF.swiftness[player]
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
-		victim.is_slow = factor < 1
-
 	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
+	playerphysics.add_physics_factor(player, "speed", "mcl_potions:swiftness", 1 + 0.20*level)
 end
 
-function mcl_potions.leaping_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not player:get_meta() then
-		return false
+function mcl_potions.slowness_func(player, level, duration)
+	if not player:get_meta() then return false end
+	if not EF.slowness[player] then
+		EF.slowness[player] = {dur = duration, timer = 0}
+	else
+		local victim = EF.slowness[player]
+		victim.dur = math.max(duration, victim.dur - victim.timer)
+		victim.timer = 0
 	end
+	playerphysics.add_physics_factor(player, "speed", "mcl_potions:swiftness", 1 - 0.15*level)
+end
 
+function mcl_potions.leaping_func(player, level, duration)
+	if not player:get_meta() then return false end
 	if not EF.leaping[player] then
-
 		EF.leaping[player] = {dur = duration, timer = 0}
-		playerphysics.add_physics_factor(player, "jump", "mcl_potions:leaping", factor)
-
 	else
-
 		local victim = EF.leaping[player]
-
-		playerphysics.add_physics_factor(player, "jump", "mcl_potions:leaping", factor)
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
-
 	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
+	playerphysics.add_physics_factor(player, "jump", "mcl_potions:leaping", 1 + 0.50*level)
 end
 
-
-function mcl_potions.weakness_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not EF.weak[player] then
-
-		EF.weak[player] = {dur = duration, timer = 0, factor = factor}
-
+function mcl_potions.apply_usual_effect(player, level, duration, effect_name)
+	if not EF[effect_name][player] then
+		EF[effect_name][player] = {dur = duration, timer = 0, factor = level}
 	else
-
-		local victim = EF.weak[player]
-
-		victim.factor = factor
+		local victim = EF[effect_name][player]
+		victim.factor = level
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
-
 	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
 end
 
-
-function mcl_potions.strength_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not EF.strong[player] then
-
-		EF.strong[player] = {dur = duration, timer = 0, factor = factor}
-
-	else
-
-		local victim = EF.strong[player]
-
-		victim.factor = factor
-		victim.dur = math.max(duration, victim.dur - victim.timer)
-		victim.timer = 0
-
-	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
+function mcl_potions.fire_resistance_func(player, level, duration)
+    mcl_potions.apply_usual_effect(player, level, duration, "fire_resistance")
 end
 
-
-function mcl_potions.withering_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and (entity.is_boss or string.find(entity.name, "wither")) then return false end
-
-	if not EF.withering[player] then
-
-		EF.withering[player] = {step = factor, dur = duration, timer = 0}
-
+function mcl_potions.slow_falling_func(player, factor, duration)
+	if not player:get_meta() then return false end
+	if not EF.slow_falling[player] then
+		EF.slow_falling[player] = {dur = duration, timer = 0}
 	else
-
-		local victim = EF.withering[player]
-
-		victim.step = math.min(victim.step, factor)
+		local victim = EF.slow_falling[player]
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
-
 	end
-
-	if player:is_player() then
-		potions_set_hud(player)
-	end
-
+	playerphysics.add_physics_factor(player, "gravity", "mcl_potions:slow_falling", 0.3)
 end
 
 
 function mcl_potions.poison_func(player, factor, duration)
 
-	if not player or player:get_hp() <= 0 then return false end
+	if not EF.poisoning[player] then
 
-	local entity = player:get_luaentity()
-	if entity and (entity.is_boss or entity.harmed_by_heal or string.find(entity.name, "spider")) then return false end
-
-	if not EF.poisoned[player] then
-
-		EF.poisoned[player] = {step = factor, dur = duration, timer = 0}
+		EF.poisoning[player] = {step = factor, dur = duration, timer = 0}
 
 	else
 
-		local victim = EF.poisoned[player]
+		local victim = EF.poisoning[player]
 
 		victim.step = math.min(victim.step, factor)
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
 
 	end
-
-	if player:is_player() then
-		potions_set_hud(player)
-	end
-
 end
 
 
 function mcl_potions.regeneration_func(player, factor, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and (entity.is_boss or entity.harmed_by_heal) then return false end
-
-	if not EF.regenerating[player] then
-
-		EF.regenerating[player] = {step = factor, dur = duration, timer = 0}
-
+	if not EF.regeneration[player] then
+		EF.regeneration[player] = {step = factor, dur = duration, timer = 0}
 	else
-
-		local victim = EF.regenerating[player]
-
+		local victim = EF.regeneration[player]
 		victim.step = math.min(victim.step, factor)
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
-
 	end
-
-	if player:is_player() then
-		potions_set_hud(player)
-	end
-
 end
 
 
 function mcl_potions.invisiblility_func(player, null, duration)
 
-	if not player or player:get_hp() <= 0 then return false end
+	if not EF.invisibility[player] then
 
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not EF.invisible[player] then
-
-		EF.invisible[player] = {dur = duration, timer = 0}
+		EF.invisibility[player] = {dur = duration, timer = 0}
 		mcl_potions.make_invisible(player, true)
 
 	else
 
-		local victim = EF.invisible[player]
+		local victim = EF.invisibility[player]
 
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
@@ -990,66 +804,8 @@ function mcl_potions.invisiblility_func(player, null, duration)
 	end
 
 end
-
-function mcl_potions.water_breathing_func(player, null, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not EF.water_breathing[player] then
-
-		EF.water_breathing[player] = {dur = duration, timer = 0}
-
-	else
-
-		local victim = EF.water_breathing[player]
-
-		victim.dur = math.max(duration, victim.dur - victim.timer)
-		victim.timer = 0
-
-	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
-end
-
-
-function mcl_potions.fire_resistance_func(player, null, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
-
-	if not EF.fire_proof[player] then
-
-		EF.fire_proof[player] = {dur = duration, timer = 0}
-
-	else
-
-		local victim = EF.fire_proof[player]
-		victim.dur = math.max(duration, victim.dur - victim.timer)
-		victim.timer = 0
-
-	end
-
-	if player:is_player() then
-		potions_set_icons(player)
-	end
-
-end
-
 
 function mcl_potions.night_vision_func(player, null, duration)
-
-	if not player or player:get_hp() <= 0 then return false end
-
-	local entity = player:get_luaentity()
-	if entity and entity.is_boss then return false end
 
 	meta = player:get_meta()
 	if not EF.night_vision[player] then
@@ -1072,17 +828,26 @@ function mcl_potions.night_vision_func(player, null, duration)
 		return -- Do not attempt to set night_vision on mobs
 	end
 	mcl_weather.skycolor.update_sky_color({player})
+end
 
-	if player:is_player() then
-		potions_set_icons(player)
+function mcl_potions.withering_func(player, factor, duration)
+	if not player or player:get_hp() <= 0 then return false end
+	local entity = player:get_luaentity()
+	if entity and (entity.is_boss or string.find(entity.name, "wither")) then return false end
+	if not EF.withering[player] then
+		EF.withering[player] = {step = factor, dur = duration, timer = 0}
+	else
+		local victim = EF.withering[player]
+		victim.step = math.min(victim.step, factor)
+		victim.dur = math.max(duration, victim.dur - victim.timer)
+		victim.timer = 0
 	end
-
 end
 
 function mcl_potions._extinguish_nearby_fire(pos, radius)
 	local epos = {x=pos.x, y=pos.y+0.5, z=pos.z}
 	local dnode = minetest.get_node({x=pos.x,y=pos.y-0.5,z=pos.z})
-	if minetest.get_item_group(dnode.name, "fire") ~= 0 or minetest.get_item_group(dnode.name, "lit_campfire") ~= 0 then
+	if minetest.get_item_group(dnode.name, "fire") ~= 0 then
 		epos.y = pos.y - 0.5
 	end
 	local exting = false
@@ -1102,11 +867,6 @@ function mcl_potions._extinguish_nearby_fire(pos, radius)
 				minetest.sound_play("fire_extinguish_flame", {pos = tpos, gain = 0.25, max_hear_distance = 16}, true)
 				minetest.remove_node(tpos)
 				exting = true
-			elseif minetest.get_item_group(node.name, "lit_campfire") ~= 0 then
-				minetest.sound_play("fire_extinguish_flame", {pos = tpos, gain = 0.25, max_hear_distance = 16}, true)
-				local def = minetest.registered_nodes[node.name]
-				minetest.set_node(tpos, {name = def._mcl_campfires_smothered_form, param2 = node.param2})
-				exting = true
 			end
 		end
 	-- Has radius: lingering, extinguish all nodes in area
@@ -1114,16 +874,10 @@ function mcl_potions._extinguish_nearby_fire(pos, radius)
 		local nodes = minetest.find_nodes_in_area(
 			{x=epos.x-radius,y=epos.y,z=epos.z-radius},
 			{x=epos.x+radius,y=epos.y,z=epos.z+radius},
-			{"group:fire", "group:lit_campfire"})
+			{"group:fire"})
 		for n=1, #nodes do
-			local node = minetest.get_node(nodes[n])
 			minetest.sound_play("fire_extinguish_flame", {pos = nodes[n], gain = 0.25, max_hear_distance = 16}, true)
-			if minetest.get_item_group(node.name, "fire") ~= 0 then
-				minetest.remove_node(nodes[n])
-			elseif minetest.get_item_group(node.name, "lit_campfire") ~= 0 then
-				local def = minetest.registered_nodes[node.name]
-				minetest.set_node(nodes[n], {name = def._mcl_campfires_smothered_form, param2 = node.param2})
-			end
+			minetest.remove_node(nodes[n])
 			exting = true
 		end
 	end
@@ -1138,9 +892,5 @@ function mcl_potions.bad_omen_func(player, factor, duration)
 		victim.dur = math.max(duration, victim.dur - victim.timer)
 		victim.timer = 0
 		victim.factor = factor
-	end
-
-	if player:is_player() then
-		potions_set_icons(player)
 	end
 end
