@@ -6,12 +6,13 @@ local function lingering_image(colorstring, opacity)
 	if not opacity then
 		opacity = 127
 	end
-	return "mcl_potions_splash_overlay.png^[colorize:"..colorstring..":"..tostring(opacity).."^mcl_potions_lingering_bottle.png"
+	return "mcl_potions_potion_overlay.png^[colorize:"..colorstring..":"..tostring(opacity).."^mcl_potions_lingering_bottle.png"
 end
 
 local lingering_effect_at = {}
 
-local function add_lingering_effect(pos, color, def, is_water, instant)
+local function add_lingering_effect(pos, color, def, is_water, instant, name)
+	if not areas.can_use_potion(pos, name) then return end
 	lingering_effect_at[pos] = {color = color, timer = 30, def = def, is_water = is_water}
 end
 
@@ -42,7 +43,6 @@ minetest.register_globalstep(function(dtime)
 	if lingering_timer >= 1 then
 
 		for pos, vals in pairs(lingering_effect_at) do
-
 			vals.timer = vals.timer - lingering_timer
 			local d = 4 * (vals.timer / 30.0)
 			local texture
@@ -102,7 +102,7 @@ function mcl_potions.register_lingering(name, descr, color, def)
 		_doc_items_longdesc = longdesc,
 		_doc_items_usagehelp = S("Use the “Punch” key to throw it."),
 		inventory_image = lingering_image(color),
-		groups = {brewitem=1, not_in_creative_inventory=0, bottle=1},
+		groups = {brewitem=1, not_in_creative_inventory=0},
 		on_use = function(item, placer, pointed_thing)
 			local velocity = 10
 			local dir = placer:get_look_dir();
@@ -148,7 +148,7 @@ function mcl_potions.register_lingering(name, descr, color, def)
 			end
 			if n ~= "air" and n ~= "mcl_portals:portal" and n ~= "mcl_portals:portal_end" and g == 0 or mcl_potions.is_obj_hit(self, pos) then
 				minetest.sound_play("mcl_potions_breaking_glass", {pos = pos, max_hear_distance = 16, gain = 1})
-				add_lingering_effect(pos, color, def, name == "water")
+				add_lingering_effect(pos, color, def, name == "water", def.instant, name)
 				local texture
 				if name == "water" then
 					texture = "mcl_particles_droplet_bottle.png"

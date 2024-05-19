@@ -3,6 +3,7 @@ local modpath = minetest.get_modpath(modname)
 local S = minetest.get_translator(modname)
 
 mcl_potions = {}
+mcl_potions.registered_potions = {}
 
 -- duration effects of redstone are a factor of 8/3
 -- duration effects of glowstone are a time factor of 1/2
@@ -20,18 +21,31 @@ mcl_potions.SPLASH_FACTOR = 0.75
 mcl_potions.LINGERING_FACTOR = 0.25
 
 dofile(modpath .. "/functions.lua")
-dofile(modpath .. "/commands.lua")
 dofile(modpath .. "/splash.lua")
 dofile(modpath .. "/lingering.lua")
 dofile(modpath .. "/tipped_arrow.lua")
 dofile(modpath .. "/potions.lua")
 
+minetest.register_craftitem("mcl_potions:phantom_membrane", {
+	description = S("Phantom Membrane"),
+	inventory_image = "mcl_potions_phantom_membrane.png",
+	groups = {brewitem=1},
+	stack_max = 64,
+})
+
+minetest.register_craft({
+	output = "mcl_potions:phantom_membrane",
+	recipe = {
+		{"mcl_mobitems:feather", "mcl_mobitems:feather"},
+		{"mcl_mobitems:feather", "mcl_mobitems:feather"},
+	}
+})
+
 minetest.register_craftitem("mcl_potions:fermented_spider_eye", {
 	description = S("Fermented Spider Eye"),
 	_doc_items_longdesc = S("Try different combinations to create potions."),
-	wield_image = "mcl_potions_spider_eye_fermented.png",
 	inventory_image = "mcl_potions_spider_eye_fermented.png",
-	groups = { brewitem = 1, },
+	groups = {brewitem = 1},
 	stack_max = 64,
 })
 
@@ -102,12 +116,8 @@ minetest.register_craftitem("mcl_potions:glass_bottle", {
 				end
 			end
 			if get_water then
-				local water_bottle
-				if river_water then
-					water_bottle = ItemStack("mcl_potions:river_water")
-				else
-					water_bottle = ItemStack("mcl_potions:water")
-				end
+				local water_bottle = ItemStack("mcl_potions:water")
+
 				-- Replace with water bottle, if possible, otherwise
 				-- place the water potion at a place where's space
 				local inv = placer:get_inventory()
@@ -190,7 +200,7 @@ local function set_node_empty_bottle(itemstack, placer, pointed_thing, newitemst
 	-- play sound
 	minetest.sound_play("mcl_potions_bottle_pour", {pos=pointed_thing.under, gain=0.5, max_hear_range=16}, true)
 
-	--
+	-- 
 	if minetest.is_creative_enabled(placer:get_player_name()) then
 		return itemstack
 	else
@@ -256,7 +266,7 @@ minetest.register_craftitem("mcl_potions:water", {
 	stack_max = 1,
 	inventory_image = potion_image("#0022FF"),
 	wield_image = potion_image("#0022FF"),
-	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1, bottle=1},
+	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1},
 	on_place = water_bottle_on_place,
 	_on_dispense = dispense_water_bottle,
 	_dispense_into_walkable = true,
@@ -273,7 +283,7 @@ minetest.register_craftitem("mcl_potions:river_water", {
 	stack_max = 1,
 	inventory_image = potion_image("#0044FF"),
 	wield_image = potion_image("#0044FF"),
-	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1, bottle=1},
+	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1},
 	on_place = water_bottle_on_place,
 	_on_dispense = dispense_water_bottle,
 	_dispense_into_walkable = true,
@@ -334,7 +344,7 @@ minetest.register_craft({
 
 local water_table = {
 	["mcl_nether:nether_wart_item"] = "mcl_potions:awkward",
-	-- ["mcl_potions:fermented_spider_eye"] = "mcl_potions:weakness",
+	["mcl_potions:fermented_spider_eye"] = "mcl_potions:weakness",
 	["mcl_potions:speckled_melon"] = "mcl_potions:mundane",
 	["mcl_core:sugar"] = "mcl_potions:mundane",
 	["mcl_mobitems:magma_cream"] = "mcl_potions:mundane",
@@ -344,7 +354,7 @@ local water_table = {
 	["mcl_mobitems:spider_eye"] = "mcl_potions:mundane",
 	["mcl_mobitems:rabbit_foot"] = "mcl_potions:mundane",
 	["mcl_nether:glowstone_dust"] = "mcl_potions:thick",
-	["mcl_mobitems:gunpowder"] = "mcl_potions:water_splash"
+	["mcl_mobitems:gunpowder"] = "mcl_potions:water_splash",
 }
 
 local awkward_table = {
@@ -352,12 +362,13 @@ local awkward_table = {
 	["mcl_farming:carrot_item_gold"] = "mcl_potions:night_vision",
 	["mcl_core:sugar"] = "mcl_potions:swiftness",
 	["mcl_mobitems:magma_cream"] = "mcl_potions:fire_resistance",
-	-- ["mcl_mobitems:blaze_powder"] = "mcl_potions:strength",
+	["mcl_mobitems:blaze_powder"] = "mcl_potions:strength",
 	["mcl_fishing:pufferfish_raw"] = "mcl_potions:water_breathing",
 	["mcl_mobitems:ghast_tear"] = "mcl_potions:regeneration",
 	["mcl_mobitems:spider_eye"] = "mcl_potions:poison",
-	["mcl_flowers:wither_rose"] = "mcl_potions:withering",
 	["mcl_mobitems:rabbit_foot"] = "mcl_potions:leaping",
+	["mcl_potions:phantom_membrane"] = "mcl_potions:slow_falling",
+	["mcl_mobitems:nautilus_shell"] = "mcl_potions:turtle_master"
 }
 
 local output_table = {
@@ -366,19 +377,18 @@ local output_table = {
 	["mcl_potions:awkward"] = awkward_table,
 }
 
-
 local enhancement_table = {}
 local extension_table = {}
 local potions = {}
 
 for i, potion in ipairs({"healing","harming","swiftness","slowness",
 	 "leaping","poison","regeneration","invisibility","fire_resistance",
-	 -- "weakness","strength",
-	 "water_breathing","night_vision", "withering"}) do
+	 "weakness","strength",
+	 "water_breathing","night_vision", "slow_falling", "turtle_master"}) do
 
 	table.insert(potions, potion)
 
-	if potion ~= "invisibility" and potion ~= "night_vision" and potion ~= "weakness" and potion ~= "water_breathing" and potion ~= "fire_resistance" then
+	if potion ~= "invisibility" and potion ~= "night_vision" and potion ~= "weakness" and potion ~= "water_breathing" and potion ~= "fire_resistance" and potion ~= "slow_falling" then
 		enhancement_table["mcl_potions:"..potion] = "mcl_potions:"..potion.."_2"
 		enhancement_table["mcl_potions:"..potion.."_splash"] = "mcl_potions:"..potion.."_2_splash"
 		table.insert(potions, potion.."_2")
@@ -461,31 +471,6 @@ function mcl_potions.get_alchemy(ingr, pot)
 
 	return false
 end
-
-mcl_mobs.effect_functions["poison"] = mcl_potions.poison_func
-mcl_mobs.effect_functions["regeneration"] = mcl_potions.regeneration_func
-mcl_mobs.effect_functions["invisibility"] = mcl_potions.invisiblility_func
-mcl_mobs.effect_functions["fire_resistance"] = mcl_potions.fire_resistance_func
-mcl_mobs.effect_functions["night_vision"] = mcl_potions.night_vision_func
-mcl_mobs.effect_functions["water_breathing"] = mcl_potions.water_breathing_func
-mcl_mobs.effect_functions["leaping"] = mcl_potions.leaping_func
-mcl_mobs.effect_functions["swiftness"] = mcl_potions.swiftness_func
-mcl_mobs.effect_functions["heal"] = mcl_potions.healing_func
-mcl_mobs.effect_functions["bad_omen"] = mcl_potions.bad_omen_func
-mcl_mobs.effect_functions["withering"] = mcl_potions.withering_func
-
--- give withering to players in a wither rose
-local etime = 0
-minetest.register_globalstep(function(dtime)
-	etime = dtime + etime
-	if etime < 0.5 then return end
-	etime = 0
-	for _,pl in pairs(minetest.get_connected_players()) do
-		local npos = vector.offset(pl:get_pos(), 0, 0.2, 0)
-		local n = minetest.get_node(npos)
-		if n.name == "mcl_flowers:wither_rose" then mcl_potions.withering_func(pl, 1, 2) end
-	end
-end)
 
 mcl_wip.register_wip_item("mcl_potions:night_vision")
 mcl_wip.register_wip_item("mcl_potions:night_vision_plus")

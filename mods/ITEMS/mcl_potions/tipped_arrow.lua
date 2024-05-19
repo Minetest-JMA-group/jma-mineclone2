@@ -33,14 +33,13 @@ local mod_button = minetest.get_modpath("mesecons_button")
 local enable_pvp = minetest.settings:get_bool("enable_pvp")
 
 local arrow_longdesc = minetest.registered_items["mcl_bows:arrow"]._doc_items_longdesc or ""
-local arrow_tt = minetest.registered_items["mcl_bows:arrow"]._tt_help or ""
 
 function mcl_potions.register_arrow(name, desc, color, def)
 
 	local longdesc = def.longdesc or ""
 	minetest.register_craftitem("mcl_potions:"..name.."_arrow", {
 		description = desc,
-		_tt_help = arrow_tt .. "\n" .. def.tt,
+		_tt_help = def.tt,
 		_doc_items_longdesc = arrow_longdesc .. "\n" ..
 			S("This particular arrow is tipped and will give an effect when it hits a player or mob.") .. "\n" ..
 			longdesc,
@@ -133,6 +132,7 @@ function mcl_potions.register_arrow(name, desc, color, def)
 
 	function ARROW_ENTITY.on_step(self, dtime)
 		local pos = self.object:get_pos()
+        if areas.is_safe(pos) then self.object:remove() return end
 		local dpos = table.copy(pos) -- digital pos
 		dpos = vector.round(dpos)
 		local node = minetest.get_node(dpos)

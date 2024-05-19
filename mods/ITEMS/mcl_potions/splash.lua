@@ -7,10 +7,26 @@ local function splash_image(colorstring, opacity)
 	if not opacity then
 		opacity = 127
 	end
-	return "mcl_potions_splash_overlay.png^[colorize:"..colorstring..":"..tostring(opacity).."^mcl_potions_splash_bottle.png"
+	return "mcl_potions_potion_overlay.png^[colorize:"..colorstring..":"..tostring(opacity).."^mcl_potions_splash_bottle.png"
 end
 
-
+local function apply_splash(pos, name, def)
+    if not areas.can_use_potion(pos, name) then return end
+    for _,obj in pairs(minetest.get_objects_inside_radius(pos, 4)) do
+        local entity = obj:get_luaentity()
+        local redux_map = {7/8,0.5,0.25}
+        if obj:is_player() or entity.is_mob then
+            local pos2 = obj:get_pos()
+            local rad = math.floor(math.sqrt((pos2.x-pos.x)^2 + (pos2.y-pos.y)^2 + (pos2.z-pos.z)^2))
+            if rad > 0 then
+                def.potion_fun(obj, redux_map[rad])
+            else
+                def.potion_fun(obj, 1)
+            end
+        end
+    end
+end
+    
 function mcl_potions.register_splash(name, descr, color, def)
 	local id = "mcl_potions:"..name.."_splash"
 	local longdesc = def.longdesc
@@ -26,7 +42,7 @@ function mcl_potions.register_splash(name, descr, color, def)
 		_doc_items_longdesc = longdesc,
 		_doc_items_usagehelp = S("Use the “Punch” key to throw it."),
 		inventory_image = splash_image(color),
-		groups = {brewitem=1, not_in_creative_inventory=0, bottle=1},
+		groups = {brewitem=1, not_in_creative_inventory=0},
 		on_use = function(item, placer, pointed_thing)
 			local velocity = 10
 			local dir = placer:get_look_dir();
@@ -67,7 +83,6 @@ function mcl_potions.register_splash(name, descr, color, def)
 			local n = node.name
 			local g = minetest.get_item_group(n, "liquid")
 			local d = 0.1
-			local redux_map = {7/8,0.5,0.25}
 			if mod_target and n == "mcl_target:target_off" then
 				mcl_target.hit(vector.round(pos), 0.4) --4 redstone ticks
 			end
@@ -102,31 +117,12 @@ function mcl_potions.register_splash(name, descr, color, def)
 					vertical = false,
 					texture = texture.."^[colorize:"..color..":127"
 				})
-
 				if name == "water" then
 					mcl_potions._extinguish_nearby_fire(pos)
 				end
 				self.object:remove()
-				for _,obj in pairs(minetest.get_objects_inside_radius(pos, 4)) do
-
-					local entity = obj:get_luaentity()
-					if obj:is_player() or entity and entity.is_mob then
-
-						local pos2 = obj:get_pos()
-						local rad = math.floor(math.sqrt((pos2.x-pos.x)^2 + (pos2.y-pos.y)^2 + (pos2.z-pos.z)^2))
-						if rad > 0 then
-							def.potion_fun(obj, redux_map[rad])
-						else
-							def.potion_fun(obj, 1)
-						end
-					end
-				end
-
+                apply_splash(pos, name, def)
 			end
 		end,
 	})
 end
-
---[[local function time_string(dur)
-	return math.floor(dur/60)..string.format(":%02d",math.floor(dur % 60))
-end]]
