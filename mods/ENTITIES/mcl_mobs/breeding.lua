@@ -78,6 +78,7 @@ function mob_class:feed_tame(clicker, feed_count, breed, tame, notake)
 				self.food = 0
 				self.horny = true
 				self.persistent = true
+				self._luck = mcl_luck.get_luck(clicker:get_player_name())
 			end
 		end
 
@@ -273,7 +274,7 @@ function mob_class:check_breeding()
 						return
 					end
 
-					mcl_experience.throw_xp(pos, math.random(1, 7))
+					mcl_experience.throw_xp(pos, math.random(1, 7) + (parent1._luck or 0) + (parent2._luck or 0))
 
 					-- custom breed function
 					if parent1.on_breed then
@@ -322,7 +323,7 @@ function mob_class:toggle_sit(clicker,p)
 		particle = "mobs_mc_wolf_icon_roam.png"
 		self.order = "roam"
 		self.state = "stand"
-		self.walk_chance = default_walk_chance
+		self.walk_chance = 50
 		self.jump = true
 		self:set_animation("stand")
 		-- TODO: Add sitting model

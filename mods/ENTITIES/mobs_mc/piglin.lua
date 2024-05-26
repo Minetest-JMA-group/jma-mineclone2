@@ -16,6 +16,13 @@ local trading_items = {
 	{ itemstring = "mcl_throwing:ender_pearl", amount_min = 2, amount_max = 6 },
 	{ itemstring = "mcl_potions:fire_resistance", amount_min = 1, amount_max = 1 },
 	{ itemstring = "mcl_potions:fire_resistance_splash", amount_min = 1, amount_max = 1 },
+	{ itemstring = "mcl_enchanting:book_enchanted", amount_min = 1, amount_max = 1 },
+	{ itemstring = "mcl_armor:boots_iron_enchanted", amount_min = 1, amount_max = 1 },
+	{ itemstring = "mcl_blackstone:blackstone", amount_min = 8, amount_max = 16 },
+	{ itemstring = "mcl_bows:arrow", amount_min = 6, amount_max = 12 },
+	{ itemstring = "mcl_core:crying_obsidian", amount_min = 1, amount_max = 1 },
+	{ itemstring = "mcl_fire:fire_charge", amount_min = 1, amount_max = 1 },
+	--{ itemstring = "FIXME:spectral_arrow", amount_min = 6, amount_max = 12 },
 }
 
 local S = minetest.get_translator("mobs_mc")
@@ -61,8 +68,10 @@ local piglin = {
 	} },
 	visual_size = {x=1, y=1},
 	sounds = {
-		random = "extra_mobs_piglin",
-		damage = "extra_mobs_piglin_hurt",
+		random = "mobs_mc_zombiepig_random",
+		war_cry = "mobs_mc_zombiepig_war_cry",                  death = "mobs_mc_zombiepig_death",
+		damage = "mobs_mc_zombiepig_hurt.2",
+		death = "mobs_mc_zombiepig_death.2",
 		distance = 16,
 	},
 	jump = true,
@@ -140,14 +149,18 @@ local piglin = {
 				local c_pos = self.object:get_pos()
 				if c_pos then
 					self.what_traded = trading_items[math.random(#trading_items)]
-					for x = 1, math.random(self.what_traded.amount_min, self.what_traded.amount_max) do
-						local p = c_pos
-						local nn=minetest.find_nodes_in_area_under_air(vector.offset(c_pos,-1,-1,-1),vector.offset(c_pos,1,1,1),{"group:solid"})
-						if nn and #nn > 0 then
-							p = vector.offset(nn[math.random(#nn)],0,1,0)
-						end
-						minetest.add_item(p, self.what_traded.itemstring)
+					local stack = ItemStack(self.what_traded.itemstring)
+					stack:set_count(math.random(self.what_traded.amount_min, self.what_traded.amount_max))
+					if mcl_enchanting.is_enchanted(self.what_traded.itemstring) then
+						local enchantment = "soul_speed"
+						mcl_enchanting.enchant(stack, enchantment, mcl_enchanting.random(nil, 1, mcl_enchanting.enchantments[enchantment].max_level))
 					end
+					local p = c_pos
+					local nn=minetest.find_nodes_in_area_under_air(vector.offset(c_pos,-1,-1,-1),vector.offset(c_pos,1,1,1),{"group:solid"})
+					if nn and #nn > 0 then
+						p = vector.offset(nn[math.random(#nn)],0,1,0)
+					end
+					minetest.add_item(p, stack)
 				end
 			end)
 		end
@@ -330,8 +343,13 @@ mcl_mobs.register_mob("mobs_mc:baby_zombified_piglin", baby_zombified_piglin)
 
 -- Compatibility code. These were removed, and now are called zombie piglins. They don't spawn.
 -- This is only to catch old cases. Maybe could be an alias?
-mcl_mobs.register_mob("mobs_mc:pigman", zombified_piglin)
-mcl_mobs.register_mob("mobs_mc:baby_pigman", baby_zombified_piglin)
+local pigman_unused = table.copy(zombified_piglin)
+pigman_unused.unused = true
+local baby_pigman_unused = table.copy(baby_zombified_piglin)
+baby_pigman_unused.unused = true
+
+mcl_mobs.register_mob("mobs_mc:pigman", pigman_unused)
+mcl_mobs.register_mob("mobs_mc:baby_pigman", baby_pigman_unused)
 
 
 -- Piglin Brute --
@@ -397,7 +415,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-6000,
+150,
 3,
 mcl_vars.mg_lava_nether_max,
 mcl_vars.mg_nether_max)
@@ -413,7 +431,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-6000,
+150,
 3,
 mcl_vars.mg_lava_nether_max,
 mcl_vars.mg_nether_max)
@@ -429,7 +447,7 @@ mcl_mobs:spawn_specific(
 		0,
 		minetest.LIGHT_MAX+1,
 		30,
-		6000,
+		1000,
 		3,
 		mcl_vars.mg_nether_min,
 		mcl_vars.mg_nether_max)
@@ -446,7 +464,7 @@ mcl_mobs:spawn_specific(
 		0,
 		minetest.LIGHT_MAX+1,
 		30,
-		100000,
+		50,
 		4,
 		mcl_vars.mg_nether_min,
 		mcl_vars.mg_nether_max)

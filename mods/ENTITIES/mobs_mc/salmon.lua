@@ -10,6 +10,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 --###################
 
 local salmon = {
+	description = S("Salmon"),
 	type = "animal",
 	spawn_class = "water_ambient",
 	can_despawn = true,
@@ -220,7 +221,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-4000,
+260,
 3,
 water-16,
 water+1)

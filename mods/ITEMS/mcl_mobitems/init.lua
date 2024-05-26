@@ -134,15 +134,49 @@ minetest.register_craftitem("mcl_mobitems:cooked_rabbit", {
 	stack_max = 64,
 })
 
--- Reset food poisoning and status effects
-local function drink_milk(itemstack, player, pointed_thing)
-	local bucket = minetest.do_item_eat(0, "mcl_buckets:bucket_empty", itemstack, player, pointed_thing)
-	-- Check if we were allowed to drink this (eat delay check)
-	if mcl_hunger.active and (bucket:get_name() ~= "mcl_mobitems:milk_bucket" or minetest.is_creative_enabled(player:get_player_name())) then
-		mcl_hunger.stop_poison(player)
+local function drink_milk_delayed(itemstack, player, pointed_thing)
+	if pointed_thing.type == "node" then
+		local node = minetest.get_node(pointed_thing.under)
+		if player and not player:get_player_control().sneak then
+			if minetest.registered_nodes[node.name] and minetest.registered_nodes[node.name].on_rightclick then
+				return minetest.registered_nodes[node.name].on_rightclick(pointed_thing.under, node, player, itemstack) or itemstack
+			end
+		end
+	elseif pointed_thing.type == "object" then
+		return itemstack
 	end
-	mcl_potions._reset_player_effects(player)
-	return bucket
+
+	local function drink_milk(itemstack, player, pointed_thing)
+		-- Check if we were allowed to drink this (eat delay check)
+		if mcl_hunger.active and (
+			player:get_inventory():get_stack("main", player:get_wield_index(), itemstack) == "mcl_mobitems:milk_bucket" or
+			minetest.is_creative_enabled(player:get_player_name())
+		) then
+			mcl_hunger.stop_poison(player)
+		end
+		mcl_potions._reset_effects(player)
+	end
+
+	-- Wrapper for handling mcl_hunger delayed eating
+	local name = player:get_player_name()
+	local hunger_internal = mcl_hunger.eat_internal[name]
+	hunger_internal._custom_itemstack = itemstack -- Used as comparison to make sure the custom wrapper executes only when the same item is eaten
+	hunger_internal._custom_var = {
+		itemstack = itemstack,
+		player = player,
+		pointed_thing = pointed_thing,
+	}
+	hunger_internal._custom_func = drink_milk
+	hunger_internal._custom_wrapper = function(name)
+		local hunger_internal2 = mcl_hunger.eat_internal[name]
+		hunger_internal2._custom_func(
+			hunger_internal2._custom_var.itemstack,
+			hunger_internal2._custom_var.player,
+			hunger_internal2._custom_var.pointed_thing
+		)
+	end
+
+	minetest.do_item_eat(0, "mcl_buckets:bucket_empty", itemstack, player, pointed_thing)
 end
 
 minetest.register_craftitem("mcl_mobitems:milk_bucket", {
@@ -152,8 +186,8 @@ minetest.register_craftitem("mcl_mobitems:milk_bucket", {
 	_doc_items_usagehelp = S("Use the placement key to drink the milk."),
 	inventory_image = "mcl_mobitems_bucket_milk.png",
 	wield_image = "mcl_mobitems_bucket_milk.png",
-	on_place = drink_milk,
-	on_secondary_use = drink_milk,
+	on_place = drink_milk_delayed,
+	on_secondary_use = drink_milk_delayed,
 	stack_max = 1,
 	groups = { food = 3, can_eat_when_full = 1 },
 })
@@ -195,6 +229,46 @@ minetest.register_craftitem("mcl_mobitems:string",{
 	inventory_image = "mcl_mobitems_string.png",
 	stack_max = 64,
 	groups = { craftitem = 1 },
+})
+
+minetest.register_craftitem("mcl_mobitems:spectre_membrane",{
+	description = S("Spectre Membrane"),
+	_doc_items_longdesc = S("This is a crafting component dropped from dead spectres."),
+	inventory_image = "vl_mobitems_spectre_membrane.png",
+	groups = { craftitem = 1, brewitem = 1 },
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:shiny_ice_crystal",{
+	description = S("Shiny Ice Crystal"),
+	_doc_items_longdesc = S("This item is mainly used for crafting."),
+	inventory_image = "vl_mobitems_ice_crystal.png",
+	groups = { craftitem = 1, brewitem = 1 },
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:aery_charge",{
+	description = S("Aery Charge"),
+	_doc_items_longdesc = S("This item is mainly used for crafting."), -- TODO shoot?
+	inventory_image = "vl_mobitems_aery_charge.png",
+	groups = { craftitem = 1, brewitem = 1 },
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:crystalline_drop",{
+	description = S("Crystalline Drop"),
+	_doc_items_longdesc = S("This item is mainly used for crafting."), -- TODO other uses?
+	inventory_image = "vl_mobitems_crystalline_drop.png",
+	groups = { craftitem = 1, brewitem = 1 },
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:earthen_ash",{
+	description = S("Earthen Ash"),
+	_doc_items_longdesc = S("This item is mainly used for crafting."), -- TODO other uses?
+	inventory_image = "vl_mobitems_earthen_ash.png",
+	groups = { craftitem = 1, brewitem = 1 },
+	stack_max = 64,
 })
 
 minetest.register_craftitem("mcl_mobitems:blaze_rod", {
@@ -298,7 +372,7 @@ minetest.register_craftitem("mcl_mobitems:rabbit_stew", {
 	stack_max = 1,
 	on_place = minetest.item_eat(10, "mcl_core:bowl"),
 	on_secondary_use = minetest.item_eat(10, "mcl_core:bowl"),
-	groups = { food = 3, eatable = 10 },
+	groups = { food = 2, eatable = 10 },
 	_mcl_saturation = 12.0,
 })
 
@@ -546,6 +620,6 @@ minetest.register_craft({
 
 minetest.register_on_item_eat(function (hp_change, replace_with_item, itemstack, user, pointed_thing)	-- poisoning with spider eye
 	if itemstack:get_name() == "mcl_mobitems:spider_eye" then
-		mcl_potions.poison_func(user, 1, 4)
+		mcl_potions.give_effect_by_level("poison", user, 1, 4)
 	end
 end)

@@ -608,6 +608,8 @@ local professions = {
 			{
 			{ { "mcl_nether:nether_wart_item", 22, 22 }, E1 },
 			{ { "mcl_core:emerald", 3, 3 }, { "mcl_experience:bottle", 1, 1 } },
+			{ { "mcl_core:emerald", 15, 15 }, { "mcl_mobitems:aery_charge", 1, 1 } }, -- TODO reconsider
+			{ { "mcl_core:emerald", 15, 15 }, { "mcl_mobitems:earthen_ash", 1, 1 } }, -- TODO reconsider
 			},
 		},
 	},
@@ -1989,6 +1991,17 @@ local trade_inventory = {
 					-- Otherwise, 20% chance to unlock if used freshly reset trade
 					unlock_stuff = true
 				end
+				-- calculate xp based on the price
+				local emeralds = 0
+				if wanted1:get_name() == "mcl_core:emerald" then
+					emeralds = wanted1:get_count()
+				elseif wanted2:get_name() == "mcl_core:emerald" then
+					emeralds = wanted2:get_count()
+				else
+					local offered = inv:get_stack("offered", 1)
+					emeralds = offered:get_name() == "mcl_core:emerald" and offered:get_count() or 0
+				end
+				local xp = 2 + math.ceil(emeralds / (64/4)) -- 1..64 emeralds = 3..6 xp
 				local update_formspec = false
 				if unlock_stuff then
 					-- First-time trade unlock all trades and unlock next trade tier
@@ -2000,6 +2013,7 @@ local trade_inventory = {
 						set_textures(trader)
 						update_max_tradenum(trader)
 						update_formspec = true
+						xp = xp + 5
 					end
 					for t=1, #trades do
 						trades[t].locked = false
@@ -2010,6 +2024,7 @@ local trade_inventory = {
 					-- TODO: Replace by Regeneration I
 					trader.health = math.min(trader.hp_max, trader.health + 4)
 				end
+				mcl_experience.add_xp(player, xp)
 				trade.trade_counter = trade.trade_counter + 1
 				mcl_log("Trade counter is: ".. trade.trade_counter)
 				-- Semi-randomly lock trade for repeated trade (not if there's only 1 trade)
@@ -2047,6 +2062,7 @@ local trade_inventory = {
 				if update_formspec then
 					show_trade_formspec(name, trader, tradenum)
 				end
+
 			else
 				minetest.log("error", "[mobs_mc] Player took item from trader output but player_trading_with or player_tradenum is nil!")
 			end
@@ -2336,7 +2352,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-20,
+2,
 4,
 mobs_mc.water_level+1,
 mcl_vars.mg_overworld_max)

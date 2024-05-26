@@ -3,7 +3,7 @@
 ## Creator of MineClone
 * davedevils
 
-## Creator of MineClone2
+## Creator of VoxeLibre
 * Wuzzy
 
 ## Maintainers
@@ -24,6 +24,8 @@
 * SmokeyDope
 * Faerraven / Michieal
 * Codiac
+* rudzik8
+* teknomunk
 
 ## Past Developers
 * jordan4ibanez
@@ -37,7 +39,6 @@
 
 ## Contributors
 * RandomLegoBrick
-* rudzik8
 * Code-Sploit
 * aligator
 * Rootyjr
@@ -129,12 +130,22 @@
 * Bakawun
 * JoseDouglas26
 * Zasco
+* PrWalterB
+* michaljmalinowski
+* nixnoxus
+* Potiron
+* Tuxilio
+* Impulse
+* Doods
+* SOS-Games
+* Bram
+* qoheniac
 
 ## Music
 * Jordach for the jukebox music compilation from Big Freaking Dig
 * Dark Reaven Music (https://soundcloud.com/dark-reaven-music) for the main menu theme (Calmed Cube) and Traitor (horizonchris96), which is licensed under https://creativecommons.org/licenses/by-sa/3.0/
-* Jester for helping to finely tune MineClone2 (https://www.youtube.com/@Jester-8-bit). Songs: Hailing Forest, Gift, 0dd BL0ck, Flock of One (License CC BY-SA 4.0)
-* Exhale & Tim Unwin for some wonderful MineClone2 tracks (https://www.youtube.com/channel/UClFo_JDWoG4NGrPQY0JPD_g). Songs: Valley of Ghosts, Lonely Blossom, Farmer (License CC BY-SA 4.0)
+* Jester for helping to finely tune VoxeLibre (https://www.youtube.com/@Jester-8-bit). Songs: Hailing Forest, Gift, 0dd BL0ck, Flock of One (License CC BY-SA 4.0)
+* Exhale & Tim Unwin for some wonderful VoxeLibre tracks (https://www.youtube.com/channel/UClFo_JDWoG4NGrPQY0JPD_g). Songs: Valley of Ghosts, Lonely Blossom, Farmer (License CC BY-SA 4.0)
 * Diminixed for 3 fantastic tracks and remastering and leveling volumes. Songs: Afternoon Lullaby (pianowtune02), Spooled (ambientwip02), Never Grow Up (License CC BY-SA 4.0)
 
 ## Original Mod Authors

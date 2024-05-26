@@ -38,7 +38,7 @@ local stem_drop = {
 		{ items = {"mcl_farming:pumpkin_seeds 2"}, rarity = 31 },
 
 		-- 3 seeds: 1/125 chance
-		{ items = {"mcl_farming:pumkin_seeds 3"}, rarity = 125 },
+		{ items = {"mcl_farming:pumpkin_seeds 3"}, rarity = 125 },
 	},
 }
 
@@ -119,7 +119,7 @@ pumpkin_face_base_def.groups.non_combat_armor=1
 pumpkin_face_base_def.groups.armor_head=1
 pumpkin_face_base_def.groups.non_combat_armor_head=1
 pumpkin_face_base_def._mcl_armor_mob_range_factor = 0
-pumpkin_face_base_def._mcl_armor_mob_range_mob = "mobs_mc:enderman"
+pumpkin_face_base_def._mcl_armor_mob_range_mob = "mobs_mc:rover"
 
 pumpkin_face_base_def._mcl_armor_element = "head"
 pumpkin_face_base_def._mcl_armor_texture = "mcl_farming_pumpkin_face.png"

@@ -44,6 +44,13 @@ local skeleton = {
 			"mcl_bows_bow_0.png", -- wielded_item
 		}
 	},
+	-- TODO: change random to new api when min minetest version is 5.8
+	sounds = {
+		random = "mobs_mc_skeleton_random.2",
+		death = "mobs_mc_skeleton_death",
+		damage = "mobs_mc_skeleton_hurt",
+		distance = 16,
+	},
 	walk_velocity = 1.2,
 	run_velocity = 2.0,
 	damage = 2,
@@ -66,7 +73,7 @@ local skeleton = {
 		looting = "common",},
 
 		-- Head
-		-- TODO: Only drop if killed by charged creeper
+		-- TODO: Only drop if killed by charged stalker
 		{name = "mcl_heads:skeleton",
 		chance = 200, -- 0.5% chance
 		min = 1,
@@ -106,7 +113,8 @@ local skeleton = {
 				self.object:set_yaw(minetest.dir_to_yaw(vector.direction(self.object:get_pos(), self.attack:get_pos())))
 			end
 			local dmg = math.random(2, 4)
-			mcl_bows.shoot_arrow("mcl_bows:arrow", pos, dir, self.object:get_yaw(), self.object, nil, dmg)
+			local arrow = self.arrow:match("^(.+)_entity$")
+			mcl_bows.shoot_arrow(arrow, pos, dir, self.object:get_yaw(), self.object, nil, dmg)
 		end
 	end,
 	shoot_interval = 2,
@@ -133,10 +141,10 @@ stray.textures = {
 		"mcl_bows_bow_0.png",
 	},
 }
+stray.arrow = "mcl_potions:frost_arrow_entity"
 -- TODO: different sound (w/ echo)
--- TODO: stray's arrow inflicts slowness status
 table.insert(stray.drops, {
-	name = "mcl_potions:slowness_arrow",
+	name = "mcl_potions:frost_arrow",
 	chance = 2,
 	min = 1,
 	max = 1,
@@ -145,12 +153,19 @@ table.insert(stray.drops, {
 		local chance = 0.5
 		for i = 1, lvl do
 			if chance > 1 then
-				return 1
+				return 1 -- TODO verify this logic, I think this is not how chance works
 			end
 			chance = chance + (1 - chance) / 2
 		end
 		return chance
 	end,
+})
+table.insert(stray.drops, {
+	name = "mcl_mobitems:shiny_ice_crystal",
+	chance = 3,
+	min = 1,
+	max = 2,
+	looting = "rare",
 })
 
 mcl_mobs.register_mob("mobs_mc:stray", stray)
@@ -299,7 +314,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 20,
-17000,
+800,
 2,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)
@@ -316,7 +331,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-10000,
+800,
 3,
 mcl_vars.mg_nether_min,
 mcl_vars.mg_nether_max)
@@ -336,7 +351,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 20,
-19000,
+1200,
 2,
 mobs_mc.water_level,
 mcl_vars.mg_overworld_max)

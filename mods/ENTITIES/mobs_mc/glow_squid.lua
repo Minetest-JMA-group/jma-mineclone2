@@ -30,6 +30,7 @@ for i=1,4 do
 end
 
 mcl_mobs.register_mob("mobs_mc:glow_squid", {
+	description = S("Glow Squid"),
 	type = "animal",
 	spawn_class = "water_underground",
 	can_despawn = true,
@@ -237,7 +238,7 @@ mcl_mobs:spawn_specific(
 		0,
 		minetest.LIGHT_MAX + 1,
 		30,
-		10000,
+		100,
 		3,
 		water - 16,
 		water)

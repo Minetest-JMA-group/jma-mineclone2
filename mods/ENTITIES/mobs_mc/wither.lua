@@ -349,7 +349,7 @@ mcl_mobs.register_mob("mobs_mc:wither", {
 					mcl_util.deal_damage(objs[n], 8, {type = "magic"})
 					hit_some = true
 				end
-				mcl_mobs.effect_functions["withering"](objs[n], 0.5, 10)
+				mcl_potions.give_effect("withering", objs[n], 2, 10)
 			end
 			if hit_some then
 				mcl_mobs.effect(pos, 32, "mcl_particles_soul_fire_flame.png", 5, 10, self.reach, 1, 0)
@@ -463,13 +463,13 @@ mcl_mobs.register_arrow("mobs_mc:wither_skull", {
 	},
 	velocity = 7,
 	rotate = 90,
-	_lifetime = 350,
+	_lifetime = 15,
 	on_punch = function(self) end,
 
 	-- direct hit
 	hit_player = function(self, player)
 		local pos = vector.new(self.object:get_pos())
-		mcl_mobs.effect_functions["withering"](player, 0.5, 10)
+		mcl_potions.give_effect("withering", player, 2, 10)
 		player:punch(self.object, 1.0, {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 8},
@@ -484,7 +484,7 @@ mcl_mobs.register_arrow("mobs_mc:wither_skull", {
 
 	hit_mob = function(self, mob)
 		local pos = vector.new(self.object:get_pos())
-		mcl_mobs.effect_functions["withering"](mob, 0.5, 10)
+		mcl_potions.give_effect("withering", mob, 2, 10)
 		mob:punch(self.object, 1.0, {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 8},
@@ -516,13 +516,13 @@ mcl_mobs.register_arrow("mobs_mc:wither_skull_strong", {
 	},
 	velocity = 4,
 	rotate = 90,
-	_lifetime = 500,
+	_lifetime = 25,
 	on_punch = function(self) end,
 
 	-- direct hit
 	hit_player = function(self, player)
 		local pos = vector.new(self.object:get_pos())
-		mcl_mobs.effect_functions["withering"](player, 0.5, 10)
+		mcl_potions.give_effect("withering", player, 2, 10)
 		player:punch(self.object, 1.0, {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 12},
@@ -541,7 +541,7 @@ mcl_mobs.register_arrow("mobs_mc:wither_skull_strong", {
 
 	hit_mob = function(self, mob)
 		local pos = vector.new(self.object:get_pos())
-		mcl_mobs.effect_functions["withering"](mob, 0.5, 10)
+		mcl_potions.give_effect("withering", mob, 2, 10)
 		mob:punch(self.object, 1.0, {
 			full_punch_interval = 0.5,
 			damage_groups = {fleshy = 12},

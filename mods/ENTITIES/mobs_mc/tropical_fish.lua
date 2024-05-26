@@ -58,6 +58,7 @@ local function set_textures(self)
 end
 
 local tropical_fish = {
+	description = S("Tropical Fish"),
 	type = "animal",
 	spawn_class = "water_ambient",
 	can_despawn = true,
@@ -183,7 +184,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-4000,
+750,
 3,
 water-16,
 water+1)

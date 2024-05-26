@@ -30,6 +30,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 --###################
 
 local dolphin = {
+	description = S("Dolphin"),
 	type = "animal",
 	spawn_class = "water",
 	can_despawn = true,
@@ -244,7 +245,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-4000,
+70,
 3,
 water-16,
 water+1)

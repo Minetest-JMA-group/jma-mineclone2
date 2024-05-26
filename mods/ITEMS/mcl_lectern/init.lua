@@ -76,8 +76,7 @@ local lectern_def = {
 		if wdir == 0 then
 			return itemstack
 			-- IE., no Hanging Lecterns for you!
-		end
-		if wdir == 1 then
+		else
 			-- (only make standing nodes...)
 			-- Determine the rotation based on player's yaw
 			local yaw = pi * 2 - placer:get_look_horizontal()
@@ -134,6 +133,12 @@ minetest.register_craft({
 		{"", "mcl_books:bookshelf", ""},
 		{"", "group:wood_slab", ""},
 	}
+})
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "mcl_lectern:lectern",
+	burntime = 15,
 })
 
 -- Base Aliases.

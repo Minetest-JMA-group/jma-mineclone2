@@ -314,6 +314,7 @@ function mcl_mobs.register_mob(name, def)
 
 			return self:mob_activate(staticdata, def, dtime)
 		end,
+		after_activate = def.after_activate,
 		attack_state = def.attack_state, -- custom attack state
 		on_attack = def.on_attack, -- called after attack, useful with otherwise predefined attack states (not custom)
 		harmed_by_heal = def.harmed_by_heal,
@@ -324,13 +325,21 @@ function mcl_mobs.register_mob(name, def)
 		attack_exception = def.attack_exception or function(p) return false end,
 
 		_spawner = def._spawner,
+		_mcl_potions = {},
 	}
-	minetest.register_entity(name, setmetatable(final_def,mcl_mobs.mob_class_meta))
 
 	if minetest.get_modpath("doc_identifier") ~= nil then
 		doc.sub.identifier.register_object(name, "basics", "mobs")
+
+		if def.unused ~= true then
+			doc.add_entry("mobs", name, {
+				name = def.description or name,
+				data = final_def,
+			})
+		end
 	end
 
+	minetest.register_entity(name, setmetatable(final_def,mcl_mobs.mob_class_meta))
 end -- END mcl_mobs.register_mob function
 
 
@@ -362,12 +371,13 @@ function mcl_mobs.register_arrow(name, def)
 		collisionbox = {0, 0, 0, 0, 0, 0}, -- remove box around arrows
 		timer = 0,
 		switch = 0,
-		_lifetime = def._lifetime or 150,
+		_lifetime = def._lifetime or 7,
 		owner_id = def.owner_id,
 		rotate = def.rotate,
-		on_punch = def.on_punch or function(self)
-			local vel = self.object:get_velocity()
-			self.object:set_velocity({x=vel.x * -1, y=vel.y * -1, z=vel.z * -1})
+		on_punch = def.on_punch or function(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
+			local vel = self.object:get_velocity():length()
+			self.object:set_velocity(dir * vel)
+			self._puncher = puncher
 		end,
 		collisionbox = def.collisionbox or {0, 0, 0, 0, 0, 0},
 		automatic_face_movement_dir = def.rotate
@@ -377,7 +387,7 @@ function mcl_mobs.register_arrow(name, def)
 
 		on_step = def.on_step or function(self, dtime)
 
-			self.timer = self.timer + 1
+			self.timer = self.timer + dtime
 
 			local pos = self.object:get_pos()
 
@@ -443,24 +453,24 @@ function mcl_mobs.register_arrow(name, def)
 
 			if self.hit_player or self.hit_mob or self.hit_object then
 
-				for _,player in pairs(minetest.get_objects_inside_radius(pos, 1.5)) do
+				for _,object in pairs(minetest.get_objects_inside_radius(pos, 1.5)) do
 
 					if self.hit_player
-					and player:is_player() then
+					and object:is_player() then
 
-						self.hit_player(self, player)
+						self.hit_player(self, object)
 						self.object:remove();
 						return
 					end
 
-					local entity = player:get_luaentity()
+					local entity = object:get_luaentity()
 
 					if entity
 					and self.hit_mob
 					and entity.is_mob == true
-					and tostring(player) ~= self.owner_id
+					and (tostring(object) ~= self.owner_id or self.timer > 2)
 					and entity.name ~= self.object:get_luaentity().name then
-						self.hit_mob(self, player)
+						self.hit_mob(self, object)
 						self.object:remove();
 						return
 					end
@@ -468,9 +478,9 @@ function mcl_mobs.register_arrow(name, def)
 					if entity
 					and self.hit_object
 					and (not entity.is_mob)
-					and tostring(player) ~= self.owner_id
+					and (tostring(object) ~= self.owner_id or self.timer > 2)
 					and entity.name ~= self.object:get_luaentity().name then
-						self.hit_object(self, player)
+						self.hit_object(self, object)
 						self.object:remove();
 						return
 					end

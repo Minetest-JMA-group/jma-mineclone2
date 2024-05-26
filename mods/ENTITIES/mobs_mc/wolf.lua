@@ -135,6 +135,7 @@ end
 
 -- Tamed wolf (aka “dog”)
 local dog = table.copy(wolf)
+dog.description = S("Dog")
 dog.can_despawn = false
 dog.passive = true
 dog.hp_min = 20
@@ -224,7 +225,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-9000,
+80,
 7,
 mobs_mc.water_level+3,
 mcl_vars.mg_overworld_max)

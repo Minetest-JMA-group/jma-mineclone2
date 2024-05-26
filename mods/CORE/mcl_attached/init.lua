@@ -1,5 +1,5 @@
 -- Overrides the builtin minetest.check_single_for_falling.
--- We need to do this in order to handle nodes in mineclone specific groups
+-- We need to do this in order to handle nodes in VoxeLibre specific groups
 -- "supported_node" and "attached_node_facedir".
 --
 -- Nodes in group "supported_node" can be placed on any node that does not
@@ -91,6 +91,17 @@ function minetest.check_single_for_falling(pos)
 		if def and def.drawtype == "airlike" then
 			drop_attached_node(pos)
 			return true
+		end
+	end
+
+	if get_item_group(node.name, "supported_node_facedir") ~= 0 then
+		local dir = facedir_to_dir(node.param2)
+		if dir then
+			local def = registered_nodes[get_node(vector.add(pos, dir)).name]
+			if def and def.drawtype == "airlike" then
+				drop_attached_node(pos)
+				return true
+			end
 		end
 	end
 

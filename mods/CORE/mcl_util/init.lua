@@ -1,5 +1,7 @@
 mcl_util = {}
 
+dofile(minetest.get_modpath(minetest.get_current_modname()).."/roman_numerals.lua")
+
 -- Updates all values in t using values from to*.
 function table.update(t, ...)
 	for _, to in ipairs {...} do
@@ -113,7 +115,7 @@ end
 -- Minetest 5.3.0 or less can only measure the light level. This came in at 5.4
 -- This function has been known to fail in multiple places so the error handling is added increase safety and improve
 -- debugging. See:
--- https://git.minetest.land/MineClone2/MineClone2/issues/1392
+-- https://git.minetest.land/VoxeLibre/VoxeLibre/issues/1392
 function mcl_util.get_natural_light (pos, time)
 	local status, retVal = pcall(minetest.get_natural_light, pos, time)
 	if status then
@@ -160,7 +162,7 @@ function mcl_util.rotate_axis_and_place(itemstack, placer, pointed_thing, infini
 		return
 	end
 	local undef = minetest.registered_nodes[unode.name]
-	if undef and undef.on_rightclick then
+	if undef and undef.on_rightclick and not invert_wall then
 		undef.on_rightclick(pointed_thing.under, unode, placer,
 			itemstack, pointed_thing)
 		return
@@ -198,25 +200,11 @@ function mcl_util.rotate_axis_and_place(itemstack, placer, pointed_thing, infini
 
 	local p2
 	if is_y then
-		if invert_wall then
-			if fdir == 3 or fdir == 1 then
-				p2 = 12
-			else
-				p2 = 6
-			end
-		end
+		p2 = 0
 	elseif is_x then
-		if invert_wall then
-			p2 = 0
-		else
-			p2 = 12
-		end
+		p2 = 12
 	elseif is_z then
-		if invert_wall then
-			p2 = 0
-		else
-			p2 = 6
-		end
+		p2 = 6
 	end
 	minetest.set_node(pos, {name = wield_name, param2 = p2})
 
@@ -271,12 +259,21 @@ end
 ---@param dst_inventory InvRef Destination inventory to push to
 ---@param dst_list string Name of destination inventory list to push to
 ---@param condition? fun(stack: ItemStack) Condition which items are allowed to be transfered.
+---@param count? integer Number of items to try to transfer at once
 ---@return integer Item stack number to be transfered
-function mcl_util.select_stack(src_inventory, src_list, dst_inventory, dst_list, condition)
+function mcl_util.select_stack(src_inventory, src_list, dst_inventory, dst_list, condition, count)
 	local src_size = src_inventory:get_size(src_list)
 	local stack
 	for i = 1, src_size do
 		stack = src_inventory:get_stack(src_list, i)
+
+		-- Allow for partial stack movement
+		if count and stack:get_count() >= count then
+			local new_stack = ItemStack(stack)
+			new_stack:set_count(count)
+			stack = new_stack
+		end
+
 		if not stack:is_empty() and dst_inventory:room_for_item(dst_list, stack) and ((condition == nil or condition(stack))) then
 			return i
 		end
@@ -294,21 +291,22 @@ end
 -- Returns true on success and false on failure
 -- Possible failures: No item in source slot, destination inventory full
 function mcl_util.move_item(source_inventory, source_list, source_stack_id, destination_inventory, destination_list)
-	if not source_inventory:is_empty(source_list) then
-		local stack = source_inventory:get_stack(source_list, source_stack_id)
-		if not stack:is_empty() then
-			local new_stack = ItemStack(stack)
-			new_stack:set_count(1)
-			if not destination_inventory:room_for_item(destination_list, new_stack) then
-				return false
-			end
-			stack:take_item()
-			source_inventory:set_stack(source_list, source_stack_id, stack)
-			destination_inventory:add_item(destination_list, new_stack)
-			return true
-		end
+	-- Can't move items we don't have
+	if source_inventory:is_empty(source_list) then return false end
+
+	-- Can't move from an empty stack
+	local stack = source_inventory:get_stack(source_list, source_stack_id)
+	if stack:is_empty() then return false end
+
+	local new_stack = ItemStack(stack)
+	new_stack:set_count(1)
+	if not destination_inventory:room_for_item(destination_list, new_stack) then
+		return false
 	end
-	return false
+	stack:take_item()
+	source_inventory:set_stack(source_list, source_stack_id, stack)
+	destination_inventory:add_item(destination_list, new_stack)
+	return true
 end
 
 --- Try pushing item from hopper inventory to destination inventory
@@ -328,25 +326,23 @@ function mcl_util.hopper_push(pos, dst_pos)
 	local dst_list = 'main'
 	local dst_inv, stack_id
 
+	-- Find a inventory stack in the destination
 	if dst_def._mcl_hoppers_on_try_push then
 		dst_inv, dst_list, stack_id = dst_def._mcl_hoppers_on_try_push(dst_pos, pos, hop_inv, hop_list)
 	else
 		local dst_meta = minetest.get_meta(dst_pos)
 		dst_inv = dst_meta:get_inventory()
-		stack_id = mcl_util.select_stack(hop_inv, hop_list, dst_inv, dst_list)
+		stack_id = mcl_util.select_stack(hop_inv, hop_list, dst_inv, dst_list, nil, 1)
+	end
+	if not stack_id then return false end
+
+	-- Move the item
+	local ok = mcl_util.move_item(hop_inv, hop_list, stack_id, dst_inv, dst_list)
+	if dst_def._mcl_hoppers_on_after_push then
+		dst_def._mcl_hoppers_on_after_push(dst_pos)
 	end
 
-	if stack_id ~= nil then
-		local ok = mcl_util.move_item(hop_inv, hop_list, stack_id, dst_inv, dst_list)
-		if dst_def._mcl_hoppers_on_after_push then
-			dst_def._mcl_hoppers_on_after_push(dst_pos)
-		end
-		if ok then
-			return true
-		end
-	end
-
-	return false
+	return ok
 end
 
 -- Try pulling from source inventory to hopper inventory
@@ -371,7 +367,7 @@ function mcl_util.hopper_pull(pos, src_pos)
 	else
 		local src_meta = minetest.get_meta(src_pos)
 		src_inv = src_meta:get_inventory()
-		stack_id = mcl_util.select_stack(src_inv, src_list, hop_inv, hop_list)
+		stack_id = mcl_util.select_stack(src_inv, src_list, hop_inv, hop_list, nil, 1)
 	end
 
 	if stack_id ~= nil then
@@ -442,10 +438,11 @@ function mcl_util.generate_on_place_plant_function(condition)
 		if not def_under or not def_above then
 			return itemstack
 		end
-		if def_under.buildable_to then
+		if def_under.buildable_to and def_under.name ~= itemstack:get_name() then
 			place_pos = pointed_thing.under
-		elseif def_above.buildable_to then
+		elseif def_above.buildable_to and def_above.name ~= itemstack:get_name() then
 			place_pos = pointed_thing.above
+			pointed_thing.under = pointed_thing.above
 		else
 			return itemstack
 		end
@@ -540,6 +537,7 @@ end
 function mcl_util.use_item_durability(itemstack, n)
 	local uses = mcl_util.calculate_durability(itemstack)
 	itemstack:add_wear(65535 / uses * n)
+	tt.reload_itemstack_description(itemstack) -- update tooltip
 end
 
 function mcl_util.deal_damage(target, damage, mcl_reason)

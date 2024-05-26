@@ -105,7 +105,13 @@ minetest.register_on_mods_loaded(function()
 				nonmisc = true
 			end
 			if def.groups.brewitem then
-				table.insert(inventory_lists["brew"], name)
+				local str = name
+				if def.groups._mcl_potion == 1 then
+					local stack = ItemStack(name)
+					tt.reload_itemstack_description(stack)
+					str = stack:to_string()
+				end
+				table.insert(inventory_lists["brew"], str)
 				nonmisc = true
 			end
 			if def.groups.craftitem then
@@ -115,6 +121,23 @@ minetest.register_on_mods_loaded(function()
 			-- Misc. category is for everything which is not in any other category
 			if not nonmisc then
 				table.insert(inventory_lists["misc"], name)
+			end
+
+			if def.groups._mcl_potion == 1 then
+				if def.has_potent then
+					local stack = ItemStack(name)
+					local potency = def._default_potent_level - 1
+					stack:get_meta():set_int("mcl_potions:potion_potent", potency)
+					tt.reload_itemstack_description(stack)
+					table.insert(inventory_lists["brew"], stack:to_string())
+				end
+				if def.has_plus then
+					local stack = ItemStack(name)
+					local extend = def._default_extend_level
+					stack:get_meta():set_int("mcl_potions:potion_plus", extend)
+					tt.reload_itemstack_description(stack)
+					table.insert(inventory_lists["brew"], stack:to_string())
+				end
 			end
 
 			table.insert(inventory_lists["all"], name)
@@ -204,7 +227,8 @@ local function init(player)
 	local playername = player:get_player_name()
 	minetest.create_detached_inventory("creative_" .. playername, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
-			if minetest.is_creative_enabled(playername) then
+			if minetest.is_creative_enabled(playername) and
+			   from_list ~= to_list then
 				return count
 			else
 				return 0
@@ -541,7 +565,6 @@ function mcl_inventory.set_creative_formspec(player)
 			"style[" .. this_tab .. ";border=false;bgimg=;bgimg_pressed=;noclip=true]",
 			"image[" .. offset[this_tab] .. ";1.5,1.44;" .. bg_img .. "]",
 			"item_image_button[" .. boffset[this_tab] .. ";1,1;" .. tab_icon[this_tab] .. ";" .. this_tab .. ";]",
-			"tooltip[blocks;" .. F(filtername[this_tab]) .. "]"
 		})
 	end
 
@@ -570,20 +593,33 @@ function mcl_inventory.set_creative_formspec(player)
 
 		listrings,
 
-		tab(name, "blocks"),
-		tab(name, "deco"),
-		tab(name, "redstone"),
-		tab(name, "rail"),
-		tab(name, "misc"),
-		tab(name, "nix"),
+		tab(name, "blocks") ..
+		"tooltip[blocks;"..F(filtername["blocks"]).."]"..
+		tab(name, "deco") ..
+		"tooltip[deco;"..F(filtername["deco"]).."]"..
+		tab(name, "redstone") ..
+		"tooltip[redstone;"..F(filtername["redstone"]).."]"..
+		tab(name, "rail") ..
+		"tooltip[rail;"..F(filtername["rail"]).."]"..
+		tab(name, "misc") ..
+		"tooltip[misc;"..F(filtername["misc"]).."]"..
+		tab(name, "nix") ..
+		"tooltip[nix;"..F(filtername["nix"]).."]"..
 
-		tab(name, "food"),
-		tab(name, "tools"),
-		tab(name, "combat"),
-		tab(name, "mobs"),
-		tab(name, "brew"),
-		tab(name, "matr"),
-		tab(name, "inv"),
+		tab(name, "food") ..
+		"tooltip[food;"..F(filtername["food"]).."]"..
+		tab(name, "tools") ..
+		"tooltip[tools;"..F(filtername["tools"]).."]"..
+		tab(name, "combat") ..
+		"tooltip[combat;"..F(filtername["combat"]).."]"..
+		tab(name, "mobs") ..
+		"tooltip[mobs;"..F(filtername["mobs"]).."]"..
+		tab(name, "brew") ..
+		"tooltip[brew;"..F(filtername["brew"]).."]"..
+		tab(name, "matr") ..
+		"tooltip[matr;"..F(filtername["matr"]).."]"..
+		tab(name, "inv") ..
+		"tooltip[inv;"..F(filtername["inv"]).."]"
 	})
 
 	if name == "nix" then
@@ -594,6 +630,7 @@ function mcl_inventory.set_creative_formspec(player)
 		formspec = formspec .. table.concat({
 			"field[5.325,0.15;6.1,0.6;search;;" .. minetest.formspec_escape(filter) .. "]",
 			"field_close_on_enter[search;false]",
+			"field_enter_after_edit[search;true]",
 			"set_focus[search;true]",
 		})
 	end

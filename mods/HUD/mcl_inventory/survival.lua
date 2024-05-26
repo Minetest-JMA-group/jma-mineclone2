@@ -1,18 +1,15 @@
 ---@diagnostic disable need-check-nil
-
-local table = table
-local ipairs = ipairs
-
 local S = minetest.get_translator("mcl_inventory")
 local F = minetest.formspec_escape
 
 ---@type {id: string, description: string, item_icon: string, build: (fun(player: ObjectRef): string), handle: fun(player: ObjectRef, fields: table), access: (fun(player): boolean), show_inventory: boolean}[]
 mcl_inventory.registered_survival_inventory_tabs = {}
 
+
 ---@param def {id: string, description: string, item_icon: string, build: (fun(player: ObjectRef): string), handle: fun(player: ObjectRef, fields: table), access: (fun(player): boolean), show_inventory: boolean}
 function mcl_inventory.register_survival_inventory_tab(def)
 	if #mcl_inventory.registered_survival_inventory_tabs == 7 then
-		error("Too much tabs registered!")
+		error("Too many tabs registered!")
 	end
 
 	assert(def.id)
@@ -39,9 +36,14 @@ function mcl_inventory.register_survival_inventory_tab(def)
 end
 
 local player_current_tab = {}
+function get_player_tab(player)
+	local tab = player_current_tab[player] or "main"
+	player_current_tab[player] = tab
+	return tab
+end
 
 minetest.register_on_joinplayer(function(player, last_login)
-	player_current_tab[player] = "main"
+	get_player_tab(player)
 end)
 
 minetest.register_on_leaveplayer(function(player, timed_out)
@@ -134,9 +136,9 @@ local main_page_static = table.concat({
 
 	--Listring
 	"listring[current_player;main]",
-	"listring[current_player;armor]",
-	"listring[current_player;main]",
 	"listring[current_player;craft]",
+	"listring[current_player;main]",
+	"listring[current_player;armor]",
 	"listring[current_player;main]",
 })
 
@@ -187,7 +189,7 @@ function mcl_inventory.build_survival_formspec(player)
 	inv:set_width("craft", 2)
 	inv:set_size("craft", 4)
 
-	local tab = player_current_tab[player]
+	local tab = get_player_tab(player)
 
 	local tab_def = nil
 
@@ -204,18 +206,19 @@ function mcl_inventory.build_survival_formspec(player)
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
+	local player_name = player:get_player_name()
 	if formname == "" and #mcl_inventory.registered_survival_inventory_tabs ~= 1 and
-		mcl_gamemode.get_gamemode(player) == "survival" then
+		not minetest.is_creative_enabled(player_name) then
 		for _, d in ipairs(mcl_inventory.registered_survival_inventory_tabs) do
 			if fields["tab_" .. d.id] and d.access(player) then
 				player_current_tab[player] = d.id
 				mcl_inventory.update_inventory(player)
-				return
+				break
 			end
 		end
 
 		for _, d in ipairs(mcl_inventory.registered_survival_inventory_tabs) do
-			if player_current_tab[player] == d.id and d.access(player) then
+			if get_player_tab(player) == d.id and d.access(player) then
 				d.handle(player, fields)
 				return
 			end
