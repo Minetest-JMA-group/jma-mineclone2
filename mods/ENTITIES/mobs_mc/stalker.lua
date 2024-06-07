@@ -35,7 +35,8 @@ local function get_texture(self)
 	if not texture or texture == "" then
 		texture = "vl_stalker_default.png"
 	end
-	texture = "([combine:16x24:0,0=" .. texture .. ":0,16=" .. texture .. texture_suff
+	texture = texture:gsub("([\\^:\\[])","\\%1") -- escape texture modifiers
+	texture = "([combine:16x24:0,0=(" .. texture .. "):0,16=(" .. texture ..")".. texture_suff
 	if self.attack then
 		texture = texture .. ")^vl_mobs_stalker_overlay_angry.png"
 	else
@@ -131,7 +132,11 @@ mcl_mobs.register_mob("mobs_mc:stalker", {
 				self:boom(mcl_util.get_object_center(self.object), self.explosion_strength)
 			end
 		end
-		self.object:set_properties({textures={get_texture(self)}})
+		local new_texture = get_texture(self)
+		if self._stalker_texture ~= new_texture then
+			self.object:set_properties({textures={new_texture, "mobs_mc_empty.png"}})
+			self._stalker_texture = new_texture
+		end
 	end,
 	on_die = function(self, pos, cmi_cause)
 		-- Drop a random music disc when killed by skeleton or stray
@@ -175,7 +180,18 @@ mcl_mobs.register_mob("mobs_mc:stalker", {
 	floats = 1,
 	fear_height = 4,
 	view_range = 16,
-})
+
+	_on_after_convert = function(obj)
+		obj:set_properties({
+			visual_size = {x=2, y=2},
+			mesh = "vl_stalker.b3d",
+			textures = {
+				{get_texture({}),
+				"mobs_mc_empty.png"},
+			},
+		})
+	end,
+}) -- END mcl_mobs.register_mob("mobs_mc:stalker", {
 
 mcl_mobs.register_mob("mobs_mc:stalker_overloaded", {
 	description = S("Overloaded Stalker"),
@@ -304,26 +320,8 @@ mcl_mobs.register_mob("mobs_mc:stalker_overloaded", {
 	--Having trouble when fire is placed with lightning
 	fire_resistant = true,
 	glow = 3,
-})
 
--- compat
-minetest.register_entity("mobs_mc:creeper", {
-	on_activate = function(self, staticdata, dtime)
-		local obj = minetest.add_entity(self.object:get_pos(), "mobs_mc:stalker", staticdata)
-		obj:set_properties({
-			visual_size = {x=2, y=2},
-			mesh = "vl_stalker.b3d",
-			textures = {
-				{get_texture({}),
-				"mobs_mc_empty.png"},
-			},
-		})
-		self.object:remove()
-	end,
-})
-minetest.register_entity("mobs_mc:creeper_charged", {
-	on_activate = function(self, staticdata, dtime)
-		local obj = minetest.add_entity(self.object:get_pos(), "mobs_mc:stalker_overloaded", staticdata)
+	_on_after_convert = function(obj)
 		obj:set_properties({
 			visual_size = {x=2, y=2},
 			mesh = "vl_stalker.b3d",
@@ -332,9 +330,12 @@ minetest.register_entity("mobs_mc:creeper_charged", {
 				AURA},
 			},
 		})
-		self.object:remove()
 	end,
-})
+}) -- END mcl_mobs.register_mob("mobs_mc:stalker_overloaded", {
+
+-- compat
+mcl_mobs.register_conversion("mobs_mc:creeper", "mobs_mc:stalker")
+mcl_mobs.register_conversion("mobs_mc:creeper_charged", "mobs_mc:stalker_overloaded")
 
 mcl_mobs:spawn_specific(
 "mobs_mc:stalker",
