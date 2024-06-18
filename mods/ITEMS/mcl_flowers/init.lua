@@ -183,6 +183,39 @@ def_fern.groups.compostability = 65
 
 minetest.register_node("mcl_flowers:fern", def_fern)
 
+
+--- Clover ---
+-- Similar deal as fern, we can copy a lot from tall grass
+local def_clover = table.copy(def_tallgrass)
+def_clover.description = S("Clover")
+def_clover._doc_items_longdesc = S("Clovers are small plants which occur naturally in plains and other temperate biomes. They can be picked up and planted again.")
+def_clover.drawtype = "mesh"
+def_clover.mesh = "mcl_clover_3leaf.obj"
+def_clover.tiles = { "mcl_flowers_clover.png" }
+def_clover.inventory_image = "mcl_flowers_clover_inv.png"
+def_clover.wield_image = "mcl_flowers_clover_inv.png"
+def_clover.use_texture_alpha = "clip"
+def_clover.drop = "mcl_flowers:clover"
+def_clover.selection_box = {
+	type = "fixed",
+	fixed = { -4/16, -0.5, -4/16, 4/16, 0, 4/16 },
+}
+def_clover.groups.compostability = 30
+
+minetest.register_node("mcl_flowers:clover", def_clover)
+
+local def_4l_clover = table.copy(def_clover)
+def_4l_clover.description = S("Four-leaf Clover")
+def_4l_clover._doc_items_longdesc = S("Clovers are small plants which occur naturally in plains and other temperate biomes. They can be picked up and planted again.")
+def_4l_clover.mesh = "mcl_clover_4leaf.obj"
+def_4l_clover.tiles = { "mcl_flowers_fourleaf_clover.png" }
+def_4l_clover.inventory_image = "mcl_flowers_fourleaf_clover_inv.png"
+def_4l_clover.wield_image = "mcl_flowers_fourleaf_clover_inv.png"
+def_4l_clover.use_texture_alpha = "clip"
+def_4l_clover.drop = "mcl_flowers:fourleaf_clover"
+
+minetest.register_node("mcl_flowers:fourleaf_clover", def_4l_clover)
+
 if has_mcl_flowerpots then
 	mcl_flowerpots.register_potted_flower("mcl_flowers:fern", {
 		name = "fern",
@@ -238,6 +271,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 	end
 	-- Sunflower mesh and tiles
 	local top_drawtype, bottom_drawtype
+	local alpha = nil
 	local bottom_tiles = {}
 	if not mesh then
 		top_drawtype = "plantlike"
@@ -247,6 +281,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 		top_drawtype = "airlike"
 		bottom_drawtype = "mesh"
 		bottom_tiles = bottom_img
+		alpha = "clip"
 	end
 	-- Bottom
 	minetest.register_node("mcl_flowers:"..name, {
@@ -268,6 +303,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 		_mcl_shears_drop = shears_drop,
 		_mcl_fortune_drop = fortune_drop,
 		node_placement_prediction = "",
+		use_texture_alpha = alpha,
 		selection_box = {
 			type = "fixed",
 			fixed = { -selbox_radius, -0.5, -selbox_radius, selbox_radius, 0.5, selbox_radius },
@@ -367,6 +403,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 		palette = palette,
 		walkable = false,
 		buildable_to = false,
+		use_texture_alpha = alpha,
 		selection_box = {
 			type = "fixed",
 			fixed = { -selbox_radius, -0.5, -selbox_radius, selbox_radius, selbox_top_height, selbox_radius },

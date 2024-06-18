@@ -6,6 +6,7 @@ local MAPBLOCK_SIZE = 16
 local seed = minetest.get_mapgen_setting("seed")
 
 local slime_chunk_match
+local slime_chunk_spawn_max = mcl_worlds.layer_to_y(40)
 local x_modifier
 local z_modifier
 
@@ -166,16 +167,16 @@ local swamp_light_max = 7
 local function slime_spawn_check(pos, environmental_light, artificial_light, sky_light)
 	local maxlight = swamp_light_max
 
-	if is_slime_chunk(pos) then
+	if pos.y <= slime_chunk_spawn_max and is_slime_chunk(pos) then
 		maxlight = minetest.LIGHT_MAX + 1
 	end
 
-	return artificial_light <= maxlight
+	return math.max(artificial_light, sky_light) <= maxlight
 end
 
 -- Slime
 local slime_big = {
-	description = S("Slime"),
+	description = S("Slime - big"),
 	type = "monster",
 	spawn_class = "hostile",
 	group_attack = { "mobs_mc:slime_big", "mobs_mc:slime_small", "mobs_mc:slime_tiny" },
@@ -230,6 +231,7 @@ local slime_big = {
 mcl_mobs.register_mob("mobs_mc:slime_big", slime_big)
 
 local slime_small = table.copy(slime_big)
+slime_small.description = S("Slime - small")
 slime_small.sounds.base_pitch = 1.15
 slime_small.hp_min = 4
 slime_small.hp_max = 4
@@ -247,6 +249,7 @@ slime_small.on_die = spawn_children_on_die("mobs_mc:slime_tiny", 0.6, 1.0)
 mcl_mobs.register_mob("mobs_mc:slime_small", slime_small)
 
 local slime_tiny = table.copy(slime_big)
+slime_tiny.description = S("Slime - tiny")
 slime_tiny.sounds.base_pitch = 1.3
 slime_tiny.hp_min = 1
 slime_tiny.hp_max = 1
@@ -321,7 +324,7 @@ cave_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-12000,
+1000,
 4,
 cave_min,
 cave_max,
@@ -335,7 +338,7 @@ swampy_biomes,
 0,
 swamp_light_max,
 30,
-12000,
+1000,
 4,
 swamp_min,
 swamp_max)
@@ -348,7 +351,7 @@ cave_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-8500,
+1000,
 4,
 cave_min,
 cave_max,
@@ -362,7 +365,7 @@ swampy_biomes,
 0,
 swamp_light_max,
 30,
-8500,
+1000,
 4,
 swamp_min,
 swamp_max)
@@ -375,7 +378,7 @@ cave_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-10000,
+1000,
 4,
 cave_min,
 cave_max,
@@ -389,14 +392,14 @@ swampy_biomes,
 0,
 swamp_light_max,
 30,
-10000,
+1000,
 4,
 swamp_min,
 swamp_max)
 
 -- Magma cube
 local magma_cube_big = {
-	description = S("Magma Cube"),
+	description = S("Magma Cube - big"),
 	type = "monster",
 	spawn_class = "hostile",
 	hp_min = 16,
@@ -457,6 +460,7 @@ local magma_cube_big = {
 mcl_mobs.register_mob("mobs_mc:magma_cube_big", magma_cube_big)
 
 local magma_cube_small = table.copy(magma_cube_big)
+magma_cube_small.description = S("Magma Cube - small")
 magma_cube_small.sounds.jump = "mobs_mc_magma_cube_small"
 magma_cube_small.sounds.death = "mobs_mc_magma_cube_small"
 magma_cube_small.hp_min = 4
@@ -478,6 +482,7 @@ magma_cube_small.on_die = spawn_children_on_die("mobs_mc:magma_cube_tiny", 0.6, 
 mcl_mobs.register_mob("mobs_mc:magma_cube_small", magma_cube_small)
 
 local magma_cube_tiny = table.copy(magma_cube_big)
+magma_cube_tiny.description = S("Magma Cube - tiny")
 magma_cube_tiny.sounds.jump = "mobs_mc_magma_cube_small"
 magma_cube_tiny.sounds.death = "mobs_mc_magma_cube_small"
 magma_cube_tiny.sounds.base_pitch = 1.25
@@ -512,7 +517,7 @@ magma_cube_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-15000,
+100,
 4,
 nether_min,
 nether_max)
@@ -525,7 +530,7 @@ magma_cube_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-15500,
+100,
 4,
 nether_min,
 nether_max)
@@ -538,7 +543,7 @@ magma_cube_biomes,
 0,
 minetest.LIGHT_MAX+1,
 30,
-16000,
+100,
 4,
 nether_min,
 nether_max)

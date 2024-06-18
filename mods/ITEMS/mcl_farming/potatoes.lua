@@ -83,6 +83,13 @@ minetest.register_node("mcl_farming:potato", {
 	groups = {dig_immediate=3, not_in_creative_inventory=1,plant=1,attached_node=1,dig_by_water=1,destroy_by_lava_flow=1,dig_by_piston=1},
 	sounds = mcl_sounds.node_sound_leaves_defaults(),
 	_mcl_blast_resistance = 0,
+	_mcl_fortune_drop = {
+		discrete_uniform_distribution = true,
+		items = {"mcl_farming:potato_item"},
+		min_count = 2,
+		max_count = 4,
+		cap = 5
+	}
 })
 
 minetest.register_craftitem("mcl_farming:potato_item", {
@@ -135,7 +142,7 @@ minetest.register_on_item_eat(function (hp_change, replace_with_item, itemstack,
 	-- 60% chance of poisoning with poisonous potato
 	if itemstack:get_name() == "mcl_farming:potato_item_poison" then
 		if math.random(1,10) >= 6 then
-			mcl_potions.poison_func(user, 1, 5)
+			mcl_potions.give_effect_by_level("poison", user, 1, 5)
 		end
 	end
 

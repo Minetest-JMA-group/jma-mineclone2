@@ -122,6 +122,7 @@ mooshroom_def.on_rightclick = function(self, clicker)
 
 		if not minetest.is_creative_enabled(clicker:get_player_name()) then
 			item:add_wear(mobs_mc.shears_wear)
+			tt.reload_itemstack_description(item) -- update tooltip
 			clicker:get_inventory():set_stack("main", clicker:get_wield_index(), item)
 		end
 	-- Use bucket to milk
@@ -207,7 +208,7 @@ mcl_mobs:spawn_specific(
 9,
 minetest.LIGHT_MAX+1,
 30,
-17000,
+80,
 10,
 mobs_mc.water_level,
 mcl_vars.mg_overworld_max)
@@ -225,7 +226,7 @@ mcl_mobs:spawn_specific(
 9,
 minetest.LIGHT_MAX+1,
 30,
-17000,
+80,
 5,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)

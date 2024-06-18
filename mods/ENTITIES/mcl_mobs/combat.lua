@@ -21,8 +21,6 @@ local function atan(x)
 	end
 end
 
-mcl_mobs.effect_functions = {}
-
 
 -- check if daytime and also if mob is docile during daylight hours
 function mob_class:day_docile()
@@ -35,14 +33,19 @@ function mob_class:day_docile()
 	end
 end
 
--- attack player/mob
-function mob_class:do_attack(player)
+-- get this mob to attack the object
+function mob_class:do_attack(object)
 
 	if self.state == "attack" or self.state == "die" then
 		return
 	end
 
-	self.attack = player
+
+	if object:is_player() and not minetest.settings:get_bool("enable_damage") then
+		return
+	end
+
+	self.attack = object
 	self.state = "attack"
 
 	-- TODO: Implement war_cry sound without being annoying
@@ -529,6 +532,8 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 		if self.protected and minetest.is_protected(mob_pos, hitter:get_player_name()) then
 			return
 		end
+
+		mcl_potions.update_haste_and_fatigue(hitter)
 	end
 
 	local time_now = minetest.get_us_time()
@@ -600,6 +605,13 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 			* tmp * ((armor[group] or 0) / 100.0)
 	end
 
+	-- strength and weakness effects
+	local strength = mcl_potions.get_effect(hitter, "strength")
+	local weakness = mcl_potions.get_effect(hitter, "weakness")
+	local str_fac = strength and strength.factor or 1
+	local weak_fac = weakness and weakness.factor or 1
+	damage = damage * str_fac * weak_fac
+
 	if weapon then
 		local fire_aspect_level = mcl_enchanting.get_enchantment(weapon, "fire_aspect")
 		if fire_aspect_level > 0 then
@@ -641,6 +653,7 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 				if def.tool_capabilities and def.tool_capabilities.punch_attack_uses then
 					local wear = math.floor(65535/tool_capabilities.punch_attack_uses)
 					weapon:add_wear(wear)
+					tt.reload_itemstack_description(weapon) -- update tooltip
 					hitter:set_wielded_item(weapon)
 				end
 			end, hitter:get_player_name())
@@ -952,6 +965,7 @@ function mob_class:do_states_attack (dtime)
 		if self.v_start then
 			self.timer = self.timer + dtime
 			self.blinktimer = (self.blinktimer or 0) + dtime
+			self:set_animation("fuse")
 
 			if self.blinktimer > 0.2 then
 				self.blinktimer = 0
@@ -1137,9 +1151,8 @@ function mob_class:do_states_attack (dtime)
 							damage_groups = {fleshy = self.damage}
 						}, nil)
 						if self.dealt_effect then
-							mcl_mobs.effect_functions[self.dealt_effect.name](
-								self.attack, self.dealt_effect.factor, self.dealt_effect.dur
-							)
+							mcl_potions.give_effect_by_level(self.dealt_effect.name, self.attack,
+								self.dealt_effect.level, self.dealt_effect.dur)
 						end
 					end
 				else

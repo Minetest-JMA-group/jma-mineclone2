@@ -1,7 +1,7 @@
 local mob_class = mcl_mobs.mob_class
 local mob_class_meta = {__index = mcl_mobs.mob_class}
 local math, vector, minetest, mcl_mobs = math, vector, minetest, mcl_mobs
--- API for Mobs Redo: MineClone 2 Edition (MRM)
+-- API for Mobs Redo: VoxeLibre Edition
 
 local PATHFINDING = "gowp"
 local CRASH_WARN_FREQUENCY = 60
@@ -96,15 +96,23 @@ function mob_class:get_staticdata()
 
 	local tmp = {}
 
-	for _,stat in pairs(self) do
+	for tag, stat in pairs(self) do
 
 		local t = type(stat)
 
 		if  t ~= "function"
 		and t ~= "nil"
 		and t ~= "userdata"
-		and _ ~= "_cmi_components" then
-			tmp[_] = self[_]
+		and tag ~= "_cmi_components" then
+			tmp[tag] = self[tag]
+		end
+	end
+
+	tmp._mcl_potions = self._mcl_potions
+	if tmp._mcl_potions then
+		for name_raw, data in pairs(tmp._mcl_potions) do
+			local def = mcl_potions.registered_effects[name_raw:match("^_EF_(.+)$")]
+			if def and def.on_save_effect then def.on_save_effect(self.object) end
 		end
 	end
 
@@ -306,7 +314,10 @@ function mob_class:mob_activate(staticdata, def, dtime)
 		self._run_armor_init = true
 	end
 
-
+	if not self._mcl_potions then
+		self._mcl_potions = {}
+	end
+	mcl_potions._load_entity_effects(self)
 
 
 	if def.after_activate then
@@ -473,7 +484,7 @@ local function warn_user_error ()
 
 	if time_since_warning > CRASH_WARN_FREQUENCY then
 		last_crash_warn_time = current_time
-		minetest.log("A game crashing bug was prevented. Please provide debug.log information to MineClone2 dev team for investigation. (Search for: --- Bug report start)")
+		minetest.log("A game crashing bug was prevented. Please provide debug.log information to VoxeLibre dev team for investigation. (Search for: --- Bug report start)")
 	end
 end
 

@@ -366,7 +366,7 @@ minetest.register_globalstep(function(dtime)
 			set_properties(player, player_props_elytra)
 
 			-- control body bone when flying
-			local body_rot = vector.new((75 - degrees(dir_to_pitch(player_velocity))), -player_vel_yaw + yaw, 0)
+			local body_rot = vector.new(degrees(dir_to_pitch(player_velocity)) + 110, -player_vel_yaw + yaw, 180)
 			set_bone_pos(player, "Body_Control", nil, body_rot)
 		elseif parent then
 			set_properties(player, player_props_riding)
@@ -749,6 +749,8 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		if time_diff <= 500000 and time_diff >= 0 then
 			player:get_meta():set_int("mcl_damage:invulnerable", 1)
 			minetest.after(0.5, function()
+				local player = minetest.get_player_by_name(name)
+				if not player then return end
 				player:get_meta():set_int("mcl_damage:invulnerable", 0)
 			end)
 			damage = damage - mcl_playerplus_internal[name].last_damage
@@ -761,6 +763,8 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 			mcl_playerplus_internal[name].invul_timestamp = time_now
 			player:get_meta():set_int("mcl_damage:damage_animation", 1)
 			minetest.after(0.5, function()
+				local player = minetest.get_player_by_name(name)
+				if not player then return end
 				player:get_meta():set_int("mcl_damage:damage_animation", 0)
 			end)
 		end

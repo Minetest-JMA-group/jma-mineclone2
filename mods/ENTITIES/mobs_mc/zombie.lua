@@ -38,7 +38,7 @@ local drops_common = {
 local drops_zombie = table.copy(drops_common)
 table.insert(drops_zombie, {
 	-- Zombie Head
-	-- TODO: Only drop if killed by charged creeper
+	-- TODO: Only drop if killed by charged stalker
 	name = "mcl_heads:zombie",
 	chance = 200, -- 0.5%
 	min = 1,
@@ -243,7 +243,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 30,
-6000,
+1000,
 4,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)
@@ -332,7 +332,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 30,
-60000,
+50,
 4,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)
@@ -348,7 +348,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 30,
-6500,
+2400,
 4,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)
@@ -362,7 +362,7 @@ mcl_mobs:spawn_specific(
 0,
 7,
 30,
-65000,
+120,
 4,
 mcl_vars.mg_overworld_min,
 mcl_vars.mg_overworld_max)

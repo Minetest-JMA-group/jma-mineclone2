@@ -122,10 +122,10 @@ local horse = {
 		stand_speed = 25,
 		stand_start = 0,
 		stand_end = 0,
-		walk_speed = 25,
+		walk_speed = 100,
 		walk_start = 0,
 		walk_end = 40,
-		run_speed = 60,
+		run_speed = 200,
 		run_start = 0,
 		run_end = 40,
 	},
@@ -543,11 +543,6 @@ donkey.description = S("Donkey")
 donkey.textures = {{"blank.png", "mobs_mc_donkey.png", "blank.png"}}
 donkey.spawn_in_group = 3
 donkey.spawn_in_group_min = 1
-donkey.animation = {
-	speed_normal = 25,
-	stand_start = 0, stand_end = 0,
-	walk_start = 0, walk_end = 40,
-}
 donkey.sounds = {
 	random = "mobs_mc_donkey_random",
 	damage = "mobs_mc_donkey_hurt",
@@ -609,7 +604,7 @@ mcl_mobs:spawn_specific(
 0,
 minetest.LIGHT_MAX+1,
 30,
-15000,
+40,
 4,
 mobs_mc.water_level+3,
 mcl_vars.mg_overworld_max)
@@ -632,7 +627,7 @@ mcl_mobs:spawn_specific(
 9,
 minetest.LIGHT_MAX+1,
 30,
-15000,
+10,
 4,
 mobs_mc.water_level+3,
 mcl_vars.mg_overworld_max)
