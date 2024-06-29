@@ -2,8 +2,8 @@
 A game inspired by Minecraft for Minetest. Forked from MineClone by davedevils.
 Developed by many people, see CREDITS.md for a complete list.
 
-> **Note**
-This repo is for the JMA Mineclone2 server for Minetest. We have a number of changes to VoxeLibre's core code, which should not be overwritten if updating. A list of files is included in CONTRIBUTING_JMA.md
+> [!IMPORTANT]  
+> This repo is for the JMA Mineclone2 server for Minetest. We have a number of changes to VoxeLibre's core code, which should not be overwritten if updating. A list of files is included in CONTRIBUTING_JMA.md
 
 ### Gameplay
 You start in a randomly-generated world made entirely of cubes. You can explore
