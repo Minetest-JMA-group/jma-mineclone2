@@ -11,3 +11,6 @@ Also, if you make any changes to VoxeLibre's code, please do include those here 
 
 - **mods/ITEMS/mcl_enchanting/enchantments.lua**
 	We have a custom enchantment, "Drill", which is registered in this file.
+
+- **mods/ITEMS/mcl_mobitems/init.lua**
+  	Dino Nuggets, a custom food craftable from Cooked Chicken, is registered here.
