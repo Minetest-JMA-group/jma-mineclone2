@@ -250,4 +250,11 @@ return {
 		"The workaholics who spent way too much time writing for the Minecraft Wiki. It's an invaluable resource for creating this game",
 		"Notch and Jeb for being the major forces behind Minecraft",
 	}},
+	{S("JMA Team"), 0xF84355, {
+		"Loki (Admin)",
+		"novaosoba (Admin)",
+		"Nanowolf4 (Developer)",
+		"fancyfinn9 (Developer)",
+		"I_am (Guardian)",
+	}},
 }
