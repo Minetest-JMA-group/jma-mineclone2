@@ -14,3 +14,6 @@ Also, if you make any changes to VoxeLibre's code, please do include those here 
 
 - **mods/ITEMS/mcl_mobitems/init.lua**
   	Dino Nuggets, a custom food craftable from Cooked Chicken, is registered here.
+
+- **mods/HUD/mcl_credits/people.lua**
+	The JMA developers and staff have been added to the end of this file to be seen at the end of the credits.
