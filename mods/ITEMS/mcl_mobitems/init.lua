@@ -86,6 +86,69 @@ minetest.register_craftitem("mcl_mobitems:cooked_chicken", {
 	stack_max = 64,
 })
 
+-- DINO NUGGETS
+
+minetest.register_craftitem("mcl_mobitems:dino_nuggets_stegosaurus", {
+	description = S("Dino Nuggets"),
+	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
+	inventory_image = "mcl_mobitems_dino_nuggets_stegosaurus.png",
+	wield_image = "mcl_mobitems_dino_nuggets_stegosaurus.png",
+	on_place = minetest.item_eat(2),
+	on_secondary_use = minetest.item_eat(2),
+	groups = { food = 2, eatable = 2 },
+	_mcl_saturation = 2,
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:dino_nuggets_brachiosaurus", {
+	description = S("Dino Nuggets"),
+	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
+	inventory_image = "mcl_mobitems_dino_nuggets_brachiosaurus.png",
+	wield_image = "mcl_mobitems_dino_nuggets_brachiosaurus.png",
+	on_place = minetest.item_eat(2),
+	on_secondary_use = minetest.item_eat(2),
+	groups = { food = 2, eatable = 2 },
+	_mcl_saturation = 2,
+	stack_max = 64,
+})
+
+minetest.register_craftitem("mcl_mobitems:dino_nuggets_trex", {
+	description = S("Dino Nuggets"),
+	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
+	inventory_image = "mcl_mobitems_dino_nuggets_trex.png",
+	wield_image = "mcl_mobitems_dino_nuggets_trex.png",
+	on_place = minetest.item_eat(2),
+	on_secondary_use = minetest.item_eat(2),
+	groups = { food = 2, eatable = 2 },
+	_mcl_saturation = 2,
+	stack_max = 64,
+})
+
+minetest.register_craft({
+	output = "mcl_mobitems:dino_nuggets_stegosaurus 6",
+	recipe = {
+		{"mcl_mobitems:cooked_chicken", "mcl_mobitems:cooked_chicken", }
+	},
+})
+
+minetest.register_craft({
+	output = "mcl_mobitems:dino_nuggets_brachiosaurus 6",
+	recipe = {
+		{"mcl_mobitems:cooked_chicken", ""},
+		{"", "mcl_mobitems:cooked_chicken"}
+	},
+})
+
+minetest.register_craft({
+	output = "mcl_mobitems:dino_nuggets_trex 6",
+	recipe = {
+		{"mcl_mobitems:cooked_chicken",},
+		{"mcl_mobitems:cooked_chicken",},
+	},
+})
+
+-- END DINO NUGGETS
+
 minetest.register_craftitem("mcl_mobitems:porkchop", {
 	description = S("Raw Porkchop"),
 	_doc_items_longdesc = S("A raw porkchop is the flesh from a pig and can be eaten safely. Cooking it will greatly increase its nutritional value."),
