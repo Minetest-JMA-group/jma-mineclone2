@@ -272,6 +272,15 @@ mcl_heads.register_head{
 	range_factor = 0.5,
 }
 
+mcl_heads.register_head{
+	name = "creeper",
+	texture = "mcl_heads_creeper.png",
+	description = S("Creeper Head"),
+	longdesc = S("A creeper head is a small decorative block which resembles the head of a creeper. It can also be worn as a helmet, which reduces the detection range of stalkers by 50%."),
+	range_mob = "mobs_mc:stalker",
+	range_factor = 0.5,
+}
+
 -- Original Minecraft name: “Head”
 mcl_heads.register_head{
 	name = "steve",
