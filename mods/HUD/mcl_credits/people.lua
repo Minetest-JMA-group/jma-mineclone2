@@ -22,10 +22,8 @@ return {
 		"epCode",
 		"chmodsayshello",
 		"MrRar",
-		"FossFanatic ",
 		"SmokeyDope",
 		"Faerraven / Michieal",
-		"Codiac",
 		"rudzik8",
 		"teknomunk",
 	}},
@@ -38,6 +36,8 @@ return {
 		"NO11",
 		"SumianVoice",
 		"PrairieWind",
+		"FossFanatic",
+		"Codiac",
 	}},
 	{S("Contributors"), 0x52FF00, {
 		"RandomLegoBrick",
@@ -142,6 +142,7 @@ return {
 		"SOS-Games",
 		"Bram",
 		"qoheniac",
+		"WillConker",
 	}},
 	{S("Music"), 0xA60014, {
 		"Jordach for the jukebox music compilation from Big Freaking Dig",
@@ -248,5 +249,12 @@ return {
 		"The Minetest team for making and supporting an engine, and distribution infrastructure that makes this all possible",
 		"The workaholics who spent way too much time writing for the Minecraft Wiki. It's an invaluable resource for creating this game",
 		"Notch and Jeb for being the major forces behind Minecraft",
+	}},
+	{S("JMA Team"), 0xF84355, {
+		"Loki (Admin)",
+		"novaosoba (Admin)",
+		"Nanowolf4 (Developer)",
+		"fancyfinn9 (Developer)",
+		"I_am (Guardian)",
 	}},
 }
