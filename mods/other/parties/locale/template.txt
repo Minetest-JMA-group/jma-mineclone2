@@ -1,0 +1,53 @@
+# textdomain: parties
+# author(s):
+# reviewer(s):
+
+##[ src/_load.lua ]##
+Notifications=
+Party invite jingle=
+Someone joins the party=
+Someone leaves the party=
+
+##[ src/api.lua ]##
+[!] Only the party leader can perform this action!=
+[!] You can't invite yourself!=
+[!] This player is not online!=
+[!] The party has reached the maximum amount of players! (@1)=
+[!] This player is already in a party!=
+[!] You've already invited this player!=
+Invite to @1 successfully sent=
+@1 has invited you to a party, would you like to join? (/party join, or /party join @2 within 60 seconds)=
+[!] You have no pending invites!=
+[!] You have no pending invites from this player!=
+[!] More players have invited you in their party: please specify the nick of the one you want to join!=
+@1 has tried to enter but the party is full=
+[!] The party leader has disconnected!=
+@1 has tried to enter but an external condition has prevented them from doing it=
+@1 has joined another party=
+@1 has joined the party=
+You've joined @1's party=
+[!] You must enter a party first!=
+You've left the party=
+@1 has left the party=
+[!] There is no player called @1 in your party!=
+[!] You can't kick yourself!=
+@1 has been kicked from the party=
+@1 has kicked you from the party=
+The party has been disbanded=
+@1 is the new party leader=
+Party=
+No answer from @1...=
+
+##[ src/commands.lua ]##
+Do '/party help' to see all the subcommands=
+COMMANDS=
+disbands your party=
+player=
+invites a player to join your party. It creates one if there is none=
+accepts an invitation. If you've received more than one, specify 'player'=
+kicks a player from the party=
+leaves the party you're in=
+message=
+sends a message in the party chat=
+manage parties=
+[!] You must enter a message after '/p'!=
