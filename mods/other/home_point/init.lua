@@ -95,7 +95,7 @@ minetest.register_chatcommand("sh", {
                     return false, "You can only have "..tostring(home_point.home_point_basic).." homes, currently you have "..tostring(homes).."."
                 end
             else
-                return false, "You appear to not have access to place any homes, You need home_point and one of these (home_point_basic, home_point_advanced, home_point_super, or home_point_unlimited)."
+                return false, "You appear to not have access to place any homes, you need home_point and one of these (home_point_basic, home_point_advanced, home_point_super, or home_point_unlimited)."
             end
         end
         -- Setup the place/home
@@ -137,7 +137,7 @@ minetest.register_chatcommand("sh", {
             end
             return rc, "Saved as "..name
         end
-        return false, "Uable to determine place_name"
+        return false, "Unable to determine place_name"
     end,
 })
 
@@ -181,7 +181,7 @@ minetest.register_chatcommand("rh", {
     privs = {
         home_point = true
     },
-    description = "Remvoes a home point given /rh (place_name)",
+    description = "Removes a home point given /rh (place_name)",
     func = function(name, param)
                 -- Don't allow players who aren't online
         if name ~= "singleplayer" then

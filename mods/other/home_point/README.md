@@ -14,9 +14,9 @@ All commands require `home_point` privilege (And `/sh` needs one of the further 
 
 > `/wh` actually toggles a waypoint, and when `/sh` is used with the same home as a waypoint a new waypoint will be place at the new location. (Also when `/rh` is used on a home with a waypoint the waypoint will be removed)
 
-## Telport Delay Feature
+## Teleport Delay Feature
 
-In Version 2.0 home_point can now telport after a delay, if a player is punched or moves the telport is canceled.
+In Version 2.0 home_point can now teleport after a delay, if a player is punched or moves the teleport is canceled.
 
 > There are also 3 new settings you can modify to define teleportation delays (see Limiting Homes section below)
 
