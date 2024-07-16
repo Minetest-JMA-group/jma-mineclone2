@@ -87,7 +87,7 @@ minetest.register_chatcommand("sh", {
                     return false, "You can only have "..tostring(home_point.home_point_super).." homes, currently you have "..tostring(homes).."."
                 end
             elseif minetest.check_player_privs(name, {home_point_advanced=true}) then
-                if homes+1 > home_point.home_point_basic then
+                if homes+1 > home_point.home_point_advanced then
                     return false, "You can only have "..tostring(home_point.home_point_advanced).." homes, currently you have "..tostring(homes).."."
                 end
             elseif minetest.check_player_privs(name, {home_point_basic=true}) then
