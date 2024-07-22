@@ -7,6 +7,18 @@
 All node definitions share a lot of code, so this is the reason why there
 are so many weird tables below.
 ]]
+
+-- for farming modification
+local function has_value(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+
+    return false
+end
+
 local S = minetest.get_translator(minetest.get_current_modname())
 local C = minetest.colorize
 local F = minetest.formspec_escape
@@ -149,6 +161,20 @@ local dispenserdef = {
 					local iname = stack:get_name()
 					local igroups = stackdef.groups
 
+					local farmitems = {"mcl_farming:carrot_item", "mcl_farming:pumpkin_seeds",
+						"mcl_farming:potato_item", "mcl_farming:wheat_seeds",
+						"mcl_farming:melon_seeds", "mcl_farming:beetroot_seeds"}
+					local farmblocks = {"mcl_farming:soil", "mcl_farming:soil_wet"}
+
+					local abovedroppos = droppos
+					abovedroppos.y = abovedroppos.y + 1
+					local abovedropnode = minetest.get_node(abovedroppos)
+
+					--minetest.log(iname) 
+					--minetest.log(dropnode["name"]) 
+					--minetest.log(minetest.serialize(abovedroppos))
+					--minetest.log(abovedropnode["name"])
+
 					--[===[ Dispense item ]===]
 
 					-- Hardcoded dispensions --
@@ -244,6 +270,29 @@ local dispenserdef = {
 							stack:take_item()
 							inv:set_stack("main", stack_id, stack)
 						end
+
+					elseif has_value(farmitems, iname) and has_value(farmblocks, dropnode["name"]) and abovedropnode["name"] == "air" then
+						-- place crop
+						local plantname = "mcl_farming:carrot_1"
+						if iname == "mcl_farming:carrot_item" then
+							plantname = "mcl_farming:carrot_1"
+						elseif iname == "mcl_farming:potato_item" then
+							plantname = "mcl_farming:potato_1"
+						elseif iname == "mcl_farming:pumpkin_seeds" then
+							plantname = "mcl_farming:pumpkin_1"
+						elseif iname == "mcl_farming:wheat_seeds" then
+							plantname = "mcl_farming:wheat_1"
+						elseif iname == "mcl_farming:melon_seeds" then
+							plantname = "mcl_farming:melontige_1"
+						elseif iname == "mcl_farming_beetroot_seeds" then
+							plantname = "mcl_farming:beetroot_0"
+						end
+
+						minetest.sound_play(minetest.registered_nodes[plantname].sounds.place, { pos = abovedroppos }, true)
+						minetest.add_node(abovedroppos, { name = plantname, param2 = minetest.registered_nodes[plantname].place_param2 })
+						
+						stack:take_item()
+						inv:set_stack("main", stack_id, stack)
 
 						-- Generalized dispension
 					elseif (not dropnodedef.walkable or stackdef._dispense_into_walkable) then

@@ -17,3 +17,6 @@ Also, if you make any changes to VoxeLibre's code, please do include those here 
 
 - **mods/HUD/mcl_credits/people.lua**
 	The JMA developers and staff have been added to the end of this file to be seen at the end of the credits.
+
+- **mods/ITEMS/REDSTONE/mcl_dispensers/init.lua**
+	We've added some custom code here that allows dispensers to plant crops when pointing at soil.
