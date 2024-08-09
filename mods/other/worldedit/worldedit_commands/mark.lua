@@ -67,7 +67,19 @@ worldedit.mark_region = function(name)
 
 		local vec = vector.subtract(pos2, pos1)
 		local maxside = math.max(vec.x, math.max(vec.y, vec.z))
-		local limit = tonumber(minetest.settings:get("active_object_send_range_blocks")) * 16
+
+		-- Debug
+		local debugvar = "Debug from mark.lua:72 > "..minetest.settings:get("active_object_send_range_blocks")
+		minetest.log("warning", debugvar)
+
+		-- Modified by fancyfinn9 because of a server crash here
+		local limit = 8 * 16
+		if minetest.settings:get("active_object_send_range_blocks") then
+			limit = tonumber(minetest.settings:get("active_object_send_range_blocks")) * 16
+		end
+
+		-- End of modification
+
 		if maxside > limit * 1.5 then
 			-- The client likely won't be able to see the plane markers as intended anyway,
 			-- thus don't place them and also don't load the area into memory
