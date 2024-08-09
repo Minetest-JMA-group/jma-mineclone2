@@ -91,7 +91,6 @@ if minetest.get_modpath("mcl_inventory") then
                 if not is_pvp_enabled(obj) or not is_pvp_enabled(reason.source) then
                     remove_nearby_arrows(obj, 5)  -- Remove attached arrows to the player
                     mcl_hunger.stop_poison(obj) -- Stop poisoning the player
-                    mcl_potions._reset_player_effects(obj) -- Remove all potion effects from the player
                     mcl_burning.extinguish(obj) -- Extinguish the player if they are on fire
                     return 0 -- No damage if PvP is disabled for either player
                 end
@@ -102,7 +101,7 @@ if minetest.get_modpath("mcl_inventory") then
         end
 
     minetest.log("action", "[PvP Mod] mcl_inventory modpath found. Registering PvP tab.")
-    
+
     mcl_inventory.register_survival_inventory_tab({
         id = "pvp_toggle",
         description = "PvP Toggle",
