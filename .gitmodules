@@ -1,3 +1,9 @@
 [submodule "mods/extras"]
 	path = mods/extras
 	url = git@github.com:markopetrovi/jma-mineclone2-extras
+[submodule "mods/shared"]
+	path = mods/shared
+	url = https://github.com/markopetrovi/jma-shared.git
+[submodule "mods/shared_private"]
+	path = mods/shared_private
+	url = git@github.com:markopetrovi/jma-shared-private.git
