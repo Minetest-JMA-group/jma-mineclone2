@@ -1,0 +1,7 @@
+# The time in seconds before you can ring a doorbell once more
+mcl_decor_doorbell_timeout (Doorbell timeout) float 3.0 0.0
+
+# Defines the melody played by the doorbells (list of noteblock param2s, or how much you rightclicked each one of them)
+# Values 0-24 are valid
+# Example: "12,7,12,12,0,14,15,15,12,12,12" is Ievan Polkka :)
+mcl_decor_melody (Doorbell melody) string "14,8,1,4,6,10"
