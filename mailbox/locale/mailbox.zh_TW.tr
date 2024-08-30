@@ -1,0 +1,13 @@
+# textdomain: mailbox
+
+##[ init.lua ]##
+Only allow written books=只允許帶文字的書
+Unrent=取消租用
+Send your goods@nto @1=將您的物品@n傳送給 @1
+Your mailbox is not empty!=您的郵箱並不爲空！
+@1's Mailbox=@1 的郵箱
+Free Mailbox, right-click to claim=空郵箱，右鍵點擊以租用
+Mailbox full.=郵箱已滿。
+Mailbox=郵箱
+Mailbox for Rent=可租用的郵箱
+Mailbox unrenter=郵箱租用解除器
