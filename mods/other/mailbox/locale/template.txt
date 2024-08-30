@@ -1,0 +1,13 @@
+# textdomain: mailbox
+
+##[ init.lua ]##
+Only allow written books=
+Unrent=
+Send your goods@nto @1=
+Your mailbox is not empty!=
+@1's Mailbox=
+Free Mailbox, right-click to claim=
+Mailbox full.=
+Mailbox=
+Mailbox for Rent=
+Mailbox unrenter=
