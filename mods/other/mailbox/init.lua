@@ -41,7 +41,7 @@ function mailbox.get_formspec(pos, owner, fs_type)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
 
 	if fs_type == 1 then
-		return "size[8,9.5]" .. xbg .. default.get_hotbar_bg(0, 5.5) ..
+		return "size[8,9.5]" .. xbg ..
 			"checkbox[0,0;books_only;" .. FS("Only allow written books") .. ";" .. selected .. "]" ..
 			"list[nodemeta:" .. spos .. ";mailbox;0,1;8,4;]" ..
 			"list[current_player;main;0,5.5;8,1;]" ..
@@ -51,7 +51,7 @@ function mailbox.get_formspec(pos, owner, fs_type)
 			"button_exit[5,0;2,1;unrent;" .. FS("Unrent") .. "]" ..
 			"button_exit[7,0;1,1;exit;X]"
 	else
-		return "size[8,5.5]" .. xbg .. default.get_hotbar_bg(0, 1.5) ..
+		return "size[8,5.5]" .. xbg ..
 			"label[0,0;" .. FS("Send your goods\nto @1", owner) .. " :]" ..
 			"list[nodemeta:" .. spos .. ";drop;3.5,0;1,1;]" ..
 			"list[current_player;main;0,1.5;8,1;]" ..
@@ -235,9 +235,20 @@ minetest.register_node("mailbox:mailbox", {
 		"mailbox_mailbox_side.png", "mailbox_mailbox_side.png",
 		"mailbox_mailbox.png", "mailbox_mailbox.png",
 	},
-	groups = { cracky = 3, oddly_breakable_by_hand = 1, tubedevice = 1, tubedevice_receiver = 1 },
+	groups = {
+		oddly_breakable_by_hand = 1,
+		tubedevice = 1,
+		tubedevice_receiver = 1,
+		pickaxey = 1,
+		solid = 1,
+		deco_block = 1,
+		pickaxey_dig_stone = 17,
+		pickaxey_dig_iron = 17
+	},
+	_mcl_blast_resistance = 0,
+	_mcl_hardness = 2.5,
 	on_rotate = minetest.global_exists("screwdriver") and screwdriver.rotate_simple or nil,
-	sounds = xcompat.sounds.node_sound_stone_defaults(),
+	sounds = mcl_sounds.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	after_place_node = mailbox.after_place_node,
 	after_dig_node = mailbox.after_dig_node,
@@ -259,7 +270,7 @@ minetest.register_node("mailbox:mailbox_free", {
 	},
 	groups = { cracky = 3, oddly_breakable_by_hand = 1, tubedevice = 1, tubedevice_receiver = 1 },
 	on_rotate = minetest.global_exists("screwdriver") and screwdriver.rotate_simple or nil,
-	sounds = xcompat.sounds.node_sound_stone_defaults(),
+	sounds = mcl_sounds.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	drop = "mailbox:mailbox",
 
@@ -286,7 +297,7 @@ minetest.register_node("mailbox:letterbox", {
 		tubedevice_receiver = 1
 	},
 	on_rotate = minetest.global_exists("screwdriver") and screwdriver.rotate_simple or nil,
-	sounds = xcompat.sounds.node_sound_stone_defaults(),
+	sounds = mcl_sounds.node_sound_metal_defaults(),
 	paramtype2 = "facedir",
 	drop = "mailbox:mailbox",
 	after_place_node = mailbox.after_place_node,
@@ -306,12 +317,11 @@ minetest.register_tool("mailbox:unrenter", {
 })
 
 
-local materials = xcompat.materials
 minetest.register_craft({
 	output = "mailbox:mailbox",
 	recipe = {
-		{ materials.steel_ingot, materials.steel_ingot, materials.steel_ingot },
-		{ materials.book,        materials.chest,       materials.book },
-		{ materials.steel_ingot, materials.steel_ingot, materials.steel_ingot }
+		{"mcl_core:iron_ingot", "mcl_core:iron_ingot", "mcl_core:iron_ingot"},
+		{"mcl_books:book",        "mcl_chests:chest",       "mcl_books:book"},
+		{"mcl_core:iron_ingot", "mcl_core:iron_ingot", "mcl_core:iron_ingot"}
 	}
 })
