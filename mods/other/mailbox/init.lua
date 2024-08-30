@@ -174,7 +174,7 @@ mailbox.allow_metadata_inventory_put = function(pos, listname, index, stack, pla
 		if inv:room_for_item("mailbox", stack) then
 			return -1
 		else
-			minetest.chat_send_player(player:get_player_name(), S("Mailbox full."))
+			minetest.chat_send_player(player:get_player_name(), S("Mailbox full, please try it later again."))
 			return 0
 		end
 	end
