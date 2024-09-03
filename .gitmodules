@@ -7,3 +7,6 @@
 [submodule "mods/shared_private"]
 	path = mods/shared_private
 	url = git@github.com:Minetest-JMA-group/jma-shared-private.git
+[submodule "mods/noctf"]
+	path = mods/noctf
+	url = https://github.com/Minetest-JMA-group/jma-noctf
