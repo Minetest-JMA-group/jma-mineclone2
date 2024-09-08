@@ -405,6 +405,7 @@ function mcl_mobs.register_arrow(name, def)
 		collisionbox = {0, 0, 0, 0, 0, 0}, -- remove box around arrows
 		timer = 0,
 		switch = 0,
+		static_save = false,
 		_lifetime = def._lifetime or 7,
 		owner_id = def.owner_id,
 		rotate = def.rotate,

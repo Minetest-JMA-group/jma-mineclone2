@@ -65,6 +65,7 @@ local ARROW_ENTITY={
 	textures = {"mcl_bows_arrow.png"},
 	collisionbox = {-0.19, -0.125, -0.19, 0.19, 0.125, 0.19},
 	collide_with_objects = false,
+	static_save = false,
 	_fire_damage_resistant = true,
 
 	_lastpos={},
@@ -120,6 +121,10 @@ function ARROW_ENTITY.on_step(self, dtime)
 	if not self.object:get_pos() then return end
 
 	self._time_in_air = self._time_in_air + .001
+	if self._time_in_air > 5 then
+		self.object:remove()
+		return
+	end
 
 	local pos = self.object:get_pos()
 	local dpos = vector.round(vector.new(pos)) -- digital pos

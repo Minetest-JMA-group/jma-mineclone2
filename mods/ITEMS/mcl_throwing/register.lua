@@ -13,6 +13,7 @@ local snowball_ENTITY={
 	visual_size = {x=0.5, y=0.5},
 	collisionbox = {0,0,0,0,0,0},
 	pointable = false,
+	static_save = false,
 
 	get_staticdata = mcl_throwing.get_staticdata,
 	on_activate = mcl_throwing.on_activate,
@@ -28,6 +29,7 @@ local egg_ENTITY={
 	visual_size = {x=0.45, y=0.45},
 	collisionbox = {0,0,0,0,0,0},
 	pointable = false,
+	static_save = false,
 
 	get_staticdata = mcl_throwing.get_staticdata,
 	on_activate = mcl_throwing.on_activate,
@@ -44,6 +46,7 @@ local pearl_ENTITY={
 	visual_size = {x=0.9, y=0.9},
 	collisionbox = {0,0,0,0,0,0},
 	pointable = false,
+	static_save = false,
 
 	get_staticdata = mcl_throwing.get_staticdata,
 	on_activate = mcl_throwing.on_activate,
@@ -100,6 +103,10 @@ end
 -- Snowball on_step()--> called when snowball is moving.
 local function snowball_on_step(self, dtime)
 	self.timer = self.timer + dtime
+	if self.timer > 10 then
+		self.object:remove()
+		return
+	end
 	local pos = self.object:get_pos()
 	local vel = self.object:get_velocity()
 	local node = minetest.get_node(pos)
@@ -129,6 +136,10 @@ end
 -- Movement function of egg
 local function egg_on_step(self, dtime)
 	self.timer = self.timer + dtime
+	if self.timer > 10 then
+		self.object:remove()
+		return
+	end
 	local pos = self.object:get_pos()
 	local node = minetest.get_node(pos)
 	local def = minetest.registered_nodes[node.name]
@@ -179,6 +190,10 @@ end
 -- Movement function of ender pearl
 local function pearl_on_step(self, dtime)
 	self.timer = self.timer + dtime
+	if self.timer > 10 then
+		self.object:remove()
+		return
+	end
 	local pos = self.object:get_pos()
 	pos.y = math.floor(pos.y)
 	local node = minetest.get_node(pos)
