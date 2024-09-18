@@ -18,6 +18,10 @@ local it_is_christmas = mcl_util.is_it_christmas()
 local tiles_chest_normal_small = { "mcl_chests_normal.png" }
 local tiles_chest_normal_double = { "mcl_chests_normal_double.png" }
 
+-- Public chests (by fancyfinn9)
+local tiles_chest_public_small = { "mcl_chests_normal.png^mcl_chests_public_normal.png" }
+local tiles_chest_public_double = { "mcl_chests_normal_double.png^mcl_chests_public_double.png" }
+
 if it_is_christmas then
 	tiles_chest_normal_small = { "mcl_chests_normal_present.png^mcl_chests_noise.png" }
 	tiles_chest_normal_double = { "mcl_chests_normal_double_present.png^mcl_chests_noise_double.png" }
@@ -415,6 +419,39 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		end
 	end
 
+	local _override_protection_check_move = protection_check_move
+	local _override_protection_check_put = protection_check_put_take
+	local _override_protection_check_take = protection_check_put_take
+
+	if basename == "publicchest" then
+		minetest.log("SET PUBLIC CHEST OVERRIDES")
+		-- Public chests
+		-- Simple protection checking functions
+		_override_protection_check_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+			local name = player:get_player_name()
+			if minetest.settings:get_bool("verbose_public_chest") == true then
+				minetest.log("[PUBLIC CHEST at X:"..tostring(pos.x).." Y:"..tostring(pos.y).." Z:"..tostring(pos.z).."] "..name.." MOVES "..tostring(count).." items from slot "..tostring(from_index).." to slot "..tostring(to_index))
+			end
+			return count
+		end
+
+		_override_protection_check_put = function(pos, listname, index, stack, player)
+			local name = player:get_player_name()
+			if minetest.settings:get_bool("verbose_public_chest") == true then
+				minetest.log("[PUBLIC CHEST at X:"..tostring(pos.x).." Y:"..tostring(pos.y).." Z:"..tostring(pos.z).."] "..name.." PUTS "..stack:get_name().." x "..tostring(stack:get_count()).." from chest slot "..tostring(index))
+			end
+			return stack:get_count()
+		end
+
+		_override_protection_check_take = function(pos, listname, index, stack, player)
+			local name = player:get_player_name()
+			if minetest.settings:get_bool("verbose_public_chest") == true then
+				minetest.log("[PUBLIC CHEST at X:"..tostring(pos.x).." Y:"..tostring(pos.y).." Z:"..tostring(pos.z).."] "..name.." TAKES "..stack:get_name().." x "..tostring(stack:get_count()).." from chest slot "..tostring(index))
+			end
+			return stack:get_count()
+		end
+	end
+
 	minetest.register_node(small_name, {
 		description = desc,
 		_tt_help = tt_help,
@@ -499,9 +536,9 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		end,
 		after_dig_node = drop_items_chest,
 		on_blast = on_chest_blast,
-		allow_metadata_inventory_move = protection_check_move,
-		allow_metadata_inventory_take = protection_check_put_take,
-		allow_metadata_inventory_put = protection_check_put_take,
+		allow_metadata_inventory_move = _override_protection_check_move,
+		allow_metadata_inventory_take = _override_protection_check_take,
+		allow_metadata_inventory_put = _override_protection_check_put,
 		on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves stuff in chest at " .. minetest.pos_to_string(pos))
@@ -997,6 +1034,19 @@ register_chest("chest",
 	false
 )
 
+-- Added by fancyfinn9
+register_chest("publicchest",
+	S("Public Chest"),
+	S("Chests are containers which provide 27 inventory slots. Chests can be turned into large chests with double the capacity by placing two chests next to each other."),
+	chestusage,
+	S("27 inventory slots") .. "\n" .. S("Can be combined to a large chest") .. "\n" .. "Anybody can put, move, or take items from public chests, even if they are protected",
+	{
+		small = tiles_chest_public_small,
+		double = tiles_chest_public_double
+	},
+	false
+)
+
 local traptiles = {
 	small = tiles_chest_trapped_small,
 	double = tiles_chest_trapped_double,
@@ -1112,6 +1162,15 @@ minetest.register_craft({
 	recipe = {
 		{ "group:wood", "group:wood", "group:wood" },
 		{ "group:wood", "",           "group:wood" },
+		{ "group:wood", "group:wood", "group:wood" },
+	},
+})
+
+minetest.register_craft({
+	output = "mcl_chests:publicchest",
+	recipe = {
+		{ "group:wood", "group:wood", "group:wood" },
+		{ "group:wood", "mcl_core:emerald",           "group:wood" },
 		{ "group:wood", "group:wood", "group:wood" },
 	},
 })
