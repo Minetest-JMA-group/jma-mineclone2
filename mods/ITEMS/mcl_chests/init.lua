@@ -462,7 +462,7 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		else
 			return stack:get_count()
 		end
-	end,
+	end
 
 	if basename == "publicchest" then
 		minetest.log("SET PUBLIC CHEST OVERRIDES")
@@ -714,7 +714,7 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		on_blast = on_chest_blast,
 		allow_metadata_inventory_move = _override_protection_check_move,
 		allow_metadata_inventory_take = _override_protection_check_take,
-		allow_metadata_inventory_put = _override_protection_check_put_left
+		allow_metadata_inventory_put = _override_protection_check_put_left,
 		on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves stuff in chest at " .. minetest.pos_to_string(pos))
@@ -884,7 +884,7 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		on_blast = on_chest_blast,
 		allow_metadata_inventory_move = _override_protection_check_move,
 		allow_metadata_inventory_take = _override_protection_check_take,
-		allow_metadata_inventory_put = _override_protection_check_put_right
+		allow_metadata_inventory_put = _override_protection_check_put_right,
 		on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves stuff in chest at " .. minetest.pos_to_string(pos))
