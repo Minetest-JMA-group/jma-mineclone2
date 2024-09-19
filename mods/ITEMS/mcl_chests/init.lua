@@ -423,6 +423,47 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 	local _override_protection_check_put = protection_check_put_take
 	local _override_protection_check_take = protection_check_put_take
 
+	local _override_protection_check_put_left = function(pos, listname, index, stack, player)
+		local name = player:get_player_name()
+		if minetest.is_protected(pos, name) then
+			minetest.record_protection_violation(pos, name)
+			return 0
+			-- BEGIN OF LISTRING WORKAROUND
+		elseif listname == "input" then
+			local inv = minetest.get_inventory({ type = "node", pos = pos })
+			local other_pos = mcl_util.get_double_container_neighbor_pos(pos, minetest.get_node(pos).param2, "left")
+			local other_inv = minetest.get_inventory({ type = "node", pos = other_pos })
+			return limit_put(stack, inv, other_inv)
+		else
+			return stack:get_count()
+		end
+	end
+	local _override_protection_check_put_right = function(pos, listname, index, stack, player)
+		local name = player:get_player_name()
+		if minetest.is_protected(pos, name) then
+			minetest.record_protection_violation(pos, name)
+			return 0
+			-- BEGIN OF LISTRING WORKAROUND
+		elseif listname == "input" then
+			local other_pos = mcl_util.get_double_container_neighbor_pos(pos, minetest.get_node(pos).param2, "right")
+			local other_inv = minetest.get_inventory({ type = "node", pos = other_pos })
+			local inv = minetest.get_inventory({ type = "node", pos = pos })
+			--[[if other_inv:room_for_item("main", stack) then
+				return -1
+			else
+				if inv:room_for_item("main", stack) then
+					return -1
+				else
+					return 0
+				end
+			end--]]
+			return limit_put(stack, other_inv, inv)
+			-- END OF LISTRING WORKAROUND
+		else
+			return stack:get_count()
+		end
+	end,
+
 	if basename == "publicchest" then
 		minetest.log("SET PUBLIC CHEST OVERRIDES")
 		-- Public chests
@@ -442,6 +483,9 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 			end
 			return stack:get_count()
 		end
+
+		_override_protection_check_put_left = _override_protection_check_put
+		_override_protection_check_put_right = _override_protection_check_put
 
 		_override_protection_check_take = function(pos, listname, index, stack, player)
 			local name = player:get_player_name()
@@ -668,35 +712,9 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		end,
 		after_dig_node = drop_items_chest,
 		on_blast = on_chest_blast,
-		allow_metadata_inventory_move = protection_check_move,
-		allow_metadata_inventory_take = protection_check_put_take,
-		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-			local name = player:get_player_name()
-			if minetest.is_protected(pos, name) then
-				minetest.record_protection_violation(pos, name)
-				return 0
-				-- BEGIN OF LISTRING WORKAROUND
-			elseif listname == "input" then
-				local inv = minetest.get_inventory({ type = "node", pos = pos })
-				local other_pos = mcl_util.get_double_container_neighbor_pos(pos, minetest.get_node(pos).param2, "left")
-				local other_inv = minetest.get_inventory({ type = "node", pos = other_pos })
-				return limit_put(stack, inv, other_inv)
-				--[[if inv:room_for_item("main", stack) then
-					return -1
-				else
-
-					if other_inv:room_for_item("main", stack) then
-						return -1
-					else
-						return 0
-					end
-				end]]
-				--
-				-- END OF LISTRING WORKAROUND
-			else
-				return stack:get_count()
-			end
-		end,
+		allow_metadata_inventory_move = _override_protection_check_move,
+		allow_metadata_inventory_take = _override_protection_check_take,
+		allow_metadata_inventory_put = _override_protection_check_put_left
 		on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves stuff in chest at " .. minetest.pos_to_string(pos))
@@ -864,33 +882,9 @@ local function register_chest(basename, desc, longdesc, usagehelp, tt_help, tile
 		end,
 		after_dig_node = drop_items_chest,
 		on_blast = on_chest_blast,
-		allow_metadata_inventory_move = protection_check_move,
-		allow_metadata_inventory_take = protection_check_put_take,
-		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-			local name = player:get_player_name()
-			if minetest.is_protected(pos, name) then
-				minetest.record_protection_violation(pos, name)
-				return 0
-				-- BEGIN OF LISTRING WORKAROUND
-			elseif listname == "input" then
-				local other_pos = mcl_util.get_double_container_neighbor_pos(pos, minetest.get_node(pos).param2, "right")
-				local other_inv = minetest.get_inventory({ type = "node", pos = other_pos })
-				local inv = minetest.get_inventory({ type = "node", pos = pos })
-				--[[if other_inv:room_for_item("main", stack) then
-					return -1
-				else
-					if inv:room_for_item("main", stack) then
-						return -1
-					else
-						return 0
-					end
-				end--]]
-				return limit_put(stack, other_inv, inv)
-				-- END OF LISTRING WORKAROUND
-			else
-				return stack:get_count()
-			end
-		end,
+		allow_metadata_inventory_move = _override_protection_check_move,
+		allow_metadata_inventory_take = _override_protection_check_take,
+		allow_metadata_inventory_put = _override_protection_check_put_right
 		on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves stuff in chest at " .. minetest.pos_to_string(pos))
