@@ -244,19 +244,19 @@ minetest.register_abm({
 					-- Treasure
 					items = mcl_loot.get_loot({
 						items = {
-							{ itemstring = "mcl_bows:bow", wear_min = 49144, wear_max = 65535, func = function(stack, pr)
+							{ itemstring = "mcl_bows:bow", weight = 5, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
 								mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
 							end }, -- 75%-100% damage
-							{ itemstring = "mcl_books:book", func = function(stack, pr)
+							{ itemstring = "mcl_books:book", weight = 5, func = function(stack, pr)
 								mcl_enchanting.enchant_randomly(stack, 30, true, true, false, pr)
 							end },
-							{ itemstring = "mcl_fishing:fishing_rod", wear_min = 49144, wear_max = 65535, func = function(stack, pr)
+							{ itemstring = "mcl_fishing:fishing_rod", weight = 7, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
 								mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
 							end }, -- 75%-100% damage
-							{ itemstring = "mcl_mobs:nametag", },
-							{ itemstring = "mcl_mobitems:saddle", },
-							{ itemstring = "mcl_flowers:waterlily", },
-							{ itemstring = "mcl_mobitems:nautilus_shell", },
+							{ itemstring = "mcl_mobs:nametag", weight = 10},
+							{ itemstring = "mcl_mobitems:saddle", weight = 10},
+							{ itemstring = "mcl_flowers:waterlily", weight = 10},
+							{ itemstring = "mcl_mobitems:nautilus_shell", weight = 10},
 						},
 						stacks_min = 1,
 						stacks_max = 1,

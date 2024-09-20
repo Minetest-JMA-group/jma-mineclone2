@@ -2,6 +2,20 @@ local modname = minetest.get_current_modname()
 local S = minetest.get_translator(modname)
 
 return {
+	{S("JMA Team"), 0xF84355, {
+		"",
+		"-- Admins --",
+		"Loki",
+		"novaosoba",
+		"",
+		"-- Developers --",
+		"fancyfinn9",
+		"Nanowolf4",
+		"",
+		"-- Guardians --",
+		"I_am",
+		"cpi6",
+	}},
 	{S("Creator of MineClone"), 0x0A9400, {
 		"davedevils",
 	}},
@@ -249,12 +263,5 @@ return {
 		"The Minetest team for making and supporting an engine, and distribution infrastructure that makes this all possible",
 		"The workaholics who spent way too much time writing for the Minecraft Wiki. It's an invaluable resource for creating this game",
 		"Notch and Jeb for being the major forces behind Minecraft",
-	}},
-	{S("JMA Team"), 0xF84355, {
-		"Loki (Admin)",
-		"novaosoba (Admin)",
-		"Nanowolf4 (Developer)",
-		"fancyfinn9 (Developer)",
-		"I_am (Guardian)",
 	}},
 }
