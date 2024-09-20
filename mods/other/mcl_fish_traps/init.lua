@@ -145,8 +145,8 @@ trap.tiles = {
 	"mcl_fish_traps_trap.png", "mcl_fish_traps_trap.png"
 }
 
-water_tex = "default_water_source_animated.png^[verticalframe:16:0"
-trap_w.tiles = {
+water_tex = "mcl_core_water_source_animation.png^[verticalframe:16:0"
+trap_w.tiles = { 
 	"("..water_tex..")^mcl_fish_traps_trap.png",
 	"("..water_tex..")^mcl_fish_traps_trap.png",
 	"("..water_tex..")^mcl_fish_traps_trap.png",
