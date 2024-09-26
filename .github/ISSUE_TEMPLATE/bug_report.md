@@ -1,32 +1,44 @@
----
 name: Bug report
-about: Create a report to help us improve
-title: "[BUG]"
+about: Found a bug? Please report it to help us improve
+title: "[Bug]: "
 labels: bug
 assignees: ''
-
----
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Device (please complete the following information):**
- - Type: [e.g. Phone, Laptop]
- - OS: [e.g. iOS, Android, Windows]
- - Minetest Version: [e.g. Minetest 5.9.0]
-
-**Additional context**
-Add any other context about the problem here.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Every report helps us to improve, and fix bugs we otherwise may not have found.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us more about the bug here...
+      value: |
+       The bug happened when I...
+       The bug is...
+       What should have happened is...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      value: |
+        1.
+        2.
+        3.
+        ...
+  - type: input
+    id: device
+    attributes:
+      label: What game version did this happen on?
+      description: This should be in the "About" tab of the game
+      placeholder: "Example: Minetest 5.9.0"  
+  - type: input
+    id: device
+    attributes:
+      label: What device did this happen on?
+      description: Please include your OS!
+      placeholder: "Example: Redmi A1, with Android 12"
