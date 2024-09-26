@@ -2,7 +2,6 @@ name: Bug report
 about: Found a bug? Please report it to help us improve
 title: "[Bug]: "
 labels: bug
-assignees: ''
 body:
   - type: markdown
     attributes:
@@ -31,7 +30,7 @@ body:
         3.
         ...
   - type: input
-    id: device
+    id: version
     attributes:
       label: What game version did this happen on?
       description: This should be in the "About" tab of the game
