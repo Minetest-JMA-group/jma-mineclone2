@@ -15,7 +15,7 @@ local function remove_nearby_arrows(player, radius)
         local luaentity = obj:get_luaentity()
         -- Check if the object is the specific arrow entity
         if luaentity and luaentity.name == "mcl_bows:arrow_entity" then
-            obj:remove() -- Remove the arrow entity
+            luaentity._remove = true
         end
     end
 end
@@ -89,7 +89,7 @@ if minetest.get_modpath("mcl_inventory") then
             if obj and obj:is_player() and reason.source and reason.source:is_player() then
                 -- Check PvP settings for both players
                 if not is_pvp_enabled(obj) or not is_pvp_enabled(reason.source) then
-                    -- remove_nearby_arrows(obj, 5) -- Remove attached arrows to the player
+                    remove_nearby_arrows(obj, 5) -- Remove attached arrows to the player
                     mcl_hunger.stop_poison(obj) -- Stop poisoning the player
                     mcl_burning.extinguish(obj) -- Extinguish the player if they are on fire
                     return 0 -- No damage if PvP is disabled for either player
