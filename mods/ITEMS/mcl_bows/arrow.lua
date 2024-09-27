@@ -120,6 +120,12 @@ function ARROW_ENTITY.on_step(self, dtime)
 	-- mcl_burning.tick may remove object immediately
 	if not self.object:get_pos() then return end
 
+	-- Check if removed by other mods
+	if self._remove == true then
+		self.object:remove()
+		return
+	end
+
 	self._time_in_air = self._time_in_air + .001
 	if self._time_in_air > 5 then
 		self.object:remove()
