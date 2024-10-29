@@ -415,13 +415,12 @@ minetest.register_craftitem(":mcl_bone_meal:bone_meal", {
 		return itemstack
 	end,
 	_on_dispense = function(stack, pos, droppos, dropnode, dropdir)
+		-- pos is the dispenser's position
+		-- droppos is the the position of dropnode, which is only 1 node in front of the dispenser on the faced direction
+
 		-- Apply bone meal, if possible
 		local pointed_thing
-		if dropnode.name == "air" then
-			pointed_thing = { above = droppos, under = { x=droppos.x, y=droppos.y-1, z=droppos.z } }
-		else
-			pointed_thing = { above = pos, under = droppos }
-		end
+		pointed_thing = { above = droppos, under = { x=droppos.x, y=droppos.y-1, z=droppos.z } }
 		local success = apply_bone_meal(pointed_thing, nil)
 		if success then
 			stack:take_item()
