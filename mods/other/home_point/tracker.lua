@@ -87,7 +87,8 @@ minetest.register_globalstep(function (dtime)
         local player = minetest.get_player_by_name(name)
         if player then
             for _, keyPress in pairs(player:get_player_control()) do
-                if keyPress then
+                if keyPress and keyPress ~= -0 then
+                minetest.log(minetest.serialize(keyPress))
                     info.lastAction = curTime
                     if info.request then
                         info.request = nil
