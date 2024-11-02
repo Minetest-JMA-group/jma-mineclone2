@@ -164,7 +164,7 @@ end
 mailbox.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 	if listname == "drop" then
 		if minetest.get_node(pos).name == "mailbox:letterbox" and
-			stack:get_name() ~= "default:book_written" then
+			stack:get_name() ~= "mcl_books:written_book" then
 			return 0
 		end
 
