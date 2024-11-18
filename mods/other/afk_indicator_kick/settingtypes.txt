@@ -1,0 +1,5 @@
+# Maximum allowed AFK time before being kicked, in second
+afkkick.max_inactive_time (Maximum AFK time) int 300
+
+# Time to warn player before being kicked, in second
+afkkick.warn_time (AFK kick warning time) int 20

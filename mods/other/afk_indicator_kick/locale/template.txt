@@ -1,0 +1,3 @@
+# textdomain: afk_indicator_kick
+Can AFK without being kicked=
+WARNING: Please move in @1 seconds or you will be kicked!=
