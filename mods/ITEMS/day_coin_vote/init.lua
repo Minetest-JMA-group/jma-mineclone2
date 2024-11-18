@@ -10,7 +10,7 @@ end
 
 function day_coin_vote.start_vote()
     if day_coin_vote.yes_votes == 0 and day_coin_vote.no_votes == 0 then
-        minetest.after(60, function()
+        minetest.after(25, function()
             if day_coin_vote.yes_votes > day_coin_vote.no_votes then
                 day_coin_vote.start_the_morning()
                 minetest.chat_send_all("The night was skipped with " .. day_coin_vote.yes_votes .. " votes in favor and " .. day_coin_vote.no_votes .. " against.")
