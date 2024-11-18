@@ -1,6 +1,6 @@
 local S = minetest.get_translator("afk_indicator_kick")
-local MAX_INACTIVE_TIME = tonumber(minetest.settings:get("afkkick.max_inactive_time")) or 1300
-local WARN_TIME = tonumber(minetest.settings:get("afkkick.warn_time")) or 100
+local MAX_INACTIVE_TIME = tonumber(minetest.settings:get("afkkick.max_inactive_time")) or 2400
+local WARN_TIME = tonumber(minetest.settings:get("afkkick.warn_time")) or 1200
 
 local afk_allow_cache = {}
 
