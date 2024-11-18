@@ -13,7 +13,7 @@ end
 
 local give_inventory = minetest.settings:get_bool("give_starting_inv", false)
 
-local stuff_string = "mcl_tools:pick_iron,mcl_tools:axe_iron,mcl_tools:shovel_iron,mcl_torches:torch 32,mcl_core:cobble 32"
+local stuff_string = "mcl_tools:pick_wood,mcl_tools:axe_wood,mcl_tools:shovel_wood,mcl_torches:torch 15,mcl_core:cobble 32"
 
 mcl_starting_inventory = {
 	items = {}
