@@ -15,11 +15,6 @@ else
 		"christmas_decor:candycane 20",
 		"christmas_decor:gingerbread_man 10",
 		"christmas_decor:hat_elf 1",
-		"default:gold_ingot 99",
-		"default:pick_mese 1",
-		"default:sword_mese 1",
-		"default:axe_mese 1",
-		"default:shovel_mese 1",
 	}) do
 		stuffers[#stuffers + 1] = stack
 	end
@@ -62,9 +57,10 @@ local function try_stocking_fill(pos)
 end
 
 local function player_can_interact(pos, player)
-	local is_owner = player and player:get_player_name() == minetest.get_meta(pos):get_string("owner")
-	local can_bypass = player and minetest.check_player_privs(player, "protection_bypass")
-	return is_owner or can_bypass
+	if not player then return false end
+	local name = player:get_player_name()
+	local is_owner = name == minetest.get_meta(pos):get_string("owner")
+	return (is_owner and not core.is_protected(pos, name)) or minetest.check_player_privs(player, "protection_bypass")
 end
 
 minetest.register_node("christmas_decor:stocking", {
@@ -87,14 +83,13 @@ minetest.register_node("christmas_decor:stocking", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
 	sounds = default_sounds("node_sound_leaves_defaults"),
+	_mcl_hardness = 0.3,
+	groups = {
+		deco_block = 1,
+		handy = 1
+	},
 	on_place = function(itemstack, placer, pointed_thing)
-		-- Convert legacy attribute values
-		if placer.get_attribute and placer:get_attribute("has_placed_stocking") then
-			placer:get_meta():set_int("has_placed_stocking", minetest.is_yes(placer:get_attribute("has_placed_stocking")) and 1 or 0)
-		end
-
 		if minetest.is_yes(placer:get_meta():get_int("has_placed_stocking")) then
 			minetest.chat_send_player(placer:get_player_name(), "Santa won't fill more than one stocking!")
 			return itemstack
@@ -131,6 +126,12 @@ minetest.register_node("christmas_decor:stocking", {
 	allow_metadata_inventory_move = function(pos, _, _, _, _, count, player)
 		return player_can_interact(pos, player) and count or 0
 	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+		return player_can_interact(pos, player) and stack:get_count() or 0
+	end,
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		return player_can_interact(pos, player) and stack:get_count() or 0
+	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		minetest.log("action", player:get_player_name() .. " moves stuff in stocking at " .. minetest.pos_to_string(pos))
 	end,
@@ -146,22 +147,20 @@ minetest.register_node("christmas_decor:stocking", {
 	end,
 })
 
-if depends.wool then
-	minetest.register_craft({
-		output = "christmas_decor:stocking",
-		recipe = {
-			{"", "wool:white", "wool:white"},
-			{"", "wool:red", "wool:red"},
-			{"wool:red", "wool:red", "wool:red"},
-		}
-	})
+minetest.register_craft({
+	output = "christmas_decor:stocking",
+	recipe = {
+		{"", "mcl_wool:white", "mcl_wool:white"},
+		{"", "mcl_wool:red", "mcl_wool:red"},
+		{"mcl_wool:red", "mcl_wool:red", "mcl_wool:red"},
+	}
+})
 
-	minetest.register_craft({
-		output = "christmas_decor:stocking",
-		recipe = {
-			{"wool:white", "wool:white", ""},
-			{"wool:red", "wool:red", ""},
-			{"wool:red", "wool:red", "wool:red"},
-		}
-	})
-end
+minetest.register_craft({
+	output = "christmas_decor:stocking",
+	recipe = {
+		{"mcl_wool:white", "mcl_wool:white", ""},
+		{"mcl_wool:red", "mcl_wool:red", ""},
+		{"mcl_wool:red", "mcl_wool:red", "mcl_wool:red"},
+	}
+})
