@@ -111,7 +111,7 @@ trap = {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		inv:set_size("main", 9*3)
+		inv:set_size("main", 6*3)
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		minetest.get_meta(pos):set_string("name", itemstack:get_meta():get_string("name"))
@@ -196,7 +196,7 @@ minetest.register_abm({
 	label = "Run fish trap",
 	nodenames = {"mcl_fish_traps:fishing_trap_water"},
 	interval = 60,
-	chance = 2,
+	chance = 10,
 	action = function(pos,value)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -205,7 +205,7 @@ minetest.register_abm({
 		local itemcount = 1
 		local pr = PseudoRandom(os.time() * math.random(1, 100))
 		local r = pr:next(1, 100)
-		local fish_values = {85, 84.8, 84.7, 84.5}
+		local fish_values = {92, 92.8, 92.7, 92.5}
 		local junk_values = {10, 8.1, 6.1, 4.2}
 		for _, fish_v in ipairs(fish_values) do
 			for _, junk_v in ipairs(junk_values) do
