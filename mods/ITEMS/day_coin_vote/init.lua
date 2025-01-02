@@ -3,9 +3,23 @@ day_coin_vote = {}
 day_coin_vote.yes_votes = 0
 day_coin_vote.no_votes = 0
 day_coin_vote.players_who_voted = {}
+day_coin_vote.days_on_which_voting_took_place = {}
+day_coin_vote.has_already_taken_place = false
+
+day_coin_vote.morning_time = 0.22916--~5:30
+day_coin_vote.evening_time = 0.75--18:00
 
 function day_coin_vote.start_the_morning()
-    minetest.set_timeofday(0.25)--06:00
+    minetest.set_timeofday(day_coin_vote.morning_time)
+end
+
+local function table_contains(tbl, value)
+    for _, v in ipairs(tbl) do
+        if v == value then
+            return true
+        end
+    end
+    return false
 end
 
 function day_coin_vote.start_vote()
@@ -14,15 +28,39 @@ function day_coin_vote.start_vote()
             if day_coin_vote.yes_votes > day_coin_vote.no_votes then
                 day_coin_vote.start_the_morning()
                 minetest.chat_send_all("The night was skipped with " .. day_coin_vote.yes_votes .. " votes in favor and " .. day_coin_vote.no_votes .. " against.")
+                day_coin_vote.has_already_taken_place = false
             else
                 minetest.chat_send_all("The night wasn't skipped with " .. day_coin_vote.yes_votes .. " votes in favor and " .. day_coin_vote.no_votes .. " against.")
+                day_coin_vote.has_already_taken_place = true
             end
             day_coin_vote.yes_votes = 0
             day_coin_vote.no_votes = 0
             day_coin_vote.players_who_voted = {}
+            local current_day = minetest.get_day_count()
+            table.insert(day_coin_vote.days_on_which_voting_took_place, current_day)
         end)
     end
 end
+
+minetest.register_craftitem("day_coin_vote:vote_coin", {
+    description = "Vote Coin",
+    inventory_image = "day_vote_coin.png",
+    on_use = function(itemstack, user)
+        local player_name = user:get_player_name()
+        local time_of_day = minetest.get_timeofday()
+        local current_day = minetest.get_day_count()
+        if table_contains(day_coin_vote.days_on_which_voting_took_place, current_day) then
+            minetest.chat_send_player(player_name, "A vote has already taken place today.")
+        else
+            if time_of_day <= day_coin_vote.morning_time or time_of_day >= day_coin_vote.evening_time then
+                minetest.show_formspec(player_name, "day_coin_vote:day_vote_formspec", day_coin_vote.get_day_vote_formspec())
+            else
+                minetest.chat_send_player(player_name, "You can only vote at night.")
+            end
+        end
+    end,
+    stack_max = 64,
+})
 
 function day_coin_vote.get_day_vote_formspec()
     local day_vote_formspec = "size[4,3]"
@@ -38,16 +76,6 @@ function day_coin_vote.get_day_vote_formspec()
 
     return day_vote_formspec
 end
-
-minetest.register_craftitem("day_coin_vote:vote_coin", {
-    description = "Vote Coin",
-    inventory_image = "day_vote_coin.png",
-    on_use = function(itemstack, user)
-        local player_name = user:get_player_name()
-        minetest.show_formspec(player_name, "day_coin_vote:day_vote_formspec", day_coin_vote.get_day_vote_formspec())
-    end,
-    stack_max = 64,
-})
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
     local player_name = player:get_player_name()
