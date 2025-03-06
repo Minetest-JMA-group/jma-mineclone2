@@ -62,6 +62,8 @@ function vl_hollow_logs.register_hollow_log(defs)
 		_mcl_blast_resistance = 2,
 		_mcl_hardness = 2,
 		_mcl_stripped_variant = modname .. ":stripped_"..name.."_hollow"
+		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		end,
 	})
 
 	minetest.register_node(modname .. ":"..stripped_name.."_hollow", {
