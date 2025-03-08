@@ -2,7 +2,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 local F = minetest.formspec_escape
 local C = minetest.colorize
 
-local MAX_NAME_LENGTH = 35
+local MAX_NAME_LENGTH = 80
 local MAX_WEAR = 65535
 local SAME_TOOL_REPAIR_BOOST = math.ceil(MAX_WEAR * 0.12) -- 12%
 local MATERIAL_TOOL_REPAIR_BOOST = {
@@ -126,7 +126,6 @@ local function update_anvil_slots(meta)
 	local new_name = meta:get_string("set_name")
 	local input1 = inv:get_stack("input", 1)
 	local input2 = inv:get_stack("input", 2)
-	--local output = inv:get_stack("output", 1)
 	local new_output, name_item
 	local just_rename = false
 
@@ -251,6 +250,86 @@ local function update_anvil_slots(meta)
 		fix_stack_size(new_output)
 		inv:set_stack("output", 1, new_output)
 	end
+end
+
+local function check_unpaired(str, s1, s2)
+	local first = 0
+	local second = 0
+	for i = 1, #str do
+		local char = str:sub(i, i)
+		if char == s1 then
+			first = first + 1
+		elseif char == s2 then
+			second = second + 1
+		end
+	end
+	return first == second
+end
+
+local predefined_colors = {
+	red = "#FF0000",
+	green = "#00FF00",
+	blue = "#0000FF",
+	yellow = "#FFFF00",
+	black = "#000000",
+	white = "#FFFFFF",
+	orange = "#FFA500",
+	purple = "#800080",
+	pink = "#FFC0CB",
+	brown = "#A52A2A",
+	gray = "#808080",
+	cyan = "#00FFFF",
+	magenta = "#FF00FF",
+	lime = "#00FF00",
+	navy = "#000080",
+	teal = "#008080",
+	olive = "#808000",
+	maroon = "#800000",
+	silver = "#C0C0C0",
+}
+
+local function parse_color_blocks(text)
+	local parsed_text = text
+	local color_blocks = {}
+
+	-- Find all color blocks in the text
+	for color_block in text:gmatch("%[#.-#%]") do
+		table.insert(color_blocks, color_block)
+	end
+
+	-- Replace color blocks with colored text
+	for _, color_block in ipairs(color_blocks) do
+		if check_unpaired(color_block, "%[#", "#%]") then
+			color_block = color_block:gsub("[%[#][#%]]", "")
+			local color_code, text_string = color_block:match("(%S+) ([%S].*)")
+			if color_code and text_string then
+				color_code = color_code:match("[%l%u%d]*")
+				if predefined_colors[color_code] then
+					color_code = predefined_colors[color_code]
+				end
+				if (#color_code == 6 or #color_code == 7) and color_code:match("^#?[0-9a-fA-F]+$") then
+					if color_code:sub(1, 1) ~= "#" then
+						color_code = "#" .. color_code
+					end
+					local colorized_text = minetest.colorize(color_code, text_string)
+					parsed_text = parsed_text:gsub("%[#.-#%]", colorized_text, 1)
+				else
+					minetest.log("warning", "Invalid color code '" .. color_code .. "'")
+				end
+			else
+				minetest.log("warning", "Invalid colorize tag format or missing string '" .. color_block .. "'")
+			end
+		else
+			minetest.log("warning", "Caught a syntax error in the color tag '" .. color_block .. "'")
+		end
+	end
+
+	-- Apply default color (yellow) if no color blocks are found
+	if #color_blocks == 0 then
+		parsed_text = minetest.colorize("#FFFF00", parsed_text)
+	end
+
+	return parsed_text
 end
 
 ---Drop input items of anvil at pos with metadata meta
@@ -541,11 +620,15 @@ local anvildef = {
 			local meta = minetest.get_meta(pos)
 
 			-- Limit name length
-			local set_name = string.sub(fields.name, 1, MAX_NAME_LENGTH)
+			local set_name_orig = string.sub(fields.name, 1, MAX_NAME_LENGTH)
+
+			-- Parse color blocks
+			set_name = parse_color_blocks(set_name_orig)
 
 			meta:set_string("set_name", set_name)
 			update_anvil_slots(meta)
-			meta:set_string("formspec", get_anvil_formspec(set_name))
+
+			meta:set_string("formspec", get_anvil_formspec(set_name_orig))
 		end
 	end,
 }
