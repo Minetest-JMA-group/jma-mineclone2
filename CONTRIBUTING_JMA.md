@@ -1,3 +1,4 @@
+# test commit - do not push
 # Contributing to JMA Mineclone
 Thank you for contributing!
 We strive to create a fun server to play on, so we have some custom mods and modifications to VoxeLibre's code.
