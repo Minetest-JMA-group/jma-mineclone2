@@ -1,5 +1,6 @@
 # This file contains settings of MineClone 2 that can be changed in
 # minetest.conf
+# test, do not push the pull request.
 
 [World]
 # In creative mode, players are able to dig all kind of blocks
