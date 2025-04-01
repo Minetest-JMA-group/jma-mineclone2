@@ -2,9 +2,9 @@ import random
 
 # Variables
 abm_interval = 60
-abm_chance = 10
+abm_chance = 5
 fish_values = [92, 92.8, 92.7, 92.5]
-junk_values = [10, 8.1, 6.1, 4.2]
+junk_values = [10, 8.1, 7, 9]
 
 fish_loot = [
     { 'itemstring': "mcl_fishing:fish_raw", 'weight': 60 },
@@ -31,8 +31,8 @@ treasure_loot = [
     { 'itemstring': "mcl_bows:bow", 'weight': 0.5, 'wear_min': 49144, 'wear_max': 65535 }, # 75%-100% damage
     { 'itemstring': "mcl_books:book", 'weight': 0.5},
     { 'itemstring': "mcl_fishing:fishing_rod", 'weight': 1, 'wear_min': 49144, 'wear_max': 65535}, # 75%-100% damage
-    { 'itemstring': "mcl_mobs:nametag", 'weight': 10},
-    { 'itemstring': "mcl_mobitems:saddle", 'weight': 10},
+    { 'itemstring': "mcl_mobs:nametag", 'weight': 2},
+    { 'itemstring': "mcl_mobitems:saddle", 'weight': 2},
     { 'itemstring': "mcl_flowers:waterlily", 'weight': 15},
     { 'itemstring': "mcl_mobitems:nautilus_shell", 'weight': 15},
 ]
@@ -65,24 +65,39 @@ def get_loot(l):
 def run_abm():
     random_value = random.randint(1, 100)
     if random.randint(1, abm_chance) == 1:
-        for fv in fish_values:
-            for jv in junk_values:
-                if random_value <= fv:
-                    return get_loot(fish_loot)[0]
-                elif random_value <= jv:
-                    return get_loot(junk_loot)[0]
-                else:
-                    return get_loot(treasure_loot)[0]
+        fv = fish_values[random.randint(1, len(fish_values))-1]
+        jv = junk_values[random.randint(1, len(junk_values))-1]
+        for jv in junk_values:
+            if random_value <= fv:
+                return get_loot(fish_loot)[0]
+            elif random_value <= jv:
+                return get_loot(junk_loot)[0]
+            else:
+                return get_loot(treasure_loot)[0]
 
-runs = 60
+tests = 100000
 
-results = {}
-for _ in range(runs):
-    i = run_abm()
-    if i:
-        if i['itemstring'] in results:
-            results[i['itemstring']] = results[i['itemstring']] + 1
-        else:
-            results[i['itemstring']] = 1
+print(f"Simulating drops over 60 minutes (average out of {tests} hours)")
 
-print(results)
+totals = 0
+
+for _ in range(tests):
+    results = {}
+    for _ in range(60):
+        i = run_abm()
+        if i:
+            if i['itemstring'] in results:
+                results[i['itemstring']] = results[i['itemstring']] + 1
+            else:
+                results[i['itemstring']] = 1
+
+    total = 0
+    for item in results:
+        total = total + results[item]
+        #print(f"{results[item]} x {item}")
+
+    #print(f"TOTAL: {total}")
+
+    totals = totals + total
+
+print(f"===\nAverage items per hour: {totals/tests}")

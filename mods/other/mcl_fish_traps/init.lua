@@ -196,7 +196,7 @@ minetest.register_abm({
 	label = "Run fish trap",
 	nodenames = {"mcl_fish_traps:fishing_trap_water"},
 	interval = 60,
-	chance = 10,
+	chance = 5,
 	action = function(pos,value)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -204,7 +204,7 @@ minetest.register_abm({
 		local pr = PseudoRandom(os.time() * math.random(1, 100))
 		local r = pr:next(1, 100)
 		local fish_values = {92, 92.8, 92.7, 92.5}
-		local junk_values = {10, 8.1, 6.1, 4.2}
+		local junk_values = {10, 8.1, 7, 9}
 
 		local fv = fish_values[math.random(#fish_values)]
 		local jv = junk_values[math.random(#junk_values)]
@@ -253,8 +253,8 @@ minetest.register_abm({
 					{ itemstring = "mcl_fishing:fishing_rod", weight = 1, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
 						mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
 					end }, -- 75%-100% damage
-					{ itemstring = "mcl_mobs:nametag", weight = 10},
-					{ itemstring = "mcl_mobitems:saddle", weight = 10},
+					{ itemstring = "mcl_mobs:nametag", weight = 2},
+					{ itemstring = "mcl_mobitems:saddle", weight = 2},
 					{ itemstring = "mcl_flowers:waterlily", weight = 15},
 					{ itemstring = "mcl_mobitems:nautilus_shell", weight = 15},
 				},
