@@ -56,8 +56,8 @@ tt.register_snippet(function(itemstring)
         new_id = mod_namespace .. id_string
     end
     if mod_namespace ~= id_modname then
-        minetest.register_alias_force(new_id, itemstring)
-        minetest.register_alias_force(alt_id, itemstring)
+        --minetest.register_alias_force(new_id, itemstring)
+        --minetest.register_alias_force(alt_id, itemstring)
     end
     if minetest.settings:get_bool("mcl_item_id_debug", false) then
         return new_id, "#555555"
