@@ -78,8 +78,8 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 		table.concat({
 			"size[9,8.75]",
 			"label[0,0;"..F(C("#313131", name)).."]",
-			"list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";main;0,0.5;9,3;]",
-			mcl_formspec.get_itemslot_bg(0, 0.5, 9, 3),
+			"list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";main;0,0.5;9,2;]",
+			mcl_formspec.get_itemslot_bg(0, 0.5, 9, 2),
 			"label[0,4.0;"..F(C("#313131", S("Inventory"))).."]",
 			"list[current_player;main;0,4.5;9,3;9]",
 			mcl_formspec.get_itemslot_bg(0, 4.5, 9, 3),
@@ -111,7 +111,7 @@ trap = {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		inv:set_size("main", 6*3)
+		inv:set_size("main", 9*2)
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		minetest.get_meta(pos):set_string("name", itemstack:get_meta():get_string("name"))
@@ -145,7 +145,7 @@ trap.tiles = {
 	"mcl_fish_traps_trap.png", "mcl_fish_traps_trap.png"
 }
 
-water_tex = "mcl_core_water_source_animation.png^[verticalframe:16:0"
+water_tex = "mcl_core_water_source_animation.png^[verticalframe:16:0^[colorize:#0003be:100"
 trap_w.tiles = { 
 	"("..water_tex..")^mcl_fish_traps_trap.png",
 	"("..water_tex..")^mcl_fish_traps_trap.png",

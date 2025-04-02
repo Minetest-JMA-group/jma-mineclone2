@@ -2,7 +2,7 @@ import random
 
 # Variables
 abm_interval = 60
-abm_chance = 2
+abm_chance = 5
 fish_values = [92, 92.8, 95, 92.5]
 junk_values = [10, 8.1, 7, 9]
 
