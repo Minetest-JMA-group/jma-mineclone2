@@ -196,14 +196,14 @@ minetest.register_abm({
 	label = "Run fish trap",
 	nodenames = {"mcl_fish_traps:fishing_trap_water"},
 	interval = 60,
-	chance = 5,
+	chance = 2,
 	action = function(pos,value)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local item
 		local pr = PseudoRandom(os.time() * math.random(1, 100))
 		local r = pr:next(1, 100)
-		local fish_values = {92, 92.8, 92.7, 92.5}
+		local fish_values = {92, 92.8, 95, 92.5}
 		local junk_values = {10, 8.1, 7, 9}
 
 		local fv = fish_values[math.random(#fish_values)]

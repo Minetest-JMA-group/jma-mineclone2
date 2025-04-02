@@ -2,8 +2,8 @@ import random
 
 # Variables
 abm_interval = 60
-abm_chance = 5
-fish_values = [92, 92.8, 92.7, 92.5]
+abm_chance = 2
+fish_values = [92, 92.8, 95, 92.5]
 junk_values = [10, 8.1, 7, 9]
 
 fish_loot = [
@@ -75,14 +75,15 @@ def run_abm():
             else:
                 return get_loot(treasure_loot)[0]
 
-tests = 100000
+tests = 10000
 
 print(f"Simulating drops over 60 minutes (average out of {tests} hours)")
 
 totals = 0
+results = {}
 
 for _ in range(tests):
-    results = {}
+    total = 0
     for _ in range(60):
         i = run_abm()
         if i:
@@ -90,14 +91,16 @@ for _ in range(tests):
                 results[i['itemstring']] = results[i['itemstring']] + 1
             else:
                 results[i['itemstring']] = 1
+            total = total + 1
 
-    total = 0
-    for item in results:
-        total = total + results[item]
+    #for item in results:
         #print(f"{results[item]} x {item}")
 
     #print(f"TOTAL: {total}")
 
     totals = totals + total
+
+for item in results:
+    print(f"{results[item]/tests} x {item}")
 
 print(f"===\nAverage items per hour: {totals/tests}")
