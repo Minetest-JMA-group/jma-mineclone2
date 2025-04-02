@@ -196,7 +196,7 @@ minetest.register_abm({
 	label = "Run fish trap",
 	nodenames = {"mcl_fish_traps:fishing_trap_water"},
 	interval = 60,
-	chance = 2,
+	chance = 5,
 	action = function(pos,value)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
