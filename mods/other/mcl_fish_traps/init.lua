@@ -63,6 +63,33 @@ local function protection_check_put_take(pos, listname, index, stack, player)
 	end
 end
 
+core.register_craftitem("mcl_fish_traps:earth_worm", {
+	description = "Earth Worm",
+    inventory_image = "mcl_fish_traps_worm.png",
+    stack_max = 16,
+    groups = {fish_bait = 2},
+	on_drop = function(itemstack, dropper, pos)
+        if dropper and awards then
+			if dropper:is_player() then
+            	local player_name = dropper:get_player_name()
+				awards.unlock(player_name, "mcl_fish_traps_worm")
+			end
+        end
+		return core.item_drop(itemstack, dropper, pos)
+	end
+})
+
+if awards then
+	core.log("[mcl_fish_traps] Awards found, registering achievements")
+	awards.register_achievement("mcl_fish_traps_worm", {
+		title = S("Worm Regards"),
+		description = S("Send a worm on its way."),
+		icon = "mcl_fish_traps_worm.png",
+	})
+else
+	core.log("error", "[mcl_fish_traps] Awards not found, NOT registering achievements")
+end
+
 -- Trap GUI
 local gui = function(pos, node, clicker, itemstack, pointed_thing)
 	local name = minetest.get_meta(pos):get_string("name")
@@ -80,6 +107,7 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 			"label[0,0;"..F(C("#313131", name)).."]",
 			"list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";main;0,0.5;9,2;]",
 			mcl_formspec.get_itemslot_bg(0, 0.5, 9, 2),
+			"label[2,2.7;"..F(C("#313131", S("Place bait in the fishing trap to lure more fish!"))).."]",
 			"label[0,4.0;"..F(C("#313131", S("Inventory"))).."]",
 			"list[current_player;main;0,4.5;9,3;9]",
 			mcl_formspec.get_itemslot_bg(0, 4.5, 9, 3),
