@@ -58,6 +58,9 @@ mcl_mobs.register_mob("mobs_mc:silverfish", {
 	attack_type = "dogfight",
 	damage = 1,
 	spawn_check = spawn_check,
+	drops = {
+		{name = "mcl_fish_traps:silver_worm", chance = 20, min = 0, max = 2, looting = "common"},
+	},
 })
 
 mcl_mobs.register_egg("mobs_mc:silverfish", S("Silverfish"), "#6d6d6d", "#313131", 0)

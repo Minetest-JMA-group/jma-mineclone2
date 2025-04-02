@@ -306,7 +306,11 @@ minetest.register_abm({
 			}, pr)
 		else
 			local enchant_weight = 1
-			if bait == 3 then enchant_weight = 10 end
+			local common_weight = 15
+			if bait == 3 then
+				enchant_weight = 10
+				common_weight = 3
+			end
 			-- Treasure
 			item = mcl_loot.get_loot({
 				items = {
@@ -321,8 +325,8 @@ minetest.register_abm({
 					end }, -- 75%-100% damage
 					{ itemstring = "mcl_mobs:nametag", weight = 2},
 					{ itemstring = "mcl_mobitems:saddle", weight = 2},
-					{ itemstring = "mcl_flowers:waterlily", weight = 15},
-					{ itemstring = "mcl_mobitems:nautilus_shell", weight = 15},
+					{ itemstring = "mcl_flowers:waterlily", weight = common_weight},
+					{ itemstring = "mcl_mobitems:nautilus_shell", weight = common_weight},
 				},
 				stacks_min = 1,
 				stacks_max = 1,
