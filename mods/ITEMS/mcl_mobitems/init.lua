@@ -8,7 +8,7 @@ minetest.register_craftitem("mcl_mobitems:rotten_flesh", {
 	wield_image = "mcl_mobitems_rotten_flesh.png",
 	on_place = minetest.item_eat(4),
 	on_secondary_use = minetest.item_eat(4),
-	groups = { food = 2, eatable = 4 },
+	groups = { food = 2, eatable = 4, fish_bait = 1},
 	_mcl_saturation = 0.8,
 	stack_max = 64,
 })

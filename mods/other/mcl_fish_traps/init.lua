@@ -63,6 +63,40 @@ local function protection_check_put_take(pos, listname, index, stack, player)
 	end
 end
 
+core.register_craftitem("mcl_fish_traps:earth_worm", {
+	description = "Earth Worm",
+    inventory_image = "mcl_fish_traps_worm.png",
+    stack_max = 16,
+    groups = {fish_bait = 2},
+	on_drop = function(itemstack, dropper, pos)
+        if dropper and awards then
+			if dropper:is_player() then
+            	local player_name = dropper:get_player_name()
+				awards.unlock(player_name, "mcl_fish_traps_worm")
+			end
+        end
+		return core.item_drop(itemstack, dropper, pos)
+	end
+})
+
+core.register_craftitem("mcl_fish_traps:silver_worm", {
+	description = "Silver Worm",
+    inventory_image = "mcl_fish_traps_worm_silver.png",
+    stack_max = 16,
+    groups = {fish_bait = 3}
+})
+
+if awards then
+	core.log("[mcl_fish_traps] Awards found, registering achievements")
+	awards.register_achievement("mcl_fish_traps_worm", {
+		title = S("Worm Regards"),
+		description = S("Send a worm on its way."),
+		icon = "mcl_fish_traps_worm.png",
+	})
+else
+	core.log("error", "[mcl_fish_traps] Awards not found, NOT registering achievements")
+end
+
 -- Trap GUI
 local gui = function(pos, node, clicker, itemstack, pointed_thing)
 	local name = minetest.get_meta(pos):get_string("name")
@@ -78,8 +112,9 @@ local gui = function(pos, node, clicker, itemstack, pointed_thing)
 		table.concat({
 			"size[9,8.75]",
 			"label[0,0;"..F(C("#313131", name)).."]",
-			"list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";main;0,0.5;9,3;]",
-			mcl_formspec.get_itemslot_bg(0, 0.5, 9, 3),
+			"list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";main;0,0.5;9,2;]",
+			mcl_formspec.get_itemslot_bg(0, 0.5, 9, 2),
+			"label[2,2.7;"..F(C("#313131", S("Place bait in the fishing trap to lure more fish!"))).."]",
 			"label[0,4.0;"..F(C("#313131", S("Inventory"))).."]",
 			"list[current_player;main;0,4.5;9,3;9]",
 			mcl_formspec.get_itemslot_bg(0, 4.5, 9, 3),
@@ -111,7 +146,7 @@ trap = {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		inv:set_size("main", 6*3)
+		inv:set_size("main", 9*2)
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		minetest.get_meta(pos):set_string("name", itemstack:get_meta():get_string("name"))
@@ -145,7 +180,7 @@ trap.tiles = {
 	"mcl_fish_traps_trap.png", "mcl_fish_traps_trap.png"
 }
 
-water_tex = "mcl_core_water_source_animation.png^[verticalframe:16:0"
+water_tex = "mcl_core_water_source_animation.png^[verticalframe:16:0^[colorize:#0003be:100"
 trap_w.tiles = { 
 	"("..water_tex..")^mcl_fish_traps_trap.png",
 	"("..water_tex..")^mcl_fish_traps_trap.png",
@@ -196,84 +231,114 @@ minetest.register_abm({
 	label = "Run fish trap",
 	nodenames = {"mcl_fish_traps:fishing_trap_water"},
 	interval = 60,
-	chance = 10,
+	chance = 1,
 	action = function(pos,value)
+		local chance = 15
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
-		local itemname
-		local items
-		local itemcount = 1
 		local pr = PseudoRandom(os.time() * math.random(1, 100))
-		local r = pr:next(1, 100)
-		local fish_values = {92, 92.8, 92.7, 92.5}
-		local junk_values = {10, 8.1, 6.1, 4.2}
-		for _, fish_v in ipairs(fish_values) do
-			for _, junk_v in ipairs(junk_values) do
-				if r <= fish_v then
-					-- Fish
-					items = mcl_loot.get_loot({
-						items = {
-						{ itemstring = "mcl_fishing:fish_raw", weight = 60 },
-						{ itemstring = "mcl_fishing:salmon_raw", weight = 25 },
-						{ itemstring = "mcl_fishing:clownfish_raw", weight = 2 },
-						{ itemstring = "mcl_fishing:pufferfish_raw", weight = 13 },
-					},
-					stacks_min = 1,
-					stacks_max = 1,
-					}, pr)
-				elseif r <= junk_v then
-				-- Junk
-					items = mcl_loot.get_loot({
-						items = {
-							{ itemstring = "mcl_core:bowl", weight = 10 },
-							{ itemstring = "mcl_fishing:fishing_rod", weight = 2, wear_min = 6554, wear_max = 65535 }, -- 10%-100% damage
-							{ itemstring = "mcl_mobitems:leather", weight = 10 },
-							{ itemstring = "mcl_armor:boots_leather", weight = 10, wear_min = 6554, wear_max = 65535 }, -- 10%-100% damage
-							{ itemstring = "mcl_mobitems:rotten_flesh", weight = 10 },
-							{ itemstring = "mcl_core:stick", weight = 5 },
-							{ itemstring = "mcl_mobitems:string", weight = 5 },
-							{ itemstring = "mcl_potions:water", weight = 10 },
-							{ itemstring = "mcl_mobitems:bone", weight = 10 },
-							{ itemstring = "mcl_dye:black", weight = 1, amount_min = 10, amount_max = 10 },
-							{ itemstring = "mcl_mobitems:string", weight = 10 }, -- TODO: Tripwire Hook
-						},
-						stacks_min = 1,
-						stacks_max = 1,
-					}, pr)
-				else
-					-- Treasure
-					items = mcl_loot.get_loot({
-						items = {
-							{ itemstring = "mcl_bows:bow", weight = 5, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
-								mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
-							end }, -- 75%-100% damage
-							{ itemstring = "mcl_books:book", weight = 5, func = function(stack, pr)
-								mcl_enchanting.enchant_randomly(stack, 30, true, true, false, pr)
-							end },
-							{ itemstring = "mcl_fishing:fishing_rod", weight = 7, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
-								mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
-							end }, -- 75%-100% damage
-							{ itemstring = "mcl_mobs:nametag", weight = 10},
-							{ itemstring = "mcl_mobitems:saddle", weight = 10},
-							{ itemstring = "mcl_flowers:waterlily", weight = 10},
-							{ itemstring = "mcl_mobitems:nautilus_shell", weight = 10},
-						},
-						stacks_min = 1,
-						stacks_max = 1,
-					}, pr)
+		local i_s = nil
+
+		local bait = nil
+		for i, stack in ipairs(inv:get_list("main")) do
+			if stack:get_count() > 0 then
+				local item_name = stack:get_name()
+				if core.get_item_group(item_name, "fish_bait") > 0 then
+					bait = core.get_item_group(item_name, "fish_bait")
+					i_s = ItemStack(item_name .. " 1")
+					break
 				end
 			end
 		end
+
+		if bait then
+			--core.log("Found bait: "..bait)
+			if bait == 1 then chance = 10
+			elseif bait == 2 then chance = 7
+			elseif bait == 3 then chance = 5 end
+		end
+
+		local c = pr:next(1, chance)
+		if c ~= 1 then return end
+
+		inv:remove_item("main", i_s)
+
 		local item
-		if #items >= 1 then
-			item = ItemStack(items[1])
+		local r = pr:next(1, 100)
+		local fish_values = {92, 92.8, 95, 92.5}
+		local junk_values = {10, 8.1, 7, 9}
+
+		local fv = fish_values[math.random(#fish_values)]
+		local jv = junk_values[math.random(#junk_values)]
+
+		if bait == 3 then fv = 70 end
+
+		if r <= fv then
+			-- Fish
+			item = mcl_loot.get_loot({
+				items = {
+				{ itemstring = "mcl_fishing:fish_raw", weight = 60 },
+				{ itemstring = "mcl_fishing:salmon_raw", weight = 25 },
+				{ itemstring = "mcl_fishing:clownfish_raw", weight = 2 },
+				{ itemstring = "mcl_fishing:pufferfish_raw", weight = 13 },
+			},
+			stacks_min = 1,
+			stacks_max = 1,
+			}, pr)
+		elseif r <= jv then
+		-- Junk
+			item = mcl_loot.get_loot({
+				items = {
+					{ itemstring = "mcl_core:bowl", weight = 10 },
+					{ itemstring = "mcl_fishing:fishing_rod", weight = 2, wear_min = 6554, wear_max = 65535 }, -- 10%-100% damage
+					{ itemstring = "mcl_mobitems:leather", weight = 10 },
+					{ itemstring = "mcl_armor:boots_leather", weight = 10, wear_min = 6554, wear_max = 65535 }, -- 10%-100% damage
+					{ itemstring = "mcl_mobitems:rotten_flesh", weight = 10 },
+					{ itemstring = "mcl_core:stick", weight = 5 },
+					{ itemstring = "mcl_mobitems:string", weight = 5 },
+					{ itemstring = "mcl_potions:water", weight = 5 },
+					{ itemstring = "mcl_mobitems:bone", weight = 10 },
+					{ itemstring = "mcl_dye:black", weight = 1, amount_min = 10, amount_max = 10 },
+					{ itemstring = "mcl_mobitems:string", weight = 10 }, -- TODO: Tripwire Hook
+				},
+				stacks_min = 1,
+				stacks_max = 1,
+			}, pr)
+		else
+			local enchant_weight = 1
+			local common_weight = 15
+			if bait == 3 then
+				enchant_weight = 10
+				common_weight = 3
+			end
+			-- Treasure
+			item = mcl_loot.get_loot({
+				items = {
+					{ itemstring = "mcl_bows:bow", weight = enchant_weight/2, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
+						mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
+					end }, -- 75%-100% damage
+					{ itemstring = "mcl_books:book", weight = enchant_weight/2, func = function(stack, pr)
+						mcl_enchanting.enchant_randomly(stack, 30, true, true, false, pr)
+					end },
+					{ itemstring = "mcl_fishing:fishing_rod", weight = enchant_weight, wear_min = 49144, wear_max = 65535, func = function(stack, pr)
+						mcl_enchanting.enchant_randomly(stack, 30, true, false, false, pr)
+					end }, -- 75%-100% damage
+					{ itemstring = "mcl_mobs:nametag", weight = 2},
+					{ itemstring = "mcl_mobitems:saddle", weight = 2},
+					{ itemstring = "mcl_flowers:waterlily", weight = common_weight},
+					{ itemstring = "mcl_mobitems:nautilus_shell", weight = common_weight},
+				},
+				stacks_min = 1,
+				stacks_max = 1,
+			}, pr)
+		end
+		if #item >= 1 then
+			item = ItemStack(item[1])
 		else
 			item = ItemStack()
 		end
 		if inv:room_for_item("main", item) then
 			inv:add_item("main", item)
-		else
-			minetest.add_item(pos, item)
 		end
 	end
 })

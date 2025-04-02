@@ -1,5 +1,9 @@
 Credits
 ========
+* mcl_fish_traps mod by PrairieWind
+* Modified for JMA Mineclone2 by fancyfinn9 & Marko Petrovic (balance changes, bugfixes and optimizations for multiplayer)
+* Worms & bait mechanic: coding by fancyfinn9, textures by Nanowolf4
+
 * Inventory, GUI, and metadata code is from mcl_barrels.
 * Fishing stuff is from mcl_fishing.
 * Waterlogging code came from mcl_mangrove.

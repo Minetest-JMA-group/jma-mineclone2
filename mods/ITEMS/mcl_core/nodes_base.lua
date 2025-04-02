@@ -510,6 +510,36 @@ minetest.register_node("mcl_core:dirt", {
 	tiles = {"default_dirt.png"},
 	is_ground_content = true,
 	stack_max = 64,
+	drop = {
+		max_items = 1,
+		items = {
+			{items = {"mcl_fish_traps:earth_worm", "mcl_core:dirt"},rarity = 20},
+			{items = {"mcl_core:dirt"}}
+		}
+	},
+	_mcl_fortune_drop = {
+		[1] = {
+			max_items = 1,
+			items = {
+				{items = {"mcl_fish_traps:earth_worm", "mcl_core:dirt"},rarity = 17},
+				{items = {"mcl_core:dirt"}}
+			}
+		},
+		[2] = {
+			max_items = 1,
+			items = {
+				{items = {"mcl_fish_traps:earth_worm", "mcl_core:dirt"},rarity = 15},
+				{items = {"mcl_core:dirt"}}
+			}
+		},
+		[3] = {
+			max_items = 1,
+			items = {
+				{items = {"mcl_fish_traps:earth_worm", "mcl_core:dirt"},rarity = 10},
+				{items = {"mcl_core:dirt"}}
+			}
+		},
+	},
 	groups = {handy=1,shovely=1, dirt=1,soil=1, soil_sapling=2, soil_sugarcane=1, cultivatable=2, enderman_takable=1, building_block=1, path_creation_possible=1},
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	_mcl_blast_resistance = 0.5,
