@@ -1,7 +1,7 @@
 local players_income = {}
 
-local income_enabled = minetest.settings:get_bool("currency.income_enabled", true)
-local creative_income_enabled = minetest.settings:get_bool("currency.creative_income_enabled", true)
+local income_enabled = minetest.settings:get_bool("currency.income_enabled", false)
+local creative_income_enabled = minetest.settings:get_bool("currency.creative_income_enabled", false)
 local income_item = minetest.settings:get("currency.income_item") or "currency:minegeld_10"
 local income_count = tonumber(minetest.settings:get("currency.income_count")) or 1
 local income_period = tonumber(minetest.settings:get("currency.income_period")) or 720
