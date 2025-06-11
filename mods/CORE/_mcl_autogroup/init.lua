@@ -1,6 +1,6 @@
 --[[
 This mod implements a HACK to make 100% sure the digging times of all tools
-match Minecraft's perfectly.  The digging times system of Minetest is very
+match Minecraft's perfectly.  The digging times system of Luanti is very
 different, so this weird group trickery has to be used.  In Minecraft, each
 block has a hardness and the actual Minecraft digging time is determined by
 this:
@@ -62,8 +62,8 @@ Information about the mod
 The mod is split up into two parts, mcl_autogroup and _mcl_autogroup.
 mcl_autogroup contains the API functions used to register custom digging groups.
 _mcl_autogroup contains most of the code.  The leading underscore in the name
-"_mcl_autogroup" is used to force Minetest to load that part of the mod as late
-as possible.  Minetest loads mods in reverse alphabetical order.
+"_mcl_autogroup" is used to force Luanti to load that part of the mod as late
+as possible.  Luanti loads mods in reverse alphabetical order.
 
 This also means that it is very important that no mod adds _mcl_autogroup as a
 dependency.
@@ -117,10 +117,6 @@ end
 -- Array of unique hardness values for each group which affects dig time.
 local hardness_values = get_hardness_values_for_groups()
 
--- Map indexed by hardness values which return the index of that value in
--- hardness_value.  Used for quick lookup.
-local hardness_lookup = get_hardness_lookup_for_groups(hardness_values)
-
 --[[local function compute_creativetimes(group)
 	local creativetimes = {}
 
@@ -147,7 +143,7 @@ local function get_digtimes(group, can_harvest, speed, efficiency)
 
 	local digtimes = {}
 
-	for index, hardness in pairs(hardness_values[group]) do
+	for _, hardness in pairs(hardness_values[group]) do
 		local digtime = (hardness or 0) / speed
 		if can_harvest then
 			digtime = digtime * 1.5
@@ -186,6 +182,7 @@ local function add_groupcaps(toolname, groupcaps, groupcaps_def, efficiency)
 		local mult = capsdef.speed or 1
 		local uses = capsdef.uses
 		local def = mcl_autogroup.registered_diggroups[g]
+		assert(def, toolname .. " has unknown diggroup '" .. dump(g) .. "'")
 		local max_level = def.levels and #def.levels or 1
 
 		assert(capsdef.level, toolname .. ' is missing level for ' .. g)
@@ -234,7 +231,7 @@ function mcl_autogroup.can_harvest(nodename, toolname, player)
 	-- Check if it can be dug by hand
 	if not player or not player:is_player() then return false end
 	local name = player:get_inventory():get_stack("hand", 1):get_name()
-	local tdef = minetest.registered_items[name]
+	tdef = minetest.registered_items[name]
 	if tdef then
 		for g, gdef in pairs(tdef._mcl_diggroups) do
 			if ndef.groups[g] then
@@ -312,9 +309,55 @@ function mcl_autogroup.get_wear(toolname, diggroup)
 	return math.ceil(65535 / uses)
 end
 
+local GROUP_MAP = {
+	["choppy"] = "axey",
+	["oddly_breakable_by_hand"] = "handy",
+	["cracky"] = "pickaxey",
+	["crumbly"] = "shovely",
+	["snappy"] = "shearsy",
+}
+
+function mcl_autogroup.group_compatibility(groups)
+	local grouped = false
+	for name,old_group_value in pairs(groups) do
+		local new_group = GROUP_MAP[name]
+		if new_group then
+			groups[new_group] = old_group_value
+		end
+		if mcl_autogroup.registered_diggroups[name] then
+			grouped = true
+		end
+	end
+
+	if not grouped then
+		groups.handy = 1
+	end
+end
+
 local function overwrite()
+	-- Refresh, now that all groups are known.
+	hardness_values = get_hardness_values_for_groups()
+
+	-- Map indexed by hardness values which return the index of that value in
+	-- hardness_value.  Used for quick lookup.
+	local hardness_lookup = get_hardness_lookup_for_groups(hardness_values)
+
+	local count = 0
 	for nname, ndef in pairs(minetest.registered_nodes) do
+		count = count + 1
 		local newgroups = table.copy(ndef.groups)
+
+		if not newgroups.unbreakable and not newgroups.indestructible and not newgroups.liquid then
+			ndef.diggable = true
+			mcl_autogroup.group_compatibility(newgroups)
+			if not ndef._mcl_hardness then
+				ndef._mcl_hardness = 0
+			end
+		end
+
+		-- Make sure compatibility groups are present for the below logic
+		ndef.groups = newgroups
+
 		if (nname ~= "ignore" and ndef.diggable) then
 			-- Automatically assign the "solid" group for solid nodes
 			if (ndef.walkable == nil or ndef.walkable == true)
@@ -359,6 +402,7 @@ local function overwrite()
 			})
 		end
 	end
+	minetest.log("verbose","Total registered nodes: "..count)
 
 	for tname, tdef in pairs(minetest.registered_items) do
 		-- Assign groupcaps for digging the registered digging groups
@@ -374,4 +418,5 @@ local function overwrite()
 	end
 end
 
-overwrite()
+-- Make sure all tools and groups are registered
+minetest.register_on_mods_loaded(overwrite)
