@@ -131,15 +131,16 @@ mcl_mobs.register_mob("mobs_mc:parrot", {
 	spawn_class = "passive",
 	passive = true,
 	pathfinding = 1,
-	hp_min = 6,
-	hp_max = 6,
+	initial_properties = {
+		hp_min = 6,
+		hp_max = 6,
+		collisionbox = {-0.25, -0.01, -0.25, 0.25, 0.89, 0.25},
+	},
 	xp_min = 1,
 	xp_max = 3,
 	head_swivel = "head.control",
-	bone_eye_height = 1.1,
-	horizontal_head_height=0,
+	head_bone_position = vector.new( 0, 1.211, 0 ), -- for minetest <= 5.8
 	curiosity = 10,
-	collisionbox = {-0.25, -0.01, -0.25, 0.25, 0.89, 0.25},
 	visual = "mesh",
 	mesh = "mobs_mc_parrot.b3d",
 	textures = {{"mobs_mc_parrot_blue.png"},{"mobs_mc_parrot_green.png"},{"mobs_mc_parrot_grey.png"},{"mobs_mc_parrot_red_blue.png"},{"mobs_mc_parrot_yellow_blue.png"}},
@@ -166,8 +167,8 @@ mcl_mobs.register_mob("mobs_mc:parrot", {
 		fly_speed = 50,
 		stand_start = 0,
 		stand_end = 0,
-		fly_start = 30,
-		fly_end = 45,
+		fly_start = 60,
+		fly_end = 120,
 		walk_start = 0,
 		walk_end = 20,
 		-- TODO: actual walk animation
@@ -222,23 +223,24 @@ mcl_mobs.register_mob("mobs_mc:parrot", {
 })
 
 -- Parrots spawn rarely in jungles. TODO: Also check for jungle *biome* <- I'll get to this eventually -j4i
-mcl_mobs:spawn_specific(
-"mobs_mc:parrot",
-"overworld",
-"ground",
-{
-"Jungle",
-"JungleEdgeM",
-"JungleM",
-"JungleEdge",
-},
-0,
-minetest.LIGHT_MAX+1,
-7,
-400,
-1,
-mobs_mc.water_level+7,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:parrot",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"Jungle",
+		"JungleEdgeM",
+		"JungleM",
+		"JungleEdge",
+	},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 400,
+	interval = 7,
+	aoc = 1,
+	min_height = mobs_mc.water_level+7,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:parrot", S("Parrot"), "#0da70a", "#ff0000", 0)

@@ -10,11 +10,14 @@ mcl_mobs.register_mob("mobs_mc:guardian", {
 	spawn_class = "hostile",
 	spawn_in_group_min = 2,
 	spawn_in_group = 4,
-	hp_min = 30,
-	hp_max = 30,
+	initial_properties = {
+		hp_min = 30,
+		hp_max = 30,
+		breath_max = -1,
+		collisionbox = {-0.425, 0.25, -0.425, 0.425, 1.1, 0.425},
+	},
 	xp_min = 10,
 	xp_max = 10,
-	breath_max = -1,
 	passive = false,
 	attack_type = "dogfight",
 	pathfinding = 1,
@@ -23,7 +26,6 @@ mcl_mobs.register_mob("mobs_mc:guardian", {
 	run_velocity = 4,
 	damage = 6,
 	reach = 3,
-	collisionbox = {-0.425, 0.25, -0.425, 0.425, 1.1, 0.425},
 	visual = "mesh",
 	mesh = "mobs_mc_guardian.b3d",
 	textures = {
@@ -99,7 +101,19 @@ mcl_mobs.register_mob("mobs_mc:guardian", {
 	view_range = 16,
 })
 
-mcl_mobs:spawn_specific("mobs_mc:guardian", { "mcl_core:water_source", "mclx_core:river_water_source" }, { "mcl_core:water_source", "mclx_core:river_water_source" }, 0, minetest.LIGHT_MAX+1, 30, 25000, 2, mcl_vars.mg_overworld_min, mobs_mc.water_level - 10, mobs_mc.water_level)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:guardian",
+	dimension = "overworld",
+	type_of_spawning = "water",
+	biomes = {},	-- no biomes, only spawn in structures
+	min_light = 0, -- min_light
+	max_light = core.LIGHT_MAX+1, -- max_light
+	chance = 25000,
+	interval = 30,
+	aoc = 2,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mobs_mc.water_level - 10
+})
 mcl_mobs:non_spawn_specific("mobs_mc:guardian","overworld",0,minetest.LIGHT_MAX+1)
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:guardian", S("Guardian"), "#5a8272", "#f17d31", 0)

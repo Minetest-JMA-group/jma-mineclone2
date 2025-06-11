@@ -16,11 +16,13 @@ mcl_mobs.register_mob("mobs_mc:ghast", {
 	spawn_class = "hostile",
 	pathfinding = 1,
 	group_attack = true,
-	hp_min = 10,
-	hp_max = 10,
+	initial_properties = {
+		hp_min = 10,
+		hp_max = 10,
+		collisionbox = {-2, 0, -2, 2, 4, 2, rotate=true},
+	},
 	xp_min = 5,
 	xp_max = 5,
-	collisionbox = {-2, 0, -2, 2, 4, 2, rotate=true},
 	visual = "mesh",
 	mesh = "mobs_mc_ghast.b3d",
 	spawn_in_group = 1,
@@ -82,25 +84,41 @@ mcl_mobs.register_mob("mobs_mc:ghast", {
 			self.object:set_properties({textures=self.base_texture})
 		end
 	end,
+	do_punch = function(self, hitter)
+		local le = hitter:get_luaentity()
+		self._last_hit = {
+			fireball = le and le.name == "mobs_mc:fireball",
+			owner = le and le._owner,
+		}
+
+		return true -- Force punch to continue with default behavior
+	end,
+	on_die = function(self)
+		local last_hit = self._last_hit or {}
+		if last_hit.fireball and last_hit.owner and core.get_player_by_name(last_hit.owner) then
+			awards.unlock(last_hit.owner, "mcl:fireball_redir_serv")
+		end
+	end,
 })
 
 
-mcl_mobs:spawn_specific(
-"mobs_mc:ghast",
-"nether",
-"ground",
-{
-"Nether",
-"SoulsandValley",
-"BasaltDelta",
-},
-0,
-7,
-30,
-400,
-2,
-mcl_vars.mg_nether_min,
-mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:ghast",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {
+		"Nether",
+		"SoulsandValley",
+		"BasaltDelta",
+	},
+	min_light = 0,
+	max_light = 7,
+	chance = 400,
+	interval = 30,
+	aoc = 2,
+	min_height = mcl_vars.mg_nether_min,
+	max_height = mcl_vars.mg_nether_max
+})
 
 -- fireball (projectile)
 mcl_mobs.register_arrow("mobs_mc:fireball", {
@@ -111,12 +129,11 @@ mcl_mobs.register_arrow("mobs_mc:fireball", {
 	collisionbox = {-.5, -.5, -.5, .5, .5, .5},
 	_lifetime = 10,
 	_is_fireball = true,
+	_vl_projectile = {
+		damage_groups = {fleshy = 6}
+	},
 
 	hit_player = function(self, player)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 6},
-		}, nil)
 		local p = self.object:get_pos()
 		if p then
 			mcl_mobs.mob_class.boom(self,p, 1, true)
@@ -127,23 +144,13 @@ mcl_mobs.register_arrow("mobs_mc:fireball", {
 
 	hit_mob = function(self, mob)
 		local name = mob:get_luaentity().name
-		mob:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 6},
-		}, nil)
 		mcl_mobs.mob_class.boom(self,self.object:get_pos(), 1, true)
-		local ent = mob:get_luaentity()
-		if (not ent or ent.health <= 0) and self._puncher and name == "mobs_mc:ghast" then
-			awards.unlock(self._puncher:get_player_name(), "mcl:fireball_redir_serv")
-		end
 	end,
 
 	hit_node = function(self, pos, node)
 		mcl_mobs.mob_class.boom(self,pos, 1, true)
 	end
 })
-
-
 
 mcl_mobs:non_spawn_specific("mobs_mc:ghast","overworld","0","7")
 -- spawn eggs

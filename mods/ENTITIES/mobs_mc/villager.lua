@@ -71,11 +71,11 @@ if minetest.get_mapgen_setting("mg_name") == "v6" then
 end
 
 local tiernames = {
-	"Novice",
-	"Apprentice",
-	"Journeyman",
-	"Expert",
-	"Master",
+	N("Novice"),
+	N("Apprentice"),
+	N("Journeyman"),
+	N("Expert"),
+	N("Master"),
 }
 
 local badges = {
@@ -383,7 +383,7 @@ local professions = {
 			},
 
 			{
-			{ { "mcl_core:emerald", 7, 7 }, { "mcl_itemframes:item_frame", 1, 1 } },
+			{ { "mcl_core:emerald", 7, 7 }, { "mcl_itemframes:frame", 1, 1 } },
 
 			{ { "mcl_core:emerald", 3, 3 }, { "mcl_banners:banner_item_white", 1, 1 } },
 			{ { "mcl_core:emerald", 3, 3 }, { "mcl_banners:banner_item_grey", 1, 1 } },
@@ -818,7 +818,7 @@ local function find_closest_bed (self)
 
 			if (owned_by and owned_by == self._id) then
 				mcl_log("Clear as already owned by me.")
-				bed_meta:set_string("villager", nil)
+				bed_meta:set_string("villager", "")
 				owned_by = nil
 			end
 
@@ -952,6 +952,9 @@ local function go_home(entity, sleep)
 			entity.order = nil
 			return
 		end
+		-- in case pathfinding fails, turn into the right direction anyways
+		local p = entity.object:get_pos()
+		entity:turn_in_direction(b.x - p.x, b.z - p.z, 8)
 
 		entity:gopath(b,function(entity,b)
 			local b = entity._bed
@@ -1049,14 +1052,18 @@ local function has_summon_participants(self)
 end
 
 local function summon_golem(self)
-	vector.offset(self.object:get_pos(),-10,-10,-10)
-	local nn = minetest.find_nodes_in_area_under_air(vector.offset(self.object:get_pos(),-10,-10,-10),vector.offset(self.object:get_pos(),10,10,10),{"group:solid","group:water"})
-	table.shuffle(nn)
-	for _,n in pairs(nn) do
-		local up = minetest.find_nodes_in_area(vector.offset(n,0,1,0),vector.offset(n,0,3,0),{"air"})
-		if up and #up >= 3 then
+	local pos = self.object:get_pos()
+	local p1 = vector.offset(pos, -10, -10, -10)
+	local p2 = vector.offset(pos,  10,  10,  10)
+	local nn = minetest.find_nodes_in_area_under_air(p1, p2,{"group:solid","group:water"})
+	while #nn > 0 do
+		local n = table.remove_random_element(nn)
+		n.y = n.y + 1
+
+		local summon = mcl_mobs.spawn(n, "mobs_mc:iron_golem")
+		if summon then
 			minetest.sound_play("mcl_portals_open_end_portal", {pos=n, gain=0.5, max_hear_distance = 16}, true)
-			return minetest.add_entity(vector.offset(n,0,1,0),"mobs_mc:iron_golem")
+			return summon
 		end
 	end
 end
@@ -1240,7 +1247,7 @@ local function retrieve_my_jobsite (self)
 		mcl_log("find_jobsite. Invalid params. Should not happen")
 		return
 	end
-	local n = mcl_vars.get_node(self._jobsite)
+	local n = minetest.get_node(self._jobsite)
 	local m = minetest.get_meta(self._jobsite)
 	if m:get_string("villager") == self._id then
 		--mcl_log("find_jobsite. is my job.")
@@ -1279,7 +1286,7 @@ local function validate_jobsite(self)
 		mcl_log("Jobsite far, so resettle: " .. tostring(resettle))
 		if resettle then
 			local m = minetest.get_meta(self._jobsite)
-			m:set_string("villager", nil)
+			m:set_string("villager", "")
 			remove_job (self)
 			return false
 		end
@@ -1327,7 +1334,7 @@ local function do_work (self)
 					--mcl_log("Jobsite not valid")
 					return false
 				end
-				if vector.distance(self.object:get_pos(),self._jobsite) < 2 then
+				if vector.distance(self.object:get_pos(),self._jobsite) < 1.5 then
 					--mcl_log("Made it to work ok callback!")
 					return true
 				else
@@ -1407,7 +1414,7 @@ local function validate_bed(self)
 	if not self or not self._bed then
 		return false
 	end
-	local n = mcl_vars.get_node(self._bed)
+	local n = minetest.get_node(self._bed)
 	if not n then
 		self._bed = nil
 		return false
@@ -1421,7 +1428,7 @@ local function validate_bed(self)
 	mcl_log("Bed far, so resettle: " .. tostring(resettle))
 	if resettle then
 		mcl_log("Resettled. Ditch bed.")
-		m:set_string("villager", nil)
+		m:set_string("villager", "")
 		self._bed = nil
 		bed_valid = false
 		return false
@@ -1431,7 +1438,7 @@ local function validate_bed(self)
 	mcl_log("Player owner: " .. owned_by_player)
 	if owned_by_player ~= "" then
 		mcl_log("Player owns this. Villager won't take this.")
-		m:set_string("villager", nil)
+		m:set_string("villager", "")
 		self._bed = nil
 		bed_valid = false
 		return false
@@ -1650,11 +1657,7 @@ local function show_trade_formspec(playername, trader, tradenum)
 		.."tooltip[3,1;0.8,0.8;"..F(wanted2:get_description()).."]"
 	end
 	local tiername = tiernames[trader._max_trade_tier]
-	if tiername then
-		tiername = S(tiername)
-	else
-		tiername = S("Master")
-	end
+	tiername = S(tiername or "Master")
 	local formspec =
 	"size[9,8.75]"
 	.."background[-0.19,-0.25;9.41,9.49;mobs_mc_trading_formspec_bg.png]"
@@ -2022,7 +2025,7 @@ local trade_inventory = {
 					trader._locked_trades = 0
 					-- Also heal trader for unlocking stuff
 					-- TODO: Replace by Regeneration I
-					trader.health = math.min(trader.hp_max, trader.health + 4)
+					trader.health = math.min(trader.initial_properties.hp_max, trader.health + 4)
 				end
 				mcl_experience.add_xp(player, xp)
 				trade.trade_counter = trade.trade_counter + 1
@@ -2055,7 +2058,7 @@ local trade_inventory = {
 						trader._locked_trades = 1
 						-- Also heal trader for unlocking stuff
 						-- TODO: Replace by Regeneration I
-						trader.health = math.min(trader.hp_max, trader.health + 4)
+						trader.health = math.min(trader.initial_properties.hp_max, trader.health + 4)
 					end
 				end
 				trader._trades = minetest.serialize(trades)
@@ -2103,14 +2106,16 @@ mcl_mobs.register_mob("mobs_mc:villager", {
 	type = "npc",
 	spawn_class = "passive",
 	passive = true,
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3},
+	},
 	head_swivel = "head.control",
-	bone_eye_height = 6.3,
-	head_eye_height = 2.2,
+	head_eye_height = 1.5,
+	head_bone_position = vector.new( 0, 6.3, 0 ), -- for minetest <= 5.8
 	curiosity = 10,
 	runaway = true,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3},
 	visual = "mesh",
 	mesh = "mobs_mc_villager.b3d",
 	textures = {
@@ -2281,7 +2286,7 @@ mcl_mobs.register_mob("mobs_mc:villager", {
 			set_textures(self)
 			return
 		end
-		self._id=minetest.sha1(minetest.get_gametime()..minetest.pos_to_string(self.object:get_pos())..tostring(math.random()))
+		self._id=mcl_util.gen_uuid()
 		set_textures(self)
 	end,
 	on_die = function(self, pos, cmi_cause)
@@ -2300,13 +2305,13 @@ mcl_mobs.register_mob("mobs_mc:villager", {
 		local bed = self._bed
 		if bed then
 			local bed_meta = minetest.get_meta(bed)
-			bed_meta:set_string("villager", nil)
+			bed_meta:set_string("villager", "")
 			mcl_log("Died, so bye bye bed")
 		end
 		local jobsite = self._jobsite
 		if jobsite then
 			local jobsite_meta = minetest.get_meta(jobsite)
-			jobsite_meta:set_string("villager", nil)
+			jobsite_meta:set_string("villager", "")
 			mcl_log("Died, so bye bye jobsite")
 		end
 
@@ -2324,39 +2329,6 @@ mcl_mobs.register_mob("mobs_mc:villager", {
 	end,
 })
 
-
---[[
-Villager spawning in mcl_villages
-mcl_mobs:spawn_specific(
-"mobs_mc:villager",
-"overworld",
-"ground",
-{
-"FlowerForest",
-"Swampland",
-"Taiga",
-"ExtremeHills",
-"BirchForest",
-"MegaSpruceTaiga",
-"MegaTaiga",
-"ExtremeHills+",
-"Forest",
-"Plains",
-"ColdTaiga",
-"SunflowerPlains",
-"RoofedForest",
-"MesaPlateauFM_grasstop",
-"ExtremeHillsM",
-"BirchForestM",
-},
-0,
-minetest.LIGHT_MAX+1,
-30,
-2,
-4,
-mobs_mc.water_level+1,
-mcl_vars.mg_overworld_max)
---]]
 -- spawn eggs
 mcl_mobs:non_spawn_specific("mobs_mc:villager","overworld", 0, minetest.LIGHT_MAX+1)
 mcl_mobs.register_egg("mobs_mc:villager", S("Villager"), "#563d33", "#bc8b72", 0)

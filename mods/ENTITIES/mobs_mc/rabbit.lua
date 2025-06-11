@@ -10,26 +10,27 @@ local rabbit = {
 	spawn_in_group = 3,
 	passive = true,
 	reach = 1,
-	hp_min = 3,
-	hp_max = 3,
+	initial_properties = {
+		hp_min = 3,
+		hp_max = 3,
+		collisionbox = {-0.2, -0.01, -0.2, 0.2, 0.49, 0.2},
+	},
 	xp_min = 1,
 	xp_max = 3,
-	collisionbox = {-0.2, -0.01, -0.2, 0.2, 0.49, 0.2},
 	head_swivel = "head.control",
-	bone_eye_height = 2,
-	head_eye_height = 0.5,
-	horizontal_head_height = -.3,
+	head_eye_height = 0.35,
+	head_bone_position = vector.new( 0, 2, -.3 ), -- for minetest <= 5.8
 	curiosity = 20,
 	head_yaw="z",
 	visual = "mesh",
 	mesh = "mobs_mc_rabbit.b3d",
 	textures = {
-        {"mobs_mc_rabbit_brown.png"},
-        {"mobs_mc_rabbit_gold.png"},
-        {"mobs_mc_rabbit_white.png"},
-        {"mobs_mc_rabbit_white_splotched.png"},
-        {"mobs_mc_rabbit_salt.png"},
-        {"mobs_mc_rabbit_black.png"},
+		{"mobs_mc_rabbit_brown.png"},
+		{"mobs_mc_rabbit_gold.png"},
+		{"mobs_mc_rabbit_white.png"},
+		{"mobs_mc_rabbit_white_splotched.png"},
+		{"mobs_mc_rabbit_salt.png"},
+		{"mobs_mc_rabbit_black.png"},
 	},
 	sounds = {
 		random = "mobs_mc_rabbit_random",
@@ -133,25 +134,26 @@ mcl_mobs.register_mob("mobs_mc:killer_bunny", killer_bunny)
 -- Mob spawning rules.
 -- Different skins depending on spawn location <- we'll get to this when the spawning algorithm is fleshed out
 
-mcl_mobs:spawn_specific(
-"mobs_mc:rabbit",
-"overworld",
-"ground",
-{
-"Desert",
-"FlowerForest",
-"Taiga",
-"MegaSpruceTaiga",
-"MegaTaiga",
-"ColdTaiga",
-},
-9,
-minetest.LIGHT_MAX+1,
-30,
-40,
-8,
-mcl_vars.mg_overworld_min,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:rabbit",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"Desert",
+		"FlowerForest",
+		"Taiga",
+		"MegaSpruceTaiga",
+		"MegaTaiga",
+		"ColdTaiga",
+	},
+	min_light = 9,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 40,
+	interval = 30,
+	aoc = 8,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 --[[
 local spawn = {
