@@ -45,6 +45,9 @@ mcl_disabled_structures (Disabled structures) string
 # Comma separated list of disabled event names
 mcl_disabled_events (Disabled events) string
 
+# Control the relative plant growth speed (default: 1)
+vl_plant_growth (Plant growth factor) float 1.0 0 100
+
 [Players]
 # If enabled, players respawn at the bed they last lay on instead of normal
 # spawn.
@@ -83,6 +86,14 @@ mcl_craftguide_progressive_mode	(Learn crafting recipes progressively) bool true
 
 # If disabled, the skin of all players will be character.png
 mcl_enable_skin_customization (Enable player skin customization) bool true
+
+# If enabled, players will be able to sit on stairs and slabs by right-clicking
+# them
+mcl_cozy_sit_on_stairs (Sit on stairs & slabs) bool false
+
+# If enabled, messages like "* player stands up" (in style of /me) will be sent
+# each time a player sits, lays or stands up
+mcl_cozy_print_actions (Print actions) bool false
 
 # How far the player hand can reach
 # Default:4.5
@@ -221,6 +232,13 @@ mcl_mobs_overworld_threshold (Artificial light threshold to stop monster spawns 
 mcl_mobs_overworld_sky_threshold (Skylight threshold to stop monster spawns in the Overworld) int 7 0 14
 mcl_mobs_overworld_passive_threshold  (Combined light threshold to stop animal and npc spawns in the Overworld) int 7 0 14
 
+# Slime chunk ratio 1:N, default is 1 in 10, 0 to disable cave slime
+slime_ratio (Slime chunk ratio) float 10.0 0.0
+# Use 3d chunking instead of 2d chunking
+slime_3d_chunks (Slime chunk placement in 3d) bool false
+# Slime chunk maximum light for spawning, default is no limit
+slime_max_light (Maximum light level in slime chunks) int 14 0 14
+
 [Audio]
 # Enable flame sound.
 flame_sound (Flame sound) bool true
@@ -247,6 +265,16 @@ mcl_default_shadow_intensity (Default shadow intensity) float 0.33 0.0 1.0
 # Selecting liquid nodes on clients without a cross hair will not work correctly if this setting is disabled.
 mcl_buckets_use_select_box (Buckets use select box) bool false
 
+# Changes when Christmas decorations (e.g. on chests) are enabled.
+# 'Calendar' means from December 24th to January 7th
+vl_christmas_decorations (Christmas decorations) enum Calendar Always,Calendar,Never
+
+# Controls the behavior when the character limit on a line on a sign is reached.
+# * word_wrap: wrap at spaces and hyphens, break words if impossible
+# * word_break: break words if they reach the limit, make exceptions for spaces
+# * truncate: stop adding characters to a line past the limit, add ... instead
+mcl_signs_wrap_mode (Signs text wrapping mode) enum word_wrap word_wrap,word_break,truncate
+
 [Experimental]
 # Whether ice is translucent. If disabled, ice is fully opaque.
 #
@@ -255,10 +283,6 @@ mcl_buckets_use_select_box (Buckets use select box) bool false
 # due to bugs in Minetest's implementation of translucency.
 # See also: https://github.com/minetest/minetest/issues/95
 mcl_translucent_ice (Translucent ice) bool false
-
-# Whether to generate fallen logs in some biomes.
-# They might not always look pretty and have strange overhangs.
-mcl_generate_fallen_logs (Generate fallen logs) bool false
 
 # If enabled, the “flat” map generator generates a Classic Superflat world:
 # Completely flat, 1 layer of grass blocks on top of 2 layers of dirt on
@@ -304,9 +328,24 @@ fix_doubleplants (Mcimport double plant fixes) bool true
 # Allow players to create Minecraft-like maps.
 enable_real_maps (Enable Real Maps) bool true
 
+# Make maps in the Nether show not only the bedrock.
+vl_maps_allow_nether (Make maps in the Nether useful) bool true
+
+# Allow maps to overlap 50% per level
+vl_maps_allow_overlap (Allow overlapping maps by 50%) bool true
+
+# Maximum map zoom level permitted (high zoom levels can take very long, do not increase on multiplayer servers)
+vl_maps_max_zoom (Maximum map zoom level) int 3 1 5
+
+# How many times per second should handheld maps be updated
+vl_maps_update_rate (Map updates per second) int 15 1 60
+
 # Enable workarounds for faulty mob navigation.
 # Hack 1: teleport golems home if they are very far from home
 mcl_mob_allow_nav_hacks (Mob navigation hacks) bool false
+
+# Enable minecart trains
+mcl_minecarts_enable_trains (Enable minecart trains) bool true
 
 [Additional Features]
 # Enable Bookshelf inventories
@@ -315,13 +354,13 @@ mcl_bookshelf_inventories (Enable bookshelf inventories) bool true
 # Enable swiftness on enchanted golden apples
 mcl_enable_fapples (Enable swiftness on enchanted golden apples) bool true
 
-# All tameable mobs listen to the "sit" righclick like dogs
+# All tameable mobs listen to the "sit" rightclick like dogs
 mcl_extended_pet_control (Extended pet control) bool true
 
 # Enable hamburgers for villagers to follow
 mcl_enable_hamburger (Enable Hamburger) bool true
 
-# Starting Inventory contents (given directly to the new player) type: bool
+# Starting Inventory contents (given directly to the new player)
 give_starting_inv (Player Starter Pack) bool false
 
 [Debugging]
@@ -329,16 +368,19 @@ give_starting_inv (Player Starter Pack) bool false
 mcl_item_id_debug (Item ID Debug) bool false
 
 #Log mob spawning and despawning events
-mcl_logging_mobs_spawn (Log Mob Spawning) bool true
+mcl_logging_mobs_spawn (Log Mob Spawning) bool false
+
+#Log mob movement events
+mcl_logging_mobs_movement (Log Mob Movement) bool false
 
 # If enabled mapgen timings will be dumped to log
 mcl_logging_mapgen (Chunk generation logging) bool false
 
+# If enabled generated dungeons will be logged
+mcl_logging_dungeons (Dungeons generation logging) bool false
+
 # If enabled generated structures will be logged
-mcl_logging_structures (Structure generation logging) bool true
+mcl_logging_structures (Structure generation logging) bool false
 
-#Complete debug logging for mcl_signs events. Use this if you have issues with signs.
-mcl_logging_mcl_signs (Complete debug logging for mcl_signs) bool false
-
-#Debug logging for mcl_events.
+# Debug logging for mcl_events.
 mcl_logging_event_api (Debug logging for mcl_events) bool false
