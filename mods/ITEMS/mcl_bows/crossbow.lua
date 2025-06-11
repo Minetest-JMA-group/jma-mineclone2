@@ -6,7 +6,6 @@ mcl_bows_s = {}
 -- 	["mcl_bows:arrow"] = "mcl_bows:arrow_entity",
 -- }
 
-local GRAVITY = 9.81
 local BOW_DURABILITY = 385
 
 -- Charging time in microseconds
@@ -41,13 +40,15 @@ local bow_load = {}
 local bow_index = {}
 
 function mcl_bows_s.shoot_arrow_crossbow(arrow_item, pos, dir, yaw, shooter, power, damage, is_critical, crossbow_stack, collectable)
-	local obj = minetest.add_entity({x=pos.x,y=pos.y,z=pos.z}, arrow_item.."_entity")
-	if power == nil then
-		power = BOW_MAX_SPEED --19
-	end
-	if damage == nil then
-		damage = 3
-	end
+	power = power or BOW_MAX_SPEED
+	damage = damage or 3
+
+	local obj = vl_projectile.create(arrow_item.."_entity", {
+		pos = pos,
+		dir = dir,
+		velocity = power,
+		owner = shooter,
+	})
 	local knockback = 4.875
 	if crossbow_stack then
 		local enchantments = mcl_enchanting.get_enchantments(crossbow_stack)
@@ -57,18 +58,15 @@ function mcl_bows_s.shoot_arrow_crossbow(arrow_item, pos, dir, yaw, shooter, pow
 			obj:get_luaentity()._piercing = 0
 		end
 	end
-	obj:set_velocity({x=dir.x*power, y=dir.y*power, z=dir.z*power})
-	obj:set_acceleration({x=0, y=-GRAVITY, z=0})
-	obj:set_yaw(yaw-math.pi/2)
 	local le = obj:get_luaentity()
-	le._shooter = shooter
 	le._source_object = shooter
 	le._damage = damage
 	le._is_critical = is_critical
 	le._startpos = pos
 	le._knockback = knockback
 	le._collectable = collectable
-	minetest.sound_play("mcl_bows_crossbow_shoot", {pos=pos, max_hear_distance=16}, true)
+	le._arrow_item = arrow_item
+	core.sound_play("mcl_bows_crossbow_shoot", {pos=pos, max_hear_distance=16}, true)
 	if shooter and shooter:is_player() then
 		if obj:get_luaentity().player == "" then
 			obj:get_luaentity().player = shooter
@@ -158,7 +156,8 @@ S("The speed and damage of the arrow increases the longer you charge. The regula
 		itemstack:get_meta():set_string("active", "true")
 		return itemstack
 	end,
-	groups = {weapon=1,weapon_ranged=1,crossbow=1,enchantability=1},
+	groups = {weapon=1,weapon_ranged=1,crossbow=1,cannot_block=1,enchantability=1},
+	touch_interaction = "short_dig_long_place",
 	_mcl_uses = 326,
 })
 
@@ -193,7 +192,8 @@ S("The speed and damage of the arrow increases the longer you charge. The regula
 		itemstack:get_meta():set_string("active", "true")
 		return itemstack
 	end,
-	groups = {weapon=1,weapon_ranged=1,crossbow=1,enchantability=1,not_in_creative_inventory=1},
+	groups = {weapon=1,weapon_ranged=1,crossbow=1,cannot_block=1,enchantability=1,not_in_creative_inventory=1},
+	touch_interaction = "short_dig_long_place",
 	_mcl_uses = 326,
 })
 
@@ -238,7 +238,7 @@ for level=0, 2 do
 		wield_scale = mcl_vars.tool_wield_scale,
 		stack_max = 1,
 		range = 0, -- Pointing range to 0 to prevent punching with bow :D
-		groups = {not_in_creative_inventory=1, not_in_craft_guide=1, bow=1, enchantability=1},
+		groups = {not_in_creative_inventory=1, not_in_craft_guide=1, cannot_block=1, bow=1, enchantability=1},
 		-- Trick to disable digging as well
 		on_use = function() return end,
 		on_drop = function(itemstack, dropper, pos)
@@ -257,6 +257,7 @@ for level=0, 2 do
 		on_place = function(itemstack)
 			return itemstack
 		end,
+		touch_interaction = "short_dig_long_place",
 		_mcl_uses = 385,
 	})
 end
@@ -302,21 +303,6 @@ controls.register_on_press(function(player, key, time)
 		if wielditem:get_name()=="mcl_bows:crossbow_loaded" or wielditem:get_name()=="mcl_bows:crossbow_loaded_enchanted" then
 		local enchanted = mcl_enchanting.is_enchanted(wielditem:get_name())
 		local speed, damage
-		local p_load = bow_load[player:get_player_name()]
-		local charge
-		-- Type sanity check
-		if type(p_load) == "number" then
-			charge = minetest.get_us_time() - p_load
-		else
-			-- In case something goes wrong ...
-			-- Just assume minimum charge.
-			charge = 0
-			minetest.log("warning", "[mcl_bows] Player "..player:get_player_name().." fires arrow with non-numeric bow_load!")
-		end
-		charge = math.max(math.min(charge, BOW_CHARGE_TIME_FULL), 0)
-
-		local charge_ratio = charge / BOW_CHARGE_TIME_FULL
-		charge_ratio = math.max(math.min(charge_ratio, 1), 0)
 
 		-- Calculate damage and speed
 		-- Fully charged

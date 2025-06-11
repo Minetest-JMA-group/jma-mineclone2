@@ -64,6 +64,8 @@ end)
 
 tt.register_snippet(function(itemstring)
 	local def = minetest.registered_items[itemstring]
+	if not def then return end
+
 	local s = ""
 	if def.groups.eatable and def.groups.eatable > 0 then
 		s = s .. S("Hunger points: +@1", def.groups.eatable)
@@ -89,6 +91,8 @@ end)
 
 tt.register_snippet(function(itemstring)
 	local def = minetest.registered_items[itemstring]
+	if not def then return end
+
 	if def.groups.place_flowerlike == 1 then
 		return S("Grows on grass blocks or dirt")
 	elseif def.groups.place_flowerlike == 2 then
@@ -98,6 +102,8 @@ end)
 
 tt.register_snippet(function(itemstring)
 	local def = minetest.registered_items[itemstring]
+	if not def then return end
+
 	if def.groups.flammable then
 		return S("Flammable")
 	end
@@ -127,6 +133,8 @@ end)
 tt.register_snippet(function(itemstring, _, itemstack)
 	if not itemstack then return end
 	local def = itemstack:get_definition()
+	if not def then return end
+
 	if def.groups._mcl_potion ~= 1 then return end
 
 	local s = ""
@@ -175,4 +183,38 @@ tt.register_snippet(function(itemstring, _, itemstack)
 		end
 	end
 	return s:trim()
+end)
+
+
+-- Fireworks info
+tt.register_snippet(function(itemstring, _, itemstack)
+	if not itemstack then return end
+	local def = itemstack:get_definition()
+	if not def then return end
+
+	if not def._vl_fireworks_tt then return end
+
+	local s = ""
+	local meta = itemstack:get_meta()
+	local stars = meta:get("vl_fireworks:stars") or core.serialize({})
+	s = s .. def._vl_fireworks_tt(meta:get_float("vl_fireworks:duration"),
+								  core.deserialize(stars))
+
+	return s:trim()
+end)
+tt.register_snippet(function(itemstring, _, itemstack)
+	if not itemstack then return end
+	local def = itemstack:get_definition()
+	if not def then return end
+
+	if not def.groups.firework_star or def.groups.firework_star == 0 then return end
+
+	local s = ""
+	local meta = itemstack:get_meta()
+	local effect = meta:get("vl_fireworks:star_effect") or core.serialize({fn="generic"})
+	if effect then
+		s = vl_fireworks.star_tt(core.deserialize(effect))
+	end
+
+	return s
 end)

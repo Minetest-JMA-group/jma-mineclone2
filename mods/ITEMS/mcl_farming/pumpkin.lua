@@ -24,7 +24,7 @@ minetest.register_craftitem("mcl_farming:pumpkin_seeds", {
 local stem_drop = {
 	max_items = 1,
 	-- The probabilities are slightly off from the original.
-	-- Update this drop list when the Minetest drop probability system
+	-- Update this drop list when the Luanti drop probability system
 	-- is more powerful.
 	items = {
 		-- 1 seed: Approximation to 20/125 chance
@@ -79,6 +79,12 @@ for s=1,7 do
 		groups = {dig_immediate=3, not_in_creative_inventory=1, plant=1,attached_node=1, dig_by_water=1,destroy_by_lava_flow=1,},
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 		_mcl_blast_resistance = 0,
+		_on_bone_meal = function(itemstack, placer, pointed_thing)
+			local pos = pointed_thing.under
+			local n = minetest.get_node(pos)
+			local stages = math.random(2, 5)
+			return mcl_farming:grow_plant("plant_pumpkin_stem", pos, n, stages, true)
+		end
 	})
 end
 
@@ -93,9 +99,9 @@ local stem_def = {
 
 -- Template for pumpkin
 local pumpkin_base_def = {
-	description = S("Faceless Pumpkin"),
-	_doc_items_longdesc = S("A faceless pumpkin is a decorative block. It can be carved with shears to obtain pumpkin seeds."),
-	_doc_items_usagehelp = S("To carve a face into the pumpkin, use the shears on the side you want to carve."),
+	description = S("Pumpkin"),
+	_doc_items_longdesc = S("A pumpkin is a decorative block. It can be carved with shears to obtain a carved pumpkin and pumpkin seeds."),
+	_doc_items_usagehelp = S("To carve a pumpkin, use the shears on the side you want the face to appear."),
 	stack_max = 64,
 	paramtype2 = "facedir",
 	tiles = {"farming_pumpkin_top.png", "farming_pumpkin_top.png", "farming_pumpkin_side.png"},
@@ -110,8 +116,8 @@ local pumpkin_base_def = {
 }
 
 local pumpkin_face_base_def = table.copy(pumpkin_base_def)
-pumpkin_face_base_def.description = S("Pumpkin")
-pumpkin_face_base_def._doc_items_longdesc = S("A pumpkin can be worn as a helmet. Pumpkins grow from pumpkin stems, which in turn grow from pumpkin seeds.")
+pumpkin_face_base_def.description = S("Carved Pumpkin")
+pumpkin_face_base_def._doc_items_longdesc = S("A carved pumpkin is a decorative block that can be used to summon snow and iron golems. It can also be worn as a helmet. It is made from shearing a pumpkin.")
 pumpkin_face_base_def._doc_items_usagehelp = nil
 pumpkin_face_base_def.tiles = {"farming_pumpkin_top.png", "farming_pumpkin_top.png", "farming_pumpkin_side.png", "farming_pumpkin_side.png", "farming_pumpkin_side.png", "farming_pumpkin_face.png"}
 pumpkin_face_base_def.groups.armor=1
@@ -135,7 +141,7 @@ if minetest.get_modpath("mcl_armor") then
 	local function add_pumpkin_hud(player)
 		pumpkin_hud[player] = {
 			pumpkin_blur = player:hud_add({
-				hud_elem_type = "image",
+				[mcl_vars.hud_type_field] = "image",
 				position = {x = 0.5, y = 0.5},
 				scale = {x = -101, y = -101},
 				text = "mcl_farming_pumpkin_hud.png",
@@ -144,7 +150,7 @@ if minetest.get_modpath("mcl_armor") then
 			--this is a fake crosshair, because hotbar and crosshair doesn't support z_index
 			--TODO: remove this and add correct z_index values
 			fake_crosshair = player:hud_add({
-				hud_elem_type = "image",
+				[mcl_vars.hud_type_field] = "image",
 				position = {x = 0.5, y = 0.5},
 				scale = {x = 1, y = 1},
 				text = "crosshair.png",
@@ -180,10 +186,10 @@ if minetest.get_modpath("mcl_armor") then
 end
 
 -- Register stem growth
-mcl_farming:add_plant("plant_pumpkin_stem", "mcl_farming:pumpkintige_unconnect", {"mcl_farming:pumpkin_1", "mcl_farming:pumpkin_2", "mcl_farming:pumpkin_3", "mcl_farming:pumpkin_4", "mcl_farming:pumpkin_5", "mcl_farming:pumpkin_6", "mcl_farming:pumpkin_7"}, 30, 5)
+mcl_farming:add_plant("plant_pumpkin_stem", "mcl_farming:pumpkintige_unconnect", {"mcl_farming:pumpkin_1", "mcl_farming:pumpkin_2", "mcl_farming:pumpkin_3", "mcl_farming:pumpkin_4", "mcl_farming:pumpkin_5", "mcl_farming:pumpkin_6", "mcl_farming:pumpkin_7"}, 5.8017, 35)
 
 -- Register actual pumpkin, connected stems and stem-to-pumpkin growth
-mcl_farming:add_gourd("mcl_farming:pumpkintige_unconnect", "mcl_farming:pumpkintige_linked", "mcl_farming:pumpkintige_unconnect", stem_def, stem_drop, "mcl_farming:pumpkin", pumpkin_base_def, 30, 15, "mcl_farming_pumpkin_stem_connected.png^[colorize:#FFA800:127")
+mcl_farming:add_gourd("mcl_farming:pumpkintige_unconnect", "mcl_farming:pumpkintige_linked", "mcl_farming:pumpkintige_unconnect", stem_def, stem_drop, "mcl_farming:pumpkin", pumpkin_base_def, 5.8018, 35, "mcl_farming_pumpkin_stem_connected.png^[colorize:#FFA800:127")
 
 -- Steal function to properly disconnect a carved pumpkin
 pumpkin_face_base_def.after_destruct = minetest.registered_nodes["mcl_farming:pumpkin"].after_destruct

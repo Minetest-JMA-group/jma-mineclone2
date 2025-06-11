@@ -72,6 +72,8 @@ minetest.register_on_mods_loaded(function()
 
 			-- Is set to true if it was added in any category besides misc
 			local nonmisc = false
+			-- Is set to true if it has already been added to the "all" category (special handler)
+			local all_handled = false
 			if def.groups.building_block then
 				table.insert(inventory_lists["blocks"], name)
 				nonmisc = true
@@ -113,6 +115,22 @@ minetest.register_on_mods_loaded(function()
 				table.insert(inventory_lists["matr"], name)
 				nonmisc = true
 			end
+			if def._vl_fireworks_std_durs_forces then
+				local generic = core.serialize({{fn="generic"}})
+				for i, tbl in ipairs(def._vl_fireworks_std_durs_forces) do
+					local stack = ItemStack(name)
+					local meta = stack:get_meta()
+					meta:set_float("vl_fireworks:duration", tbl[1])
+					meta:set_int("vl_fireworks:force", tbl[2])
+					table.insert(inventory_lists["misc"], stack:to_string())
+					table.insert(inventory_lists["all"], stack:to_string())
+					meta:set_string("vl_fireworks:stars", generic)
+					table.insert(inventory_lists["misc"], stack:to_string())
+					table.insert(inventory_lists["all"], stack:to_string())
+				end
+				nonmisc = true
+				all_handled = true
+			end
 			-- Misc. category is for everything which is not in any other category
 			if not nonmisc then
 				table.insert(inventory_lists["misc"], name)
@@ -124,16 +142,21 @@ minetest.register_on_mods_loaded(function()
 					local potency = def._default_potent_level - 1
 					stack:get_meta():set_int("mcl_potions:potion_potent", potency)
 					table.insert(inventory_lists["brew"], stack:to_string())
+					table.insert(inventory_lists["all"], stack:to_string())
 				end
 				if def.has_plus then
 					local stack = ItemStack(name)
 					local extend = def._default_extend_level
 					stack:get_meta():set_int("mcl_potions:potion_plus", extend)
 					table.insert(inventory_lists["brew"], stack:to_string())
+					table.insert(inventory_lists["all"], stack:to_string())
 				end
 			end
 
-			table.insert(inventory_lists["all"], name)
+			if not all_handled then
+				table.insert(inventory_lists["all"], name)
+			end
+
 		end
 	end
 
@@ -187,12 +210,11 @@ local function set_inv_search(filter, player)
 	local inv = minetest.get_inventory({ type = "detached", name = "creative_" .. playername })
 	local creative_list = {}
 	local lang = minetest.get_player_information(playername).lang_code
-	for name, def in pairs(minetest.registered_items) do
-		if (not def.groups.not_in_creative_inventory or def.groups.not_in_creative_inventory == 0) and def.description and
-			def.description ~= "" then
-			if filter_item(string.lower(def.name), def.description, lang, filter) then
-				table.insert(creative_list, name)
-			end
+	for _, str in pairs(inventory_lists["all"]) do
+		local stack = ItemStack(str)
+		if filter_item(stack:get_name(), minetest.strip_colors(stack:get_description()), lang, filter)
+				and stack:get_name() ~= "mcl_enchanting:book_enchanted" then
+			table.insert(creative_list, stack:to_string())
 		end
 	end
 	for ench, def in pairs(mcl_enchanting.enchantments) do
@@ -386,7 +408,7 @@ local tab_icon = {
 	blocks = "mcl_core:brick_block",
 	deco = "mcl_flowers:peony",
 	redstone = "mesecons:redstone",
-	rail = "mcl_minecarts:golden_rail",
+	rail = "mcl_minecarts:golden_rail_v2",
 	misc = "mcl_buckets:bucket_lava",
 	nix = "mcl_compass:compass",
 	food = "mcl_core:apple",
@@ -417,6 +439,18 @@ minetest.register_on_joinplayer(function(player)
 		set_stack_size(player, 64)
 	end
 end)
+
+---@param player mt.PlayerObjectRef
+local function is_touch_enabled(playername)
+	-- Luanti < 5.7.0 support
+	if not minetest.get_player_window_information then
+		return false
+	end
+	local window = minetest.get_player_window_information(playername)
+	-- Always return a boolean (not nil) to avoid false-negatives when
+	-- comparing to a boolean later.
+	return window and window.touch_controls or false
+end
 
 ---@param player mt.PlayerObjectRef
 function mcl_inventory.set_creative_formspec(player)
@@ -538,7 +572,7 @@ function mcl_inventory.set_creative_formspec(player)
 			mcl_formspec.get_itemslot_bg_v4(0.375, 0.875, 9, 5),
 
 			-- Basic code to replace buttons by scrollbar
-			-- Require Minetest 5.8
+			-- Require Luanti 5.8
 			--
 			--"scroll_container[0.375,0.875;11.575,6;scroll;vertical;1.25]",
 			--"list[detached:creative_" .. playername .. ";main;0,0;9," .. nb_lines .. ";]",
@@ -566,8 +600,10 @@ function mcl_inventory.set_creative_formspec(player)
 			bg_img = "crafting_creative_inactive" .. button_bg_postfix[this_tab] .. ".png"
 		end
 		return table.concat({
-			"style[" .. this_tab .. ";border=false;bgimg=;bgimg_pressed=;noclip=true]",
-			"image[" .. offset[this_tab] .. ";1.5,1.44;" .. bg_img .. "]",
+			"style[" .. this_tab ..       ";border=false;bgimg=;bgimg_pressed=]",
+			"style[" .. this_tab .. "_outer;border=false;bgimg=" .. bg_img ..
+				";bgimg_pressed=" .. bg_img .. "]",
+			"button[" .. offset[this_tab] .. ";1.5,1.44;" .. this_tab .. "_outer;]",
 			"item_image_button[" .. boffset[this_tab] .. ";1,1;" .. tab_icon[this_tab] .. ";" .. this_tab .. ";]",
 		})
 	end
@@ -577,11 +613,21 @@ function mcl_inventory.set_creative_formspec(player)
 		caption = "label[0.375,0.375;" .. F(C(mcl_formspec.label_color, filtername[name])) .. "]"
 	end
 
+	local touch_enabled = is_touch_enabled(playername)
+	players[playername].last_touch_enabled = touch_enabled
+
 	local formspec = table.concat({
 		"formspec_version[6]",
-		"size[13,8.75]",
+		-- Original formspec height was 8.75, increased to include tab buttons.
+		-- This avoids tab buttons going off-screen with high scaling values.
+		"size[13,11.43]",
+		-- Use as much space as possible on mobile - the tab buttons are a lot
+		-- of padding already.
+		touch_enabled and "padding[-0.015,-0.015]" or "",
 
-		"style_type[image;noclip=true]",
+		"no_prepend[]", mcl_vars.gui_nonbg, mcl_vars.gui_bg_color,
+		"background9[0,1.34;13,8.75;mcl_base_textures_background9.png;;7]",
+		"container[0,1.34]",
 
 		-- Hotbar
 		mcl_formspec.get_itemslot_bg_v4(0.375, 7.375, 9, 1),
@@ -638,6 +684,7 @@ function mcl_inventory.set_creative_formspec(player)
 			"set_focus[search;true]",
 		})
 	end
+	formspec = formspec .. "container_end[]"
 	if pagenum then formspec = formspec .. "p" .. tostring(pagenum) end
 	player:set_inventory_formspec(formspec)
 end
@@ -655,54 +702,54 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 	local name = player:get_player_name()
 
-	if fields.blocks then
+	if fields.blocks or fields.blocks_outer then
 		if players[name].page == "blocks" then return end
 		set_inv_page("blocks", player)
 		page = "blocks"
-	elseif fields.deco then
+	elseif fields.deco or fields.deco_outer then
 		if players[name].page == "deco" then return end
 		set_inv_page("deco", player)
 		page = "deco"
-	elseif fields.redstone then
+	elseif fields.redstone or fields.redstone_outer then
 		if players[name].page == "redstone" then return end
 		set_inv_page("redstone", player)
 		page = "redstone"
-	elseif fields.rail then
+	elseif fields.rail or fields.rail_outer then
 		if players[name].page == "rail" then return end
 		set_inv_page("rail", player)
 		page = "rail"
-	elseif fields.misc then
+	elseif fields.misc or fields.misc_outer then
 		if players[name].page == "misc" then return end
 		set_inv_page("misc", player)
 		page = "misc"
-	elseif fields.nix then
+	elseif fields.nix or fields.nix_outer then
 		set_inv_page("all", player)
 		page = "nix"
-	elseif fields.food then
+	elseif fields.food or fields.food_outer then
 		if players[name].page == "food" then return end
 		set_inv_page("food", player)
 		page = "food"
-	elseif fields.tools then
+	elseif fields.tools or fields.tools_outer then
 		if players[name].page == "tools" then return end
 		set_inv_page("tools", player)
 		page = "tools"
-	elseif fields.combat then
+	elseif fields.combat or fields.combat_outer then
 		if players[name].page == "combat" then return end
 		set_inv_page("combat", player)
 		page = "combat"
-	elseif fields.mobs then
+	elseif fields.mobs or fields.mobs_outer then
 		if players[name].page == "mobs" then return end
 		set_inv_page("mobs", player)
 		page = "mobs"
-	elseif fields.brew then
+	elseif fields.brew or fields.brew_outer then
 		if players[name].page == "brew" then return end
 		set_inv_page("brew", player)
 		page = "brew"
-	elseif fields.matr then
+	elseif fields.matr or fields.matr_outer  then
 		if players[name].page == "matr" then return end
 		set_inv_page("matr", player)
 		page = "matr"
-	elseif fields.inv then
+	elseif fields.inv or fields.inv_outer then
 		if players[name].page == "inv" then return end
 		page = "inv"
 	elseif fields.search == "" and not fields.creative_next and not fields.creative_prev then
@@ -816,5 +863,21 @@ minetest.register_on_player_inventory_action(function(player, action, inventory,
 		local stack = inventory_info.stack
 		stack:set_count(stack:get_stack_max())
 		player:get_inventory():set_stack("main", inventory_info.index, stack)
+	end
+end)
+
+-- This is necessary because get_player_window_information may return nil in
+-- on_joinplayer.
+-- (Also, Luanti plans to add support for toggling touchscreen mode in-game.)
+minetest.register_globalstep(function(dtime)
+	for _, player in pairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+
+		if minetest.is_creative_enabled(name) then
+			local touch_enabled = is_touch_enabled(name)
+			if not players[name] or touch_enabled ~= players[name].last_touch_enabled then
+				mcl_inventory.set_creative_formspec(player)
+			end
+		end
 	end
 end)

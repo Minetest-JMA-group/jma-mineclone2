@@ -60,6 +60,12 @@ for i=1,7 do
 			dig_by_water=1,destroy_by_lava_flow=1, dig_by_piston=1},
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 		_mcl_blast_resistance = 0,
+		_on_bone_meal = function(itemstack, placer, pointed_thing)
+			local pos = pointed_thing.under
+			local n = minetest.get_node(pos)
+			local stages = math.random(2, 5)
+			return mcl_farming:grow_plant("plant_wheat", pos, n, stages, true)
+		end
 	})
 end
 
@@ -92,13 +98,14 @@ minetest.register_node("mcl_farming:wheat", {
 	_mcl_fortune_drop = {
 		discrete_uniform_distribution = true,
 		items = {"mcl_farming:wheat_seeds"},
+		drop_without_fortune = {"mcl_farming:wheat_item"},
 		min_count = 1,
 		max_count = 6,
 		cap = 7
 	}
 })
 
-mcl_farming:add_plant("plant_wheat", "mcl_farming:wheat", {"mcl_farming:wheat_1", "mcl_farming:wheat_2", "mcl_farming:wheat_3", "mcl_farming:wheat_4", "mcl_farming:wheat_5", "mcl_farming:wheat_6", "mcl_farming:wheat_7"}, 25, 20)
+mcl_farming:add_plant("plant_wheat", "mcl_farming:wheat", {"mcl_farming:wheat_1", "mcl_farming:wheat_2", "mcl_farming:wheat_3", "mcl_farming:wheat_4", "mcl_farming:wheat_5", "mcl_farming:wheat_6", "mcl_farming:wheat_7"}, 5.8020, 35)
 
 minetest.register_craftitem("mcl_farming:wheat_item", {
 	description = S("Wheat"),

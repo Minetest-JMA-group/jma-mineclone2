@@ -63,11 +63,11 @@ local function set_doll_properties(doll, mob)
 		xs = doll_size_overrides[mob].x
 		ys = doll_size_overrides[mob].y
 	else
-		xs = (mobinfo.visual_size.x or 0) * 0.33333
-		ys = (mobinfo.visual_size.y or 0) * 0.33333
+		xs = (mobinfo.initial_properties.visual_size.x or 0) * 0.33333
+		ys = (mobinfo.initial_properties.visual_size.y or 0) * 0.33333
 	end
 	local prop = {
-		mesh = mobinfo.mesh,
+		mesh = mobinfo.initial_properties.mesh,
 		textures = get_mob_textures(mob),
 		visual_size = {
 			x = xs,
@@ -147,20 +147,14 @@ local function spawn_mobs(pos, elapsed)
 	-- get meta
 	local meta = minetest.get_meta(pos)
 
-	-- get settings
-	local mob = meta:get_string("Mob")
-	local mlig = meta:get_int("MinLight")
-	local xlig = meta:get_int("MaxLight")
-	local num = meta:get_int("MaxMobsInArea")
-	local pla = meta:get_int("PlayerDistance")
-	local yof = meta:get_int("YOffset")
-
 	-- if amount is 0 then do nothing
+	local num = meta:get_int("MaxMobsInArea")
 	if num == 0 then
 		return
 	end
 
 	-- are we spawning a registered mob?
+	local mob = meta:get_string("Mob")
 	if not mcl_mobs.spawning_mobs[mob] then
 		minetest.log("error", "[mcl_mobspawners] Mob Spawner: Mob doesn't exist: "..mob)
 		return
@@ -174,17 +168,14 @@ local function spawn_mobs(pos, elapsed)
 	local timer = minetest.get_node_timer(pos)
 
 	-- spawn mob if player detected and in range
+	local pla = meta:get_int("PlayerDistance")
 	if pla > 0 then
-
 		local in_range = 0
 		local objs = minetest.get_objects_inside_radius(pos, pla)
 
 		for _,oir in pairs(objs) do
-
 			if oir:is_player() then
-
 				in_range = 1
-
 				break
 			end
 		end
@@ -201,7 +192,7 @@ local function spawn_mobs(pos, elapsed)
 	The doll may not stay spawned if the mob spawner is placed far away from
 	players, so we will check for its existance periodically when a player is nearby.
 	This would happen almost always when the mob spawner is placed by the mapgen.
-	This is probably caused by a Minetest bug:
+	This is probably caused by a Luanti bug:
 	https://github.com/minetest/minetest/issues/4759
 	FIXME: Fix this horrible hack.
 	]]
@@ -213,7 +204,6 @@ local function spawn_mobs(pos, elapsed)
 
 	-- count mob objects of same type in area
 	for k, obj in ipairs(objs) do
-
 		ent = obj:get_luaentity()
 
 		if ent and ent.name and ent.name == mob then
@@ -228,39 +218,33 @@ local function spawn_mobs(pos, elapsed)
 	end
 
 	-- find air blocks within 8×3×8 nodes of spawner
+	local yof = meta:get_int("YOffset")
 	local air = minetest.find_nodes_in_area(
 		{x = pos.x - 4, y = pos.y - 1 + yof, z = pos.z - 4},
 		{x = pos.x + 4, y = pos.y + 1 + yof, z = pos.z + 4},
 		{"air"})
 
-	-- spawn up to 4 mobs in random air blocks
+	-- spawn mobs in random air blocks. Default max of 4
 	if air then
-		local max = 4
-		if spawn_count_overrides[mob] then
-			max = spawn_count_overrides[mob]
-		end
-		for a=1, max do
-			if #air <= 0 then
-				-- We're out of space! Stop spawning
-				break
-			end
-			local air_index = math.random(#air)
-			local pos2 = air[air_index]
-			local lig = minetest.get_node_light(pos2) or 0
+		local num_to_spawn = spawn_count_overrides[mob] or 4
+		local mlig = meta:get_int("MinLight")
+		local xlig = meta:get_int("MaxLight")
 
-			pos2.y = pos2.y + 0.5
-
+		while #air > 0 do
+			local pos2 = table.remove_random_element(air)
 			-- only if light levels are within range
+			local lig = minetest.get_node_light(pos2) or 0
 			if lig >= mlig and lig <= xlig then
-				minetest.add_entity(pos2, mob)
+				if mcl_mobs.spawn(pos2, mob) then
+					num_to_spawn = num_to_spawn - 1
+					if num_to_spawn == 0 then break end
+				end
 			end
-			table.remove(air, air_index)
 		end
 	end
 
 	-- Spawn attempt done. Next spawn attempt much later
-	timer:start(math.random(10, 39.95))
-
+	timer:start(math.random() * 29.95 + 10)
 end
 
 -- The mob spawner node.
@@ -343,13 +327,15 @@ minetest.register_node("mcl_mobspawners:spawner", {
 -- Mob spawner doll (rotating icon inside cage)
 
 local doll_def = {
-	hp_max = 1,
-	physical = false,
-	pointable = false,
-	visual = "mesh",
-	makes_footstep_sound = false,
+	initial_properties = {
+		hp_max = 1,
+		physical = false,
+		pointable = false,
+		visual = "mesh",
+		makes_footstep_sound = false,
+		automatic_rotate = math.pi * 2.9,
+	},
 	timer = 0,
-	automatic_rotate = math.pi * 2.9,
 
 	_mob = default_mob, -- name of the mob this doll represents
 }
@@ -402,7 +388,7 @@ minetest.register_lbm({
 
 minetest.register_on_mods_loaded(function()
 	for name,mobinfo in pairs(minetest.registered_entities) do
-		if ( mobinfo.is_mob or name:find("mobs_mc") ) and not ( mobinfo.visual_size or mobinfo._convert_to ) then
+		if mobinfo.is_mob and not ( mobinfo.initial_properties.visual_size or mobinfo._convert_to ) then
 			minetest.log("warning", "Definition for "..tostring(name).." is missing field 'visual_size', mob spawners will not work properly")
 		end
 	end

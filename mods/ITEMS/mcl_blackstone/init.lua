@@ -33,8 +33,8 @@ minetest.register_node("mcl_blackstone:blackstone_gilded", {
 			{items = {"mcl_blackstone:blackstone_gilded"}, rarity = 1},
 		}
 	},
-	_mcl_blast_resistance = 2,
-	_mcl_hardness = 2,
+	_mcl_blast_resistance = 6,
+	_mcl_hardness = 1.5,
 	_mcl_silk_touch_drop = true,
 	_mcl_fortune_drop = {
 		discrete_uniform_distribution = true,
@@ -196,7 +196,7 @@ end
 mcl_stairs.register_stair_and_slab("blackstone", "mcl_blackstone:blackstone",
 		{cracky=3, pickaxey=1, material_stone=1},
 		{"mcl_blackstone_top.png", "mcl_blackstone_top.png", "mcl_blackstone_side.png"},
-		S("Blackstone Stair"),
+		S("Blackstone Stairs"),
 		S("Blackstone Slab"),
 		mcl_sounds.node_sound_stone_defaults(), 6, 2,
 		S("Double Blackstone Slab"), nil)
@@ -204,7 +204,7 @@ mcl_stairs.register_stair_and_slab("blackstone", "mcl_blackstone:blackstone",
 mcl_stairs.register_stair_and_slab("blackstone_polished", "mcl_blackstone:blackstone_polished",
 		{cracky=3, pickaxey=1, material_stone=1},
 		{"mcl_blackstone_polished.png"},
-		S("Polished Blackstone Stair"),
+		S("Polished Blackstone Stairs"),
 		S("Polished Blackstone Slab"),
 		mcl_sounds.node_sound_stone_defaults(), 6, 2,
 		S("Double Polished Blackstone Slab"), nil)
@@ -212,7 +212,7 @@ mcl_stairs.register_stair_and_slab("blackstone_polished", "mcl_blackstone:blacks
 mcl_stairs.register_stair_and_slab("blackstone_chiseled_polished", "mcl_blackstone:blackstone_chiseled_polished",
 		{cracky=3, pickaxey=1, material_stone=1},
 		{"mcl_blackstone_chiseled_polished.png"},
-		S("Chiseled Polished Blackstone Stair"),
+		S("Chiseled Polished Blackstone Stairs"),
 		S("Chiseled Polished Blackstone Slab"),
 		mcl_sounds.node_sound_stone_defaults(), 6, 2,
 		S("Double Chiseled Polished Blackstone Slab"), nil)
@@ -220,24 +220,13 @@ mcl_stairs.register_stair_and_slab("blackstone_chiseled_polished", "mcl_blacksto
 mcl_stairs.register_stair_and_slab("blackstone_brick_polished", "mcl_blackstone:blackstone_brick_polished",
 		{cracky=3, pickaxey=1, material_stone=1},
 		{"mcl_blackstone_polished_bricks.png"},
-		S("Polished Blackstone Brick Stair"),
+		S("Polished Blackstone Brick Stairs"),
 		S("Polished Blackstone Brick Slab"),
 		mcl_sounds.node_sound_stone_defaults(), 6, 2,
 		S("Double Polished Blackstone Brick Slab"), nil)
 
 --Wall
-mcl_walls.register_wall(
-	"mcl_blackstone:wall",
-	S("Blackstone Wall"),
-	"mcl_blackstone:blackstone",
-	{
-		"mcl_blackstone_top.png",
-		"mcl_blackstone_top.png",
-		"mcl_blackstone_side.png"
-	},
-	"",
-	{ cracky=3, pickaxey=1, material_stone=1 }
-)
+mcl_walls.register_wall("mcl_blackstone:wall", S("Blackstone Wall"), "mcl_blackstone:blackstone")
 
 --lavacooling
 

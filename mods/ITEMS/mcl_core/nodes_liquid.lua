@@ -108,9 +108,10 @@ S("• When water is directly below lava, the water turns into stone."),
 	on_construct = function(pos)
 		local node = minetest.get_node(pos)
 		if node.param2 == 0 then
-			local new_node = mcl_core.get_water_block_type(pos)
-			if new_node.param2 ~= 0 then
-				minetest.swap_node(pos, new_node)
+			local p2 = mcl_util.get_palette_indexes_from_pos(pos).water_palette_index
+			if node.param2 ~= p2 then
+				node.param2 = p2
+				minetest.swap_node(pos, node)
 			end
 		end
 	end,
@@ -145,7 +146,7 @@ minetest.register_node("mcl_core:lava_flowing", {
 	buildable_to = true,
 	drop = "",
 	--[[ Drowning in Minecraft deals 2 damage per second.
-	In Minetest, drowning damage is dealt every 2 seconds so this
+	In Luanti, drowning damage is dealt every 2 seconds so this
 	translates to 4 drowning damage ]]
 	drowning = 4,
 	liquidtype = "flowing",
