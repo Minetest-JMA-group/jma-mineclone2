@@ -2,7 +2,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 local F = minetest.formspec_escape
 local C = minetest.colorize
 
-local MAX_NAME_LENGTH = 130
+local MAX_NAME_LENGTH = 35
 local MAX_WEAR = 65535
 local SAME_TOOL_REPAIR_BOOST = math.ceil(MAX_WEAR * 0.12) -- 12%
 local MATERIAL_TOOL_REPAIR_BOOST = {
@@ -126,6 +126,7 @@ local function update_anvil_slots(meta)
 	local new_name = meta:get_string("set_name")
 	local input1 = inv:get_stack("input", 1)
 	local input2 = inv:get_stack("input", 2)
+	--local output = inv:get_stack("output", 1)
 	local new_output, name_item
 	local just_rename = false
 
@@ -545,7 +546,7 @@ local anvildef = {
 				because node formspecs seem to only have an empty formname in MT 0.4.16.
 				Also, sice this is on_metadata_inventory_take, we KNOW which formspec has
 				been opened by the player. So this should be safe nonetheless.
-				TODO: Update this line when node formspecs get proper identifiers in Minetest. ]]
+				TODO: Update this line when node formspecs get proper identifiers in Luanti. ]]
 				minetest.close_formspec(player:get_player_name(), "")
 			end
 		end
@@ -620,15 +621,15 @@ local anvildef = {
 			local meta = minetest.get_meta(pos)
 
 			-- Limit name length
-			local set_name_orig = string.sub(fields.name, 1, MAX_NAME_LENGTH)
+			local set_name = string.sub(fields.name, 1, MAX_NAME_LENGTH)
 
 			-- Parse color blocks
-			set_name = parse_color_blocks(set_name_orig)
+			set_name = parse_color_blocks(set_name)
 
 			meta:set_string("set_name", set_name)
 			update_anvil_slots(meta)
 
-			meta:set_string("formspec", get_anvil_formspec(set_name_orig))
+			meta:set_string("formspec", get_anvil_formspec(set_name))
 		end
 	end,
 }

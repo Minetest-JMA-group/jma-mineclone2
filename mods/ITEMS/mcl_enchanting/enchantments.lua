@@ -10,6 +10,7 @@ local function increase_damage(damage_group, factor)
 	end
 end
 
+
 mcl_enchanting.enchantments.drill = {
 	name = S("Drill"),
 	max_level = 1,
@@ -424,7 +425,8 @@ function minetest.calculate_knockback(player, hitter, time_from_last_punch, tool
 		local wielditem = hitter:get_wielded_item()
 		--knockback = knockback + 3 * mcl_enchanting.get_enchantment(wielditem, "knockback")
 		local enchant = mcl_enchanting.get_enchantment(wielditem, "knockback")
-		knockback = knockback + 3.22 * enchant
+		local hammer = minetest.get_item_group(wielditem:get_name(), "hammer")
+		knockback = knockback + 3.22 * enchant + 3.22 * hammer
 		-- add vertical lift to knockback
 		local v = player:get_velocity()
 		local added_v = 0
@@ -613,6 +615,7 @@ mcl_experience.register_on_add_xp(function(player, xp)
 		local can = final_candidates[math.random(#final_candidates)]
 		local stack, list, index, wear = can.stack, can.list, can.index, can.wear
 		local uses = mcl_util.calculate_durability(stack)
+		    / (mcl_enchanting.get_enchantment(stack, "unbreaking") + 1)
 		local multiplier = 2 * 65535 / uses
 		local repair = xp * multiplier
 		local new_wear = wear - repair
@@ -830,7 +833,7 @@ mcl_enchanting.enchantments.soul_speed = {
 	disallow = {non_combat_armor = true},
 	incompatible = {frost_walker = true},
 	weight = 2,
-	description = S("Increases walking speed on soul sand."),
+	description = S("Increases walking speed on soul sand and soul soil."),
 	curse = false,
 	on_enchant = function() end,
 	requires_tool = false,
@@ -865,7 +868,9 @@ mcl_enchanting.enchantments.unbreaking = {
 	max_level = 3,
 	primary = {armor_head = true, armor_torso = true, armor_legs = true, armor_feet = true, pickaxe = true, shovel = true, axe = true, hoe = true, sword = true, fishing_rod = true, bow = true},
 	secondary = {tool = true},
-	disallow = {non_combat_armor = true},
+	-- Commented to allow elytra to be enchanted
+	--disallow = {non_combat_armor = true},
+	disallow = {},
 	incompatible = {},
 	weight = 5,
 	description = S("Increases item durability."),
