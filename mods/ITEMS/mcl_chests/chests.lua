@@ -170,6 +170,8 @@ core.register_craft({
 })
 
 core.register_alias("mcl_chests:public_chest", "mcl_chests:publicchest")
+core.register_alias("mcl_chests:public_chest_left", "mcl_chests:publicchest_left")
+core.register_alias("mcl_chests:public_chest_right", "mcl_chests:publicchest_right")
 
 core.register_craft({
 	output = "mcl_chests:chest",
