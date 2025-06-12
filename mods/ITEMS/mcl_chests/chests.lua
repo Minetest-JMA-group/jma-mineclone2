@@ -169,6 +169,8 @@ core.register_craft({
 	},
 })
 
+core.register_alias("mcl_chests:public_chest", "mcl_chests:publicchest")
+
 core.register_craft({
 	output = "mcl_chests:chest",
 	recipe = {
