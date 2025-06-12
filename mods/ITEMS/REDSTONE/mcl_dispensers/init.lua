@@ -23,6 +23,9 @@ local S = minetest.get_translator(minetest.get_current_modname())
 local C = minetest.colorize
 local F = minetest.formspec_escape
 
+-- TODO: actually should have a slight lag as in MC?
+local COOLDOWN = 0.19
+
 local dispenser_formspec = table.concat({
 	"formspec_version[4]",
 	"size[11.75,10.425]",
@@ -125,6 +128,9 @@ local dispenserdef = {
 			-- Dispense random item when triggered
 			action_on = function(pos, node)
 				local meta = minetest.get_meta(pos)
+				local gametime = core.get_gametime()
+				if gametime < meta:get_float("cooldown") then return end
+				meta:set_float("cooldown", gametime + COOLDOWN)
 				local inv = meta:get_inventory()
 				local droppos, dropdir
 				if node.name == "mcl_dispensers:dispenser" then
@@ -139,6 +145,9 @@ local dispenserdef = {
 				end
 				local dropnode = minetest.get_node(droppos)
 				local dropnodedef = minetest.registered_nodes[dropnode.name]
+				if not dropnodedef then
+					dropnodedef = minetest.registered_nodes["mapgen_stone"]
+				end
 				local stacks = {}
 				for i = 1, inv:get_size("main") do
 					local stack = inv:get_stack("main", i)
@@ -152,7 +161,7 @@ local dispenserdef = {
 					local dropitem = ItemStack(stack)
 					dropitem:set_count(1)
 					local stack_id = stacks[r].stackpos
-					local stackdef = stack:get_definition()
+					local stackdef = core.registered_items[stack:get_name()]
 
 					if not stackdef then
 						return

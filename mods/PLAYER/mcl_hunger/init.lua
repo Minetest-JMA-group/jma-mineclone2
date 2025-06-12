@@ -130,7 +130,7 @@ local function init_hud(player)
 		hb.init_hudbar(player, "exhaustion", mcl_hunger.get_exhaustion(player))
 	end
 	mcl_hunger.eat_anim_hud[name] = player:hud_add({
-		hud_elem_type = "image",
+		[mcl_vars.hud_type_field] = "image",
 		text = "blank.png",
 		position = {x = 0.5, y = 1},
 		scale = {x = -25, y = -45},
@@ -371,7 +371,7 @@ minetest.register_globalstep(function(dtime)
 
 						mcl_hunger.eat_internal[player_name]._custom_wrapper(player_name)
 
-						player:get_inventory():set_stack("main", player:get_wield_index(), itemstack)
+						--player:get_inventory():set_stack("main", player:get_wield_index(), itemstack)
 					end
 
 					clear_eat_internal_and_timers(player, player_name)

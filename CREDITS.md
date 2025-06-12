@@ -6,24 +6,23 @@
 ## Creator of VoxeLibre
 * Wuzzy
 
-## Maintainers
-* AncientMariner
+## Maintainer
 * Herowl
 
 ## Previous Maintainers
 * Fleckenstein
 * cora
 * Nicu
+* AncientMariner
 
 ## Developers
 * AFCMS
 * epCode
-* chmodsayshello
-* MrRar
 * SmokeyDope
 * Faerraven / Michieal
-* rudzik8
 * teknomunk
+* kno10
+* AncientMariner
 
 ## Past Developers
 * jordan4ibanez
@@ -36,6 +35,9 @@
 * PrairieWind
 * FossFanatic
 * Codiac
+* chmodsayshello
+* MrRar
+* rudzik8
 
 ## Contributors
 * RandomLegoBrick
@@ -71,7 +73,7 @@
 * Tianyang Zhang
 * j45
 * Marcin Serwin
-* erlehmann
+* erle
 * E
 * n_to
 * debiankaios
@@ -141,6 +143,22 @@
 * Bram
 * qoheniac
 * WillConker
+* 0ldude
+* tacotexmex
+* Pixel-Peter
+* OgelGames
+* blitzdoughnuts
+* goodspeed
+* Bloodaxe
+* ClementMR
+* THE-NERD2
+* ethan
+* villager8472
+* ninjum
+* OpenSauce04
+* grillo-delmal
+* Yoric
+* potatoalienof13
 
 ## Music
 * Jordach for the jukebox music compilation from Big Freaking Dig
@@ -185,6 +203,7 @@
 * Faerraven / Michieal
 * PrairieWind
 * ChrisPHP
+* rudzik8
 
 ## 3D Models
 * 22i
@@ -193,6 +212,7 @@
 * Faerraven / Michieal
 * SumianVoice
 * thunder1035
+* Herowl
 
 ## Textures
 * XSSheep
@@ -214,6 +234,9 @@
 * SmokeyDope
 * thunder1035
 * Herowl
+* NovaWostra
+* rudzik8
+* kno10
 
 ## Translations
 * Wuzzy
@@ -237,6 +260,15 @@
 * ADLON
 * Sab Pyrope
 * JoseDouglas26
+* 0ldude
+* Bloodaxe
+* ethan
+* Herowl
+* kno10
+* Pixel-Peter
+* Laudrin
+* chmodsayshello
+* ninjum
 
 ## Funders
 * 40W
@@ -244,6 +276,6 @@
 * Cora
 
 ## Special thanks
-* The Minetest team for making and supporting an engine, and distribution infrastructure that makes this all possible
+* The Luanti team for making and supporting an engine, and distribution infrastructure that makes this all possible
 * The workaholics who spent way too much time writing for the Minecraft Wiki. It's an invaluable resource for creating this game
 * Notch and Jeb for being the major forces behind Minecraft

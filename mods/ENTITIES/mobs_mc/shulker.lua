@@ -39,12 +39,14 @@ mcl_mobs.register_mob("mobs_mc:shulker", {
 	arrow = "mobs_mc:shulkerbullet",
 	shoot_offset = 0.5,
 	passive = false,
-	hp_min = 30,
-	hp_max = 30,
+	initial_properties = {
+		hp_min = 30,
+		hp_max = 30,
+		collisionbox = {-0.5, -0.01, -0.5, 0.5, 0.99, 0.5},
+	},
 	xp_min = 5,
 	xp_max = 5,
 	armor = 20,
-	collisionbox = {-0.5, -0.01, -0.5, 0.5, 0.99, 0.5},
 	visual = "mesh",
 	mesh = "mobs_mc_shulker.b3d",
 	textures = { "mobs_mc_endergolem.png", },
@@ -83,7 +85,6 @@ mcl_mobs.register_mob("mobs_mc:shulker", {
 		local pos = self.object:get_pos()
 		if math.floor(self.object:get_yaw()) ~=0 then
 			self.object:set_yaw(0)
-			mcl_mobs:yaw(self, 0, 0, dtime)
 		end
 		if self.state == "attack" then
 			self:set_animation("run")
@@ -172,19 +173,3 @@ mcl_mobs.register_arrow("mobs_mc:shulkerbullet", {
 
 mcl_mobs.register_egg("mobs_mc:shulker", S("Shulker"), "#946694", "#4d3852", 0)
 mcl_mobs:non_spawn_specific("mobs_mc:shulker","overworld",0,minetest.LIGHT_MAX+1)
---[[
-mcl_mobs:spawn_specific(
-"mobs_mc:shulker",
-"end",
-"ground",
-{
-"End"
-},
-0,
-minetest.LIGHT_MAX+1,
-30,
-5000,
-2,
-mcl_vars.mg_end_min,
-mcl_vars.mg_end_max)
---]]

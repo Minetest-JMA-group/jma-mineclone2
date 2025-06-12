@@ -60,17 +60,18 @@ mcl_mobs.register_mob("mobs_mc:llama", {
 	spawn_in_group = 4, -- was 6 nerfed until we can cap them properly locally. this is a group size, not a per spawn attempt
 
 	head_swivel = "head.control",
-	bone_eye_height = 11,
-	head_eye_height = 3,
-	horizontal_head_height=0,
-	curiosity = 60,
+	head_eye_height = 1.5,
 	head_yaw = "z",
+	head_bone_position = vector.new( 0, 10.62, 0 ), -- for minetest <= 5.8
+	curiosity = 60,
 
-	hp_min = 15,
-	hp_max = 30,
+	initial_properties = {
+		hp_min = 15,
+		hp_max = 30,
+		collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.86, 0.45},
+	},
 	xp_min = 1,
 	xp_max = 3,
-	collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.86, 0.45},
 	visual = "mesh",
 	mesh = "mobs_mc_llama.b3d",
 	textures = { -- 1: chest -- 2: decor (carpet) -- 3: llama base texture
@@ -123,7 +124,7 @@ mcl_mobs.register_mob("mobs_mc:llama", {
 			self.terrain_type = 3
 			self.driver_attach_at = {x = 0, y = 12.7, z = -5}
 			self.driver_eye_offset = {x = 0, y = 6, z = 0}
-			self.driver_scale = {x = 1/self.visual_size.x, y = 1/self.visual_size.y}
+			self.driver_scale = {x = 1/self.initial_properties.visual_size.x, y = 1/self.initial_properties.visual_size.y}
 		end
 
 		-- if driver present allow control of llama
@@ -259,11 +260,10 @@ mcl_mobs.register_arrow("mobs_mc:llamaspit", {
 	visual_size = {x = 0.10, y = 0.10},
 	textures = {"mobs_mc_llama_spit.png"},
 	velocity = 5,
+	_vl_projectile = {
+		damage_groups = {fleshy = 1}
+	},
 	hit_player = function(self, player)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 1},
-		}, nil)
 	end,
 
 	hit_mob = function(self, mob)
@@ -274,27 +274,28 @@ mcl_mobs.register_arrow("mobs_mc:llamaspit", {
 })
 
 --spawn
-mcl_mobs:spawn_specific(
-"mobs_mc:llama",
-"overworld",
-"ground",
-{
-	"Savanna",
-	"SavannaM",
-	"SavannaM_beach",
-	"Savanna_beach",
-	"Savanna_ocean",
-	"ExtremeHills",
-	"ExtremeHills_beach",
-	"ExtremeHillsM",
-}, --FIXME: Needs Windswept Forest when that is added.
-0,
-minetest.LIGHT_MAX+1,
-30,
-50,
-5,
-mobs_mc.water_level+15,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:llama",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"Savanna",
+		"SavannaM",
+		"SavannaM_beach",
+		"Savanna_beach",
+		"Savanna_ocean",
+		"ExtremeHills",
+		"ExtremeHills_beach",
+		"ExtremeHillsM",
+	}, --FIXME: Needs Windswept Forest when that is added.
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	interval = 30,
+	chance = 50,
+	aoc = 5,
+	min_height = mobs_mc.water_level+15,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:llama", S("Llama"), "#c09e7d", "#995f40", 0)

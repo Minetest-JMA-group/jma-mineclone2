@@ -59,6 +59,7 @@ function mcl_core.register_tree_trunk(subname, description_trunk, description_ba
 		_doc_items_hidden = false,
 		tiles = {tile_inner, tile_inner, tile_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		after_destruct = mcl_core.update_leaves,
 		stack_max = 64,
@@ -75,6 +76,7 @@ function mcl_core.register_tree_trunk(subname, description_trunk, description_ba
 		_doc_items_longdesc = S("This is a decorative block surrounded by the bark of a tree trunk."),
 		tiles = {tile_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1,axey=1, bark=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -104,6 +106,7 @@ function mcl_core.register_stripped_trunk(subname, description_stripped_trunk, d
 		_doc_items_hidden = false,
 		tiles = {tile_stripped_inner, tile_stripped_inner, tile_stripped_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1, axey=1, tree=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -118,6 +121,7 @@ function mcl_core.register_stripped_trunk(subname, description_stripped_trunk, d
 		_doc_items_longdesc = longdesc_wood,
 		tiles = {tile_stripped_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1, axey=1, bark=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -195,6 +199,7 @@ function mcl_core.register_leaves(subname, description, longdesc, tiles, color, 
 		color = color,
 		paramtype = "light",
 		paramtype2 = paramtype2,
+		is_ground_content = false,
 		palette = palette,
 		stack_max = 64,
 		groups = {
@@ -212,9 +217,10 @@ function mcl_core.register_leaves(subname, description, longdesc, tiles, color, 
 		on_construct = function(pos)
 			local node = minetest.get_node(pos)
 			if node.param2 == 0 then
-				local new_node = mcl_core.get_foliage_block_type(pos)
-				if new_node.param2 ~= 0 then
-					minetest.swap_node(pos, new_node)
+				local p2 = mcl_util.get_palette_indexes_from_pos(pos).foliage_palette_index
+				if node.param2 ~= p2 then
+					node.param2 = p2
+					minetest.swap_node(pos, node)
 				end
 			end
 		end,
@@ -280,6 +286,14 @@ function mcl_core.register_sapling(subname, description, longdesc, tt_help, text
 					nn == "mcl_core:podzol" or nn == "mcl_core:podzol_snow" or
 					nn == "mcl_core:dirt" or nn == "mcl_core:mycelium" or nn == "mcl_core:coarse_dirt"
 		end),
+		_on_bone_meal = function(itemstack, placer, pointed_thing)
+			local pos = pointed_thing.under
+			local n = minetest.get_node(pos)
+			-- Saplings: 45% chance to advance growth stage
+			if math.random(1,100) <= 45 then
+				return mcl_core.grow_sapling(pos, n)
+			end
+		end,
 		node_placement_prediction = "",
 		_mcl_blast_resistance = 0,
 		_mcl_hardness = 0,

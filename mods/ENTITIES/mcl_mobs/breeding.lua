@@ -51,9 +51,9 @@ function mob_class:feed_tame(clicker, feed_count, breed, tame, notake)
 
 		-- increase health
 
-		if self.health < self.hp_max and not consume_food then
+		if self.health < self.initial_properties.hp_max and not consume_food then
 			consume_food = true
-			self.health = math.min(self.health + 4, self.hp_max)
+			self.health = math.min(self.health + 4, self.initial_properties.hp_max)
 
 			if self.htimer < 1 then
 				self.htimer = 5
@@ -63,7 +63,7 @@ function mob_class:feed_tame(clicker, feed_count, breed, tame, notake)
 
 		-- make children grow quicker
 
-		if not consume_food and self.child == true then
+		if not consume_food and self.child then
 			consume_food = true
 			-- deduct 10% of the time to adulthood
 			self.hornytimer = self.hornytimer + ((CHILD_GROW_TIME - self.hornytimer) * 0.1)
@@ -158,7 +158,7 @@ function mob_class:check_breeding()
 
 	--mcl_log("In breed function")
 	-- child takes a long time before growing into adult
-	if self.child == true then
+	if self.child then
 
 		-- When a child, hornytimer is used to count age until adulthood
 		self.hornytimer = self.hornytimer + 1
@@ -177,16 +177,7 @@ function mob_class:check_breeding()
 			})
 
 			-- custom function when child grows up
-			if self.on_grown then
-				self.on_grown(self)
-			else
-				-- jump when fully grown so as not to fall into ground
-				self.object:set_velocity({
-					x = 0,
-					y = self.jump_height,
-					z = 0
-				})
-			end
+			if self.on_grown then self:on_grown() end
 
 			self.animation = nil
 			local anim = self._current_animation
@@ -285,6 +276,7 @@ function mob_class:check_breeding()
 					end
 
 					local child = mcl_mobs.spawn_child(pos, parent1.name)
+					if not child then return end
 
 					local ent_c = child:get_luaentity()
 

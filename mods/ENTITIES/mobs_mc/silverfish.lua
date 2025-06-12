@@ -15,12 +15,14 @@ mcl_mobs.register_mob("mobs_mc:silverfish", {
 	passive = false,
 	group_attack = true,
 	reach = 1,
-	hp_min = 8,
-	hp_max = 8,
+	initial_properties = {
+		hp_min = 8,
+		hp_max = 8,
+		collisionbox = {-0.4, -0.01, -0.4, 0.4, 0.44, 0.4},
+	},
 	xp_min = 5,
 	xp_max = 5,
 	armor = {fleshy = 100, arthropod = 100},
-	collisionbox = {-0.4, -0.01, -0.4, 0.4, 0.44, 0.4},
 	visual = "mesh",
 	mesh = "mobs_mc_silverfish.b3d",
 	textures = {
@@ -58,9 +60,6 @@ mcl_mobs.register_mob("mobs_mc:silverfish", {
 	attack_type = "dogfight",
 	damage = 1,
 	spawn_check = spawn_check,
-	drops = {
-		{name = "mcl_fish_traps:silver_worm", chance = 20, min = 0, max = 2, looting = "common"},
-	},
 })
 
 mcl_mobs.register_egg("mobs_mc:silverfish", S("Silverfish"), "#6d6d6d", "#313131", 0)

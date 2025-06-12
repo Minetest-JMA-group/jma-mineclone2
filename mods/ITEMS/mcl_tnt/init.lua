@@ -110,12 +110,20 @@ minetest.register_node("mcl_tnt:tnt", {
 			tnt.ignite(droppos)
 		end
 	end,
+	_vl_projectile = {
+		on_collide = function(projectile, pos, node, node_def)
+			if mcl_burning.is_burning(projectile) then
+				tnt.ignite(pos)
+			end
+		end
+	},
 	sounds = sounds,
 })
 
 local TNT = {
 	-- Static definition
 	physical = true, -- Collides with things
+	collide_with_objects = false,
 	--weight = -100,
 	collisionbox = { -0.5, -0.5, -0.5, 0.5, 0.5, 0.5 },
 	visual = "cube",

@@ -21,19 +21,21 @@ mcl_mobs.register_mob("mobs_mc:blaze", {
 	spawn_class = "hostile",
 	spawn_in_group_min = 2,
 	spawn_in_group = 3,
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.79, 0.3},
+	},
 	xp_min = 10,
 	xp_max = 10,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.79, 0.3},
-	rotate = -180,
+	rotate = 180,
+	head_yaw_offset = 180,
 	visual = "mesh",
 	mesh = "mobs_mc_blaze.b3d",
 	head_swivel = "head.control",
-	bone_eye_height = 4,
-	head_eye_height = 3.5,
+	head_eye_height = 1.4,
+	head_bone_position = vector.new( 0, 3.9, 0 ), -- for minetest <= 5.8
 	curiosity = 10,
-	head_yaw_offset = 180,
 	head_pitch_multiplier=-1,
 	textures = {
 		{"mobs_mc_blaze.png"},
@@ -95,8 +97,8 @@ mcl_mobs.register_mob("mobs_mc:blaze", {
 		end
 		local pos = self.object:get_pos()
 		minetest.add_particle({
-			pos = {x=pos.x+math.random(-0.7,0.7)*math.random()/2,y=pos.y+math.random(0.7,1.2),z=pos.z+math.random(-0.7,0.7)*math.random()/2},
-			velocity = {x=0, y=math.random(1,1), z=0},
+			pos = {x=pos.x+(math.random()*0.7-0.35)*math.random(),y=pos.y+0.7+math.random()*0.5,z=pos.z+(math.random()*0.7-0.35)*math.random()},
+			velocity = {x=0, y=1, z=0},
 			expirationtime = math.random(),
 			size = math.random(1, 4),
 			collisiondetection = true,
@@ -110,8 +112,8 @@ mcl_mobs.register_mob("mobs_mc:blaze", {
 			},
 		})
 		minetest.add_particle({
-			pos = {x=pos.x+math.random(-0.7,0.7)*math.random()/2,y=pos.y+math.random(0.7,1.2),z=pos.z+math.random(-0.7,0.7)*math.random()/2},
-			velocity = {x=0, y=math.random(1,1), z=0},
+			pos = {x=pos.x+(math.random()*0.7-0.35)*math.random(),y=pos.y+0.7+math.random()*0.5,z=pos.z+(math.random()*0.7-0.35)*math.random()},
+			velocity = {x=0, y=1, z=0},
 			expirationtime = math.random(),
 			size = math.random(1, 4),
 			collisiondetection = true,
@@ -125,8 +127,8 @@ mcl_mobs.register_mob("mobs_mc:blaze", {
 			},
 		})
 		minetest.add_particle({
-			pos = {x=pos.x+math.random(-0.7,0.7)*math.random()/2,y=pos.y+math.random(0.7,1.2),z=pos.z+math.random(-0.7,0.7)*math.random()/2},
-			velocity = {x=0, y=math.random(1,1), z=0},
+			pos = {x=pos.x+(math.random()*0.7-0.35)*math.random(),y=pos.y+0.7+math.random()*0.5,z=pos.z+(math.random()*0.7-0.35)*math.random()},
+			velocity = {x=0, y=1, z=0},
 			expirationtime = math.random(),
 			size = math.random(1, 4),
 			collisiondetection = true,
@@ -143,18 +145,19 @@ mcl_mobs.register_mob("mobs_mc:blaze", {
 	spawn_check = spawn_check,
 })
 
-mcl_mobs:spawn_specific(
-"mobs_mc:blaze",
-"nether",
-"ground",
-{"Nether"},
-0,
-minetest.LIGHT_MAX+1,
-30,
-1000,
-3,
-mcl_vars.mg_nether_min,
-mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:blaze",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {"Nether"},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX + 1,
+	chance = 1000,
+	interval = 30,
+	aoc = 3,
+	min_height = mcl_vars.mg_nether_min,
+	max_height = mcl_vars.mg_nether_max
+})
 
 -- Blaze fireball
 mcl_mobs.register_arrow("mobs_mc:blaze_fireball", {
@@ -163,22 +166,17 @@ mcl_mobs.register_arrow("mobs_mc:blaze_fireball", {
 	textures = {"mcl_fire_fire_charge.png"},
 	velocity = 15,
 	_is_fireball = true,
+	_vl_projectile = {
+		damage_groups = {fleshy = 5}
+	},
 
 	-- Direct hit, no fire... just plenty of pain
 	hit_player = function(self, player)
 		mcl_burning.set_on_fire(player, 5)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 5},
-		}, nil)
 	end,
 
 	hit_mob = function(self, mob)
 		mcl_burning.set_on_fire(mob, 5)
-		mob:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 5},
-		}, nil)
 	end,
 
 	hit_object = function(self, object)

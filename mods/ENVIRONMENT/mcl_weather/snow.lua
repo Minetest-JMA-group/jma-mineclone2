@@ -75,13 +75,15 @@ function mcl_weather.has_snow(pos)
 end
 
 function mcl_weather.snow.set_sky_box()
-	mcl_weather.skycolor.add_layer(
-		"weather-pack-snow-sky",
-		{{r=0, g=0, b=0},
-		{r=85, g=86, b=86},
-		{r=135, g=135, b=135},
-		{r=85, g=86, b=86},
-		{r=0, g=0, b=0}})
+	if mcl_weather.skycolor.current_layer_name() ~= "weather-pack-snow-sky" then
+		mcl_weather.skycolor.add_layer(
+			"weather-pack-snow-sky",
+			{{r=0, g=0, b=0},
+			{r=85, g=86, b=86},
+			{r=135, g=135, b=135},
+			{r=85, g=86, b=86},
+			{r=0, g=0, b=0}})
+	end
 	mcl_weather.skycolor.active = true
 	for _, player in pairs(get_connected_players()) do
 		player:set_clouds({color="#ADADADE8"})
@@ -93,6 +95,28 @@ function mcl_weather.snow.clear()
 	mcl_weather.skycolor.remove_layer("weather-pack-snow-sky")
 	mcl_weather.snow.init_done = false
 	mcl_weather.remove_all_spawners()
+end
+
+local function make_weather_for_player(player)
+	mcl_weather.rain.remove_sound(player)
+	mcl_weather.snow.add_player(player)
+	mcl_weather.snow.set_sky_box()
+end
+mcl_weather.snow.make_weather_for_player = make_weather_for_player
+
+function mcl_weather.snow.make_weather()
+	for _, player in pairs(get_connected_players()) do
+		local pos = player:get_pos()
+		if mcl_weather.has_snow(pos) then
+			make_weather_for_player(player)
+		else
+			mcl_weather.remove_spawners_player(player)
+		end
+	end
+end
+
+function mcl_weather.snow.step(_)
+	mcl_weather.snow.make_weather()
 end
 
 function mcl_weather.snow.add_player(player)

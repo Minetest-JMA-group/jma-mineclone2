@@ -11,12 +11,12 @@ doc.sub.items = {}
 
 -- Template texts
 doc.sub.items.temp = {}
-doc.sub.items.temp.deco = S("This is a decorational block.")
+doc.sub.items.temp.deco = S("This is a decorative block.")
 doc.sub.items.temp.build = S("This block is a building block for creating various buildings.")
 doc.sub.items.temp.craftitem = S("This item is primarily used for crafting other items.")
 
-doc.sub.items.temp.eat = S("Hold it in your hand, then leftclick to eat it.")
-doc.sub.items.temp.eat_bad = S("Hold it in your hand, then leftclick to eat it. But why would you want to do this?")
+doc.sub.items.temp.eat = S("Hold it in your hand, then left-click to eat it.")
+doc.sub.items.temp.eat_bad = S("Hold it in your hand, then left-click to eat it. But why would you want to do this?")
 doc.sub.items.temp.rotate_node = S("This block's rotation is affected by the way you place it: Place it on the floor or ceiling for a vertical orientation; place it at the side for a horizontal orientation. Sneaking while placing it leads to a perpendicular orientation instead.")
 
 doc.sub.items.settings = {}
@@ -315,7 +315,7 @@ local function factoid_mining_node(data)
 				datastring = datastring .. S("This block can be mined by any mining tool immediately.").."\n"
 			-- Note: “unbreakable” is an unofficial group for undiggable blocks
 			elseif data.def.diggable == false or nogroups or data.def.groups.immortal == 1 or data.def.groups.unbreakable == 1 then
-				datastring = datastring .. S("This block can not be mined by ordinary mining tools.").."\n"
+				datastring = datastring .. S("This block cannot be mined by ordinary mining tools.").."\n"
 			end
 		else
 			if data.def.groups.dig_immediate == 2 then
@@ -323,7 +323,7 @@ local function factoid_mining_node(data)
 			elseif data.def.groups.dig_immediate == 3 then
 				datastring = datastring .. S("This block can be destroyed by any mining tool immediately.").."\n"
 			elseif data.def.diggable == false or nogroups or data.def.groups.immortal == 1 or data.def.groups.unbreakable == 1 then
-				datastring = datastring .. S("This block can not be destroyed by ordinary mining tools.").."\n"
+				datastring = datastring .. S("This block cannot be destroyed by ordinary mining tools.").."\n"
 			end
 		end
 		-- Expose “ordinary” mining groups (crumbly, cracky, etc.) and level group
@@ -644,7 +644,7 @@ doc.add_category("nodes", {
 					if fdap > 0 then
 						datastring = datastring .. S("The fall damage on this block is increased by @1%.", fdap) .. "\n"
 					elseif fdap <= -100 then
-						datastring = datastring .. S("This block negates all fall damage.") .. "\n"
+						datastring = datastring .. S("This block cancels any fall damage.") .. "\n"
 					else
 						datastring = datastring .. S("The fall damage on this block is reduced by @1%.", math.abs(fdap)) .. "\n"
 					end
@@ -656,7 +656,7 @@ doc.add_category("nodes", {
 			---- Movement
 			if not forbidden_core_factoids.node_movement then
 				if data.def.groups.disable_jump == 1 then
-					datastring = datastring .. S("You can not jump while standing on this block.").."\n"
+					datastring = datastring .. S("You cannot jump while standing on this block.").."\n"
 				end
 				if data.def.climbable == true then
 					datastring = datastring .. S("This block can be climbed.").."\n"
@@ -1152,7 +1152,7 @@ doc.add_category("mobs", {
 				datastring = datastring .. S("Type: @1", data.type)
 				datastring = newline2(datastring)
 			end
-			
+
 			if data.spawn_class then
 				datastring = datastring .. S("spawn class: @1", data.spawn_class)
 				datastring = newline2(datastring)
@@ -1167,25 +1167,18 @@ doc.add_category("mobs", {
 				datastring = datastring .. S("Can Fly")
 				datastring = newline2(datastring)
 			end
-			
-			if data.drops then
-				count = 0
+
+			if data.drops and #data.drops > 0 then
+				datastring = datastring .. S("drops: ")
+				datastring = newline(datastring)
+
 				for _,item in ipairs(data.drops) do
-					count = count + 1
-				end
-
-				if count > 0 then
-					datastring = datastring .. S("drops: ")
+					local itemDescription = ItemStack(item.name):get_short_description()
+					datastring = datastring .. itemDescription
 					datastring = newline(datastring)
-
-					for _,item in ipairs(data.drops) do
-						local itemDescription = ItemStack(item.name):get_short_description()
-						datastring = datastring .. itemDescription
-						datastring = newline(datastring)
-					end
-
-					datastring = newline2(datastring)
 				end
+
+				datastring = newline2(datastring)
 			end
 
 			if data.follow then
@@ -1203,12 +1196,11 @@ doc.add_category("mobs", {
 						datastring = newline(datastring)
 					end
 				end
-				
+
 				datastring = newline2(datastring)
 			end
 
 			local formstring = doc.widgets.text(datastring, nil, nil, doc.FORMSPEC.ENTRY_WIDTH - 1.2)
-			
 			return formstring
 		else
 			return "label[0,1;NO DATA AVALIABLE!]"

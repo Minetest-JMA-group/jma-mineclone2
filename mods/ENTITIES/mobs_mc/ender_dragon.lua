@@ -4,21 +4,17 @@
 
 local S = minetest.get_translator("mobs_mc")
 
-local BEAM_CHECK_FREQUENCY = 2
+local BEAM_CHECK_FREQUENCY = 1
 local POS_CHECK_FREQUENCY = 15
-local HEAL_AMMOUNT = 37
+local HEAL_INTERVAL = 1
+local HEAL_AMOUNT = 2
 
-local function heal(self)
-	local o = self.object
-	self.health = math.min(self.hp_max,self.health + HEAL_AMMOUNT)
-end
 local function check_beam(self)
 	for _, obj in ipairs(minetest.get_objects_inside_radius(self.object:get_pos(), 80)) do
 		local luaentity = obj:get_luaentity()
 		if luaentity and luaentity.name == "mcl_end:crystal" then
 			if luaentity.beam then
 				if luaentity.beam == self.beam then
-					heal(self)
 					break
 				end
 			else
@@ -55,11 +51,13 @@ mcl_mobs.register_mob("mobs_mc:enderdragon", {
 	pathfinding = 1,
 	attacks_animals = true,
 	walk_chance = 100,
-	hp_max = 200,
-	hp_min = 200,
+	initial_properties = {
+		hp_max = 200,
+		hp_min = 200,
+		collisionbox = {-2, 3, -2, 2, 5, 2},
+	},
 	xp_min = 500,
 	xp_max = 500,
-	collisionbox = {-2, 3, -2, 2, 5, 2},
 	physical = false,
 	visual = "mesh",
 	mesh = "mobs_mc_dragon.b3d",
@@ -106,7 +104,6 @@ mcl_mobs.register_mob("mobs_mc:enderdragon", {
 	},
 	ignores_nametag = true,
 	do_custom = function(self,dtime)
-		mcl_bossbars.update_boss(self.object, "Ender Dragon", "light_purple")
 		if self._pos_timer == nil or self._pos_timer > POS_CHECK_FREQUENCY then
 			self._pos_timer = 0
 			check_pos(self)
@@ -115,8 +112,20 @@ mcl_mobs.register_mob("mobs_mc:enderdragon", {
 			self._beam_timer = 0
 			check_beam(self)
 		end
+
 		self._beam_timer = self._beam_timer + dtime
 		self._pos_timer = self._pos_timer + dtime
+
+		if self.beam ~= nil then
+			-- heal
+			self._heal_timer = (self._heal_timer or 0) + dtime
+			if self._heal_timer > HEAL_INTERVAL then
+				self.health = math.min(self.initial_properties.hp_max,self.health + HEAL_AMOUNT)
+				self._heal_timer = self._heal_timer - HEAL_INTERVAL
+			end
+		end
+
+		mcl_bossbars.update_boss(self.object, "Ender Dragon", "light_purple")
 	end,
 	on_die = function(self, pos, cmi_cause)
 		if self._portal_pos then
@@ -148,21 +157,15 @@ mcl_mobs.register_arrow("mobs_mc:dragon_fireball", {
 	visual_size = {x = 1.25, y = 1.25},
 	textures = {"mobs_mc_dragon_fireball.png"},
 	velocity = 6,
+	_vl_projectile = {
+		damage_groups = {fleshy = 12}
+	},
 
-	-- direct hit, no fire... just plenty of pain
 	hit_player = function(self, player)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 0.5,
-			damage_groups = {fleshy = 12},
-		}, nil)
 	end,
 
 	hit_mob = function(self, mob)
-		minetest.sound_play("tnt_explode", {pos = mob:get_pos(), gain = 1.5, max_hear_distance = 2*64}, true)
-		mob:punch(self.object, 1.0, {
-			full_punch_interval = 0.5,
-			damage_groups = {fleshy = 12},
-		}, nil)
+		core.sound_play("tnt_explode", {pos = mob:get_pos(), gain = 1.5, max_hear_distance = 2*64}, true)
 	end,
 
 	-- node hit, explode

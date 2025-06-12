@@ -60,13 +60,15 @@ end
 -- set skybox based on time (uses skycolor api)
 function mcl_weather.rain.set_sky_box()
 	if mcl_weather.state == "rain" then
-		mcl_weather.skycolor.add_layer(
-			"weather-pack-rain-sky",
-			{{r=0, g=0, b=0},
-			{r=85, g=86, b=98},
-			{r=135, g=135, b=151},
-			{r=85, g=86, b=98},
-			{r=0, g=0, b=0}})
+		if mcl_weather.skycolor.current_layer_name() ~= "weather-pack-rain-sky" then
+			mcl_weather.skycolor.add_layer(
+				"weather-pack-rain-sky",
+				{{r=0, g=0, b=0},
+				{r=85, g=86, b=98},
+				{r=135, g=135, b=151},
+				{r=85, g=86, b=98},
+				{r=0, g=0, b=0}})
+		end
 		mcl_weather.skycolor.active = true
 		for _, player in pairs(get_connected_players()) do
 			player:set_clouds({color="#5D5D5FE8"})
@@ -155,15 +157,13 @@ function mcl_weather.rain.clear()
 		mcl_weather.rain.remove_sound(player)
 		mcl_weather.rain.remove_player(player)
 		mcl_weather.remove_spawners_player(player)
+		player:set_clouds({color="#FFF0EF"})
 	end
 end
 
-minetest.register_globalstep(function(dtime)
-	if mcl_weather.state ~= "rain" then
-		return false
-	end
+function mcl_weather.rain.step(_)
 	mcl_weather.rain.make_weather()
-end)
+end
 
 function mcl_weather.rain.make_weather()
 	if mcl_weather.rain.init_done == false then
@@ -183,9 +183,7 @@ function mcl_weather.rain.make_weather()
 			end
 		else
 			if mcl_weather.has_snow(pos) then
-				mcl_weather.rain.remove_sound(player)
-				mcl_weather.snow.add_player(player)
-				mcl_weather.snow.set_sky_box()
+				mcl_weather.snow.make_weather_for_player(player)
 			else
 				mcl_weather.rain.add_player(player)
 				mcl_weather.rain.add_rain_particles(player)

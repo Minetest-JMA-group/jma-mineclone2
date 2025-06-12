@@ -44,7 +44,15 @@ function mcl_gamemode.get_gamemode(player)
 	if mt_is_creative_enabled(player:get_player_name()) then
 		return "creative"
 	end
-	return player:get_meta():get_string("gamemode")
+
+	local gm = player:get_meta():get("gamemode")
+	if gm then
+		---@diagnostic disable-next-line: return-type-mismatch
+		return gm
+	else
+		player:get_meta():set_string("gamemode", "survival")
+		return "survival"
+	end
 end
 
 function minetest.is_creative_enabled(name)
@@ -62,7 +70,7 @@ minetest.register_chatcommand("gamemode", {
 	description = S("Change gamemode (survival/creative) for yourself or player"),
 	privs = { server = true },
 	func = function(n, param)
-		-- Full input validation ( just for @erlehmann <3 )
+		-- Full input validation ( just for @erle <3 )
 		local p = minetest.get_player_by_name(n)
 		local args = param:split(" ")
 		if args[2] ~= nil then

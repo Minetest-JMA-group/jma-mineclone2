@@ -45,6 +45,12 @@ for i=1, 7 do
 		groups = {dig_immediate=3, not_in_creative_inventory=1,plant=1,attached_node=1,dig_by_water=1,destroy_by_lava_flow=1,dig_by_piston=1},
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 		_mcl_blast_resistance = 0,
+		_on_bone_meal = function(itemstack, placer, pointed_thing)
+			local pos = pointed_thing.under
+			local n = minetest.get_node(pos)
+			local stages = math.random(2, 5)
+			return mcl_farming:grow_plant("plant_carrot", pos, n, stages, true)
+		end
 	})
 end
 
@@ -118,7 +124,7 @@ minetest.register_craft({
 	}
 })
 
-mcl_farming:add_plant("plant_carrot", "mcl_farming:carrot", {"mcl_farming:carrot_1", "mcl_farming:carrot_2", "mcl_farming:carrot_3", "mcl_farming:carrot_4", "mcl_farming:carrot_5", "mcl_farming:carrot_6", "mcl_farming:carrot_7"}, 25, 20)
+mcl_farming:add_plant("plant_carrot", "mcl_farming:carrot", {"mcl_farming:carrot_1", "mcl_farming:carrot_2", "mcl_farming:carrot_3", "mcl_farming:carrot_4", "mcl_farming:carrot_5", "mcl_farming:carrot_6", "mcl_farming:carrot_7"}, 5.8013, 35)
 
 if minetest.get_modpath("doc") then
 	for i=2,7 do

@@ -1,12 +1,12 @@
-mcl_throwing = {}
+mcl_throwing = {
+	default_velocity = 22,
+}
 
-local modpath = minetest.get_modpath(minetest.get_current_modname())
+local modpath = core.get_modpath(core.get_current_modname())
 
 --
 -- Snowballs and other throwable items
 --
-
-local GRAVITY = tonumber(minetest.settings:get("movement_gravity"))
 
 local entity_mapping = {}
 local velocities = {}
@@ -14,24 +14,23 @@ local velocities = {}
 function mcl_throwing.register_throwable_object(name, entity, velocity)
 	entity_mapping[name] = entity
 	velocities[name] = velocity
+	assert(core.registered_entities[entity], entity.." not registered")
+	assert(core.registered_entities[entity]._vl_projectile)
 end
 
 function mcl_throwing.throw(throw_item, pos, dir, velocity, thrower)
-	if velocity == nil then
-		velocity = velocities[throw_item]
-	end
-	if velocity == nil then
-		velocity = 22
-	end
-	minetest.sound_play("mcl_throwing_throw", {pos=pos, gain=0.4, max_hear_distance=16}, true)
+	velocity = velocity or velocities[throw_item] or mcl_throwing.default_velocity
+	core.sound_play("mcl_throwing_throw", {pos=pos, gain=0.4, max_hear_distance=16}, true)
 
 	local itemstring = ItemStack(throw_item):get_name()
-	local obj = minetest.add_entity(pos, entity_mapping[itemstring])
-	obj:set_velocity({x=dir.x*velocity, y=dir.y*velocity, z=dir.z*velocity})
-	obj:set_acceleration({x=dir.x*-3, y=-GRAVITY, z=dir.z*-3})
-	if thrower then
-		obj:get_luaentity()._thrower = thrower
-	end
+	local obj = vl_projectile.create(entity_mapping[itemstring], {
+		pos = pos,
+		owner = thrower,
+		dir = dir,
+		velocity = velocity,
+		drag = 3,
+	})
+	obj:get_luaentity()._thrower = thrower
 	return obj
 end
 
@@ -40,7 +39,7 @@ function mcl_throwing.get_player_throw_function(entity_name, velocity)
 	local function func(item, player, pointed_thing)
 		local playerpos = player:get_pos()
 		local dir = player:get_look_dir()
-		mcl_throwing.throw(item, {x=playerpos.x, y=playerpos.y+1.5, z=playerpos.z}, dir, velocity, player:get_player_name())
+		mcl_throwing.throw(item, {x=playerpos.x, y=playerpos.y+1.5, z=playerpos.z}, dir, velocity, player)
 		if not minetest.is_creative_enabled(player:get_player_name()) then
 			item:take_item()
 		end
@@ -70,7 +69,8 @@ function mcl_throwing.get_staticdata(self)
 end
 
 function mcl_throwing.on_activate(self, staticdata, dtime_s)
-	local data = minetest.deserialize(staticdata)
+	local data = core.deserialize(staticdata)
+	self._staticdata = data
 	if data then
 		self._lastpos = data._lastpos
 		self._thrower = data._thrower

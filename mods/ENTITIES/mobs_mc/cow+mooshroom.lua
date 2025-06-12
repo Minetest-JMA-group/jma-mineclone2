@@ -8,11 +8,13 @@ local cow_def = {
 	spawn_class = "passive",
 	passive = true,
 	runaway = true,
-	hp_min = 10,
-	hp_max = 10,
+	initial_properties = {
+		hp_min = 10,
+		hp_max = 10,
+		collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.39, 0.45},
+	},
 	xp_min = 1,
 	xp_max = 3,
-	collisionbox = {-0.45, -0.01, -0.45, 0.45, 1.39, 0.45},
 	spawn_in_group = 4,
 	spawn_in_group_min = 2,
 	visual = "mesh",
@@ -22,9 +24,8 @@ local cow_def = {
 		"blank.png",
 	}, },
 	head_swivel = "head.control",
-	bone_eye_height = 10,
 	head_eye_height = 1.1,
-	horizontal_head_height=-1.8,
+	head_bone_position = vector.new( 0, 10.07, -1.744 ), -- for minetest <= 5.8
 	curiosity = 2,
 	head_yaw="z",
 	makes_footstep_sound = true,
@@ -168,68 +169,68 @@ mcl_mobs.register_mob("mobs_mc:mooshroom", mooshroom_def)
 
 
 -- Spawning
-mcl_mobs:spawn_specific(
-"mobs_mc:cow",
-"overworld",
-"ground",
-{
-	"flat",
-	"MegaTaiga",
-	"MegaSpruceTaiga",
-	"ExtremeHills",
-	"ExtremeHills_beach",
-	"ExtremeHillsM",
-	"ExtremeHills+",
-	"StoneBeach",
-	"Plains",
-	"Plains_beach",
-	"SunflowerPlains",
-	"Taiga",
-	"Taiga_beach",
-	"Forest",
-	"Forest_beach",
-	"FlowerForest",
-	"FlowerForest_beach",
-	"BirchForest",
-	"BirchForestM",
-	"RoofedForest",
-	"Savanna",
-	"Savanna_beach",
-	"SavannaM",
-	"Jungle",
-	"Jungle_shore",
-	"JungleM",
-	"JungleM_shore",
-	"JungleEdge",
-	"JungleEdgeM",
-	"Swampland",
-	"Swampland_shore"
-},
-9,
-minetest.LIGHT_MAX+1,
-30,
-80,
-10,
-mobs_mc.water_level,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:cow",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"flat",
+		"MegaTaiga",
+		"MegaSpruceTaiga",
+		"ExtremeHills",
+		"ExtremeHills_beach",
+		"ExtremeHillsM",
+		"ExtremeHills+",
+		"StoneBeach",
+		"Plains",
+		"Plains_beach",
+		"SunflowerPlains",
+		"Taiga",
+		"Taiga_beach",
+		"Forest",
+		"Forest_beach",
+		"FlowerForest",
+		"FlowerForest_beach",
+		"BirchForest",
+		"BirchForestM",
+		"RoofedForest",
+		"Savanna",
+		"Savanna_beach",
+		"SavannaM",
+		"Jungle",
+		"Jungle_shore",
+		"JungleM",
+		"JungleM_shore",
+		"JungleEdge",
+		"JungleEdgeM",
+		"Swampland",
+		"Swampland_shore"
+	},
+	min_light = 9,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 80,
+	interval = 30,
+	aoc = 10,
+	min_height = mobs_mc.water_level,
+	max_height = mcl_vars.mg_overworld_max
+})
 
-
-
-mcl_mobs:spawn_specific(
-"mobs_mc:mooshroom",
-"overworld",
-"ground",
-{
-"MushroomIslandShore",
-"MushroomIsland"
-},
-9,
-minetest.LIGHT_MAX+1,
-30,
-80,
-5,
-mcl_vars.mg_overworld_min,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:mooshroom",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"MushroomIslandShore",
+		"MushroomIsland"
+	},
+	min_light = 9,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 80,
+	interval = 30,
+	aoc = 5,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 -- spawn egg
 mcl_mobs.register_egg("mobs_mc:cow", S("Cow"), "#443626", "#a1a1a1", 0)

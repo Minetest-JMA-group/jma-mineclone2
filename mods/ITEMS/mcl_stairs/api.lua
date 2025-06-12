@@ -93,17 +93,29 @@ function mcl_stairs.register_stair(subname, recipeitem, groups, images, descript
 	groups.stair = 1
 	groups.building_block = 1
 
+	local image_table = {}
+	for i, image in ipairs(images) do
+		image_table[i] = type(image) == "string" and { name = image } or table.copy(image)
+		image_table[i].align_style = "world"
+	end
+
 	minetest.register_node(":mcl_stairs:stair_" .. subname, {
 		description = description,
 		_doc_items_longdesc = S("Stairs are useful to reach higher places by walking over them; jumping is not required. Placing stairs in a corner pattern will create corner stairs. Stairs placed on the ceiling or at the upper half of the side of a block will be placed upside down."),
-		drawtype = "mesh",
-		mesh = "stairs_stair.obj",
-		tiles = images,
+		drawtype = "nodebox",
+		tiles = image_table,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
 		groups = groups,
 		sounds = sounds,
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+			},
+		},
 		selection_box = {
 			type = "fixed",
 			fixed = {
@@ -237,30 +249,43 @@ function mcl_stairs.register_slab(subname, recipeitem, groups, images, descripti
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			local under = minetest.get_node(pointed_thing.under)
+			if not placer then return end
+
+			local above = pointed_thing.above
+			local under = pointed_thing.under
+			local anode = minetest.get_node(above)
+			local unode = minetest.get_node(under)
+			local adefs = minetest.registered_nodes[anode.name]
+			local udefs = minetest.registered_nodes[unode.name]
 			local wield_item = itemstack:get_name()
-			local creative_enabled = minetest.is_creative_enabled(placer:get_player_name())
+			local player_name = placer:get_player_name()
+			local creative_enabled = minetest.is_creative_enabled(player_name)
 
 			-- place slab using under node orientation
-			local dir = vector.subtract(pointed_thing.above, pointed_thing.under)
+			local dir = vector.subtract(above, under)
+			local p2 = unode.param2
 
-			local p2 = under.param2
+			if minetest.is_protected(under, player_name) and not
+				minetest.check_player_privs(placer, "protection_bypass") then
+					minetest.record_protection_violation(under, player_name)
+					return
+			end
 
 			-- combine two slabs if possible
 			-- Requirements: Same slab material, must be placed on top of lower slab, or on bottom of upper slab
-			if (wield_item == under.name or (minetest.registered_nodes[under.name] and wield_item == minetest.registered_nodes[under.name]._mcl_other_slab_half)) and
-					not ((dir.y >= 0 and minetest.get_item_group(under.name, "slab_top") == 1) or
-					(dir.y <= 0 and minetest.get_item_group(under.name, "slab_top") == 0)) then
+			if (wield_item == unode.name or (udefs and wield_item == udefs._mcl_other_slab_half)) and
+					not ((dir.y >= 0 and minetest.get_item_group(unode.name, "slab_top") == 1) or
+					(dir.y <= 0 and minetest.get_item_group(unode.name, "slab_top") == 0)) then
 
-				local player_name = placer:get_player_name()
-				if minetest.is_protected(pointed_thing.under, player_name) and not
-						minetest.check_player_privs(placer, "protection_bypass") then
-					minetest.record_protection_violation(pointed_thing.under,
-						player_name)
-					return
+				minetest.set_node(under, {name = double_slab, param2 = p2})
+
+				if not creative_enabled then
+					itemstack:take_item()
 				end
-				local newnode = double_slab
-				minetest.set_node(pointed_thing.under, {name = newnode, param2 = p2})
+				return itemstack
+			elseif (wield_item == anode.name or (adefs and wield_item == adefs._mcl_other_slab_half)) then
+				minetest.set_node(above, {name = double_slab, param2 = p2})
+
 				if not creative_enabled then
 					itemstack:take_item()
 				end
@@ -357,7 +382,7 @@ function mcl_stairs.register_slab(subname, recipeitem, groups, images, descripti
 end
 
 
--- Stair/slab registration function.
+-- Stairs/slab registration function.
 -- Nodes will be called mcl_stairs:{stair,slab}_<subname>
 
 function mcl_stairs.register_stair_and_slab(subname, recipeitem,

@@ -10,12 +10,15 @@ mcl_mobs.register_mob("mobs_mc:guardian_elder", {
 	description = S("Elder Guardian"),
 	type = "monster",
 	spawn_class = "hostile",
-	hp_min = 80,
-	hp_max = 80,
+	initial_properties = {
+		hp_min = 80,
+		hp_max = 80,
+		breath_max = -1,
+		collisionbox = {-0.99875, 0.5, -0.99875, 0.99875, 2.4975, 0.99875},
+	},
 	xp_min = 10,
 	xp_max = 10,
-	breath_max = -1,
-    	passive = false,
+	passive = false,
 	attack_type = "dogfight",
 	pathfinding = 1,
 	view_range = 16,
@@ -23,7 +26,6 @@ mcl_mobs.register_mob("mobs_mc:guardian_elder", {
 	run_velocity = 4,
 	damage = 8,
 	reach = 3,
-	collisionbox = {-0.99875, 0.5, -0.99875, 0.99875, 2.4975, 0.99875},
 	visual = "mesh",
 	mesh = "mobs_mc_guardian.b3d",
 	textures = {
@@ -112,7 +114,19 @@ mcl_mobs.register_mob("mobs_mc:guardian_elder", {
 	},
 })
 
-mcl_mobs:spawn_specific("mobs_mc:guardian_elder", { "mcl_core:water_source", "mclx_core:river_water_source" }, { "mcl_core:water_source", "mclx_core:river_water_source" }, 0, minetest.LIGHT_MAX+1, 30, 40000, 2, mcl_vars.mg_overworld_min, mobs_mc.water_level-18, mobs_mc.water_level)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:guardian_elder",
+	dimension = "overworld",
+	type_of_spawning = "water",
+	biomes = {},	-- no biomes, only spawn in structures
+	min_light = 0,
+	max_light = core.LIGHT_MAX+1,
+	chance = 40000,
+	interval = 30,
+	aoc = 2,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mobs_mc.water_level - 18
+})
 
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:guardian_elder", S("Elder Guardian"), "#ceccba", "#747693", 0)

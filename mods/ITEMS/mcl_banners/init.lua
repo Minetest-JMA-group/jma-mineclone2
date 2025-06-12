@@ -33,7 +33,7 @@ mcl_banners.colors = {
 	["unicolor_blue"] =       {"blue",       S("Blue Banner"),       "mcl_wool:blue", "#20336B", "mcl_dye:blue", N("Blue") },
 	["unicolor_red_violet"] = {"magenta",    S("Magenta Banner"),    "mcl_wool:magenta", "#B36897", "mcl_dye:magenta", N("Magenta")},
 	["unicolor_orange"] =     {"orange",     S("Orange Banner"),     "mcl_wool:orange", "#B35E2E", "mcl_dye:orange", N("Orange") },
-	["unicolor_violet"] =     {"purple",     S("Purple Banner"),     "mcl_wool:purple", "#764F91", "mcl_dye:violet", N("Violet") },
+	["unicolor_violet"] =     {"purple",     S("Violet Banner"),     "mcl_wool:purple", "#764F91", "mcl_dye:violet", N("Violet") },
 	["unicolor_brown"] =      {"brown",      S("Brown Banner"),      "mcl_wool:brown", "#46251A", "mcl_dye:brown", N("Brown") },
 	["unicolor_pink"] =       {"pink",       S("Pink Banner"),       "mcl_wool:pink", "#C98196", "mcl_dye:pink", N("Pink") },
 	["unicolor_lime"] =       {"lime",       S("Lime Banner"),       "mcl_wool:lime", "#7DA553", "mcl_dye:green", N("Lime") },
@@ -613,13 +613,15 @@ end
 
 -- Banner entities.
 local entity_standing = {
-	physical = false,
-	collide_with_objects = false,
-	visual = "mesh",
-	mesh = "amc_banner.b3d",
-	visual_size = { x=2.499, y=2.499 },
-	textures = {mcl_banners.make_banner_texture()},
-	pointable = false,
+	initial_properties = {
+		physical = false,
+		collide_with_objects = false,
+		visual = "mesh",
+		mesh = "amc_banner.b3d",
+		visual_size = { x=2.499, y=2.499 },
+		textures = {mcl_banners.make_banner_texture()},
+		pointable = false,
+	},
 
 	_base_color = nil, -- base color of banner
 	_layers = nil, -- table of layers painted over the base color.
@@ -663,7 +665,7 @@ local entity_standing = {
 minetest.register_entity("mcl_banners:standing_banner", entity_standing)
 
 local entity_hanging = table.copy(entity_standing)
-entity_hanging.mesh = "amc_banner_hanging.b3d"
+entity_hanging.initial_properties.mesh = "amc_banner_hanging.b3d"
 minetest.register_entity("mcl_banners:hanging_banner", entity_hanging)
 
 -- FIXME: Prevent entity destruction by /clearobjects
@@ -682,4 +684,3 @@ minetest.register_craft({
 	recipe = "group:banner",
 	burntime = 15,
 })
-
