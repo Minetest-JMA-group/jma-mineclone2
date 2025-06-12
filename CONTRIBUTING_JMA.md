@@ -24,3 +24,6 @@ Also, if you make any changes to VoxeLibre's code, please do include those here 
 
 - **mods/ITEMS/mcl_anvils/init.lua**
     Added support for color blocks in item names. The color blocks are parsed and applied to the item metadata.
+
+- **mods/ITEMS/mcl_chests/chests.lua**
+    Public chests are defined here.

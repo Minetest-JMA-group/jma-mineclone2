@@ -131,6 +131,44 @@ mcl_chests.register_chest("trapped_chest_on", {
 	canonical_basename = "trapped_chest"
 })
 
+mcl_chests.register_chest("public_chest", {
+	desc = S("Public Chest"),
+	longdesc = S(
+		"Chests are containers which provide 27 inventory slots. Chests can be turned into large chests with " ..
+		"double the capacity by placing two chests next to each other."..
+		"Public chests can be accessed by anyone, regardless of protections."
+	),
+	usagehelp = chestusage,
+	tt_help = S("27 inventory slots") .. "\n" .. S("Can be combined to a large chest"),
+	tiles = {
+		small = mcl_chests.tiles.chest_public_small,
+		double = mcl_chests.tiles.chest_public_double,
+		--[[inv = {
+			"default_chest_top.png", "mcl_chests_chest_bottom.png",
+			"mcl_chests_chest_right.png", "mcl_chests_chest_left.png",
+			"mcl_chests_chest_back.png", "default_chest_front.png"
+		},]]
+	},
+	groups = {
+		handy = 1,
+		axey = 1,
+		material_wood = 1,
+		flammable = -1,
+	},
+	sounds = {mcl_sounds.node_sound_wood_defaults()},
+	hardness = 2.5,
+	hidden = false,
+})
+
+core.register_craft({
+	output = "mcl_chests:public_chest",
+	recipe = {
+		{"group:wood", "group:wood", "group:wood"},
+		{"group:wood", "mcl_core:emerald", "group:wood"},
+		{"group:wood", "group:wood", "group:wood"},
+	},
+})
+
 core.register_craft({
 	output = "mcl_chests:chest",
 	recipe = {

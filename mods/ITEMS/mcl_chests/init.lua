@@ -14,6 +14,8 @@ local tiles = {-- extensions will be added later
 	chest_trapped_double = {"mcl_chests_trapped_double"},
 	chest_ender_small = {"mcl_chests_ender"},
 	ender_chest_texture = {"mcl_chests_ender"},
+	chest_public_small = {"mcl_chests_public_normal"},
+	chest_public_double = {"mcl_chests_public_double"}
 }
 
 local tiles_postfix = ".png"

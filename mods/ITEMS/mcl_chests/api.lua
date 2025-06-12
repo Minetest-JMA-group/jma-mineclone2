@@ -688,6 +688,12 @@ function mcl_chests.register_chest(basename, d)
 		after_place_node = after_place_chest,
 	})
 
+	if basename == "public_chest" then
+		core.log("[Public Chests] Registered overrides!")
+		local protection_check_move = nil
+		local protection_check_take = nil
+	end
+
 	core.register_node(names.small.a, {
 		description = d.desc,
 		_tt_help = d.tt_help,
