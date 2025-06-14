@@ -55,3 +55,17 @@ core.register_node("summer_cosmetics:sunbed", {
     },
     on_rightclick = lay,
 })
+
+core.register_node("summer_cosmetics:tropical_drink", {
+    description = "Tropical drink",
+    drawtype = "mesh",
+    mesh = "tropical_drink.gltf",
+    tiles = {"tropical_drink.png"},
+    paramtype = "light",
+    sunlight_propagates = true,
+    use_texture_alpha = "clip",
+})
+
+if core.get_modpath("mcl_jukebox") then
+    mcl_jukebox.register_record("Beach", "fancyfinn9, Ottobunny", "summer_cosmetics_beach", "summer_cosmetics_beach_disc.png", "summer_cosmetics_beach")
+end
