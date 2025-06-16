@@ -69,3 +69,11 @@ core.register_node("summer_cosmetics:tropical_drink", {
 if core.get_modpath("mcl_jukebox") then
     mcl_jukebox.register_record("Beach", "fancyfinn9, Ottobunny", "summer_cosmetics_beach", "summer_cosmetics_beach_disc.png", "summer_cosmetics_beach")
 end
+
+-- API for the cape
+
+summer_cosmetics = {}
+
+function summer_cosmetics.has_cape(player)
+    return true
+end

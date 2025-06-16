@@ -287,5 +287,11 @@
 		"name": "mclcape",
 		"mask": "mclcape_body.png",
 		"selector_func" : null
+	},
+	{
+		"type": "cape",
+		"name": "ridingahorsecape",
+		"mask": "ridingahorsecape_body.png",
+		"selector_func" : "return function(player) if core.get_modpath('summer_cosmetics') then return summer_cosmetics.has_cape(player) end end"
 	}
 ]
