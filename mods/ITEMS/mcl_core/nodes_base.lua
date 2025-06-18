@@ -515,8 +515,8 @@ minetest.register_node("mcl_core:dirt", {
 	drop = {
 		max_items = 1,
 		items = {
-			{items = {"mcl_core:dirt"},rarity = 30},
-			{items = {"mcl_core:dirt", "mcl_fish_traps:earth_worm"}}
+			{items = {"mcl_core:dirt"}},
+			{items = {"mcl_core:dirt", "mcl_fish_traps:earth_worm"},rarity = 30}
 		}
 	},
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
