@@ -58,6 +58,10 @@ mcl_mobs.register_mob("mobs_mc:silverfish", {
 	},
 	view_range = 16,
 	attack_type = "dogfight",
+	drops = {{name = "mcl_fish_traps:silver_worm",
+		chance = 100,
+		min = 1,
+		max = 1,}},
 	damage = 1,
 	spawn_check = spawn_check,
 })
