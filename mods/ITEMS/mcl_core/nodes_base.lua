@@ -512,6 +512,13 @@ minetest.register_node("mcl_core:dirt", {
 	is_ground_content = true,
 	stack_max = 64,
 	groups = {handy=1,shovely=1, dirt=1,soil=1, soil_sapling=2, soil_sugarcane=1, cultivatable=2, enderman_takable=1, building_block=1, path_creation_possible=1},
+	drop = {
+		max_items = 1,
+		items = {
+			{items = {"mcl_core:dirt"},rarity = 30},
+			{items = {"mcl_core:dirt", "mcl_fish_traps:earth_worm"}}
+		}
+	},
 	sounds = mcl_sounds.node_sound_dirt_defaults(),
 	_mcl_blast_resistance = 0.5,
 	_mcl_hardness = 0.5,
