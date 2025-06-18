@@ -6,7 +6,7 @@ smartshop.nodes.shop_node_names = {}
 
 local smartshop_def = {
 	description = S("Smartshop"),
-	tiles = { "(smartshop_face.png^[colorize:#FFFFFF77)^smartshop_border.png" },
+	tiles = { "(smartshop_face.png^[colorize:#00000077)^smartshop_border.png" },
 	use_texture_alpha = "opaque",
 	sounds = smartshop.resources.sounds.shop_sounds,
 	groups = {
