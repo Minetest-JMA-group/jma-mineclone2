@@ -580,6 +580,15 @@ function mcl_chests.register_chest(basename, d)
 	-- If this passes without crash, we know for a fact that d = {...}
 	assert(d and type(d) == "table", "Second argument to mcl_chests.register_chest must be a table")
 
+	local protection_check_move = protection_check_move
+	local protection_check_take = protection_check_take
+
+	if basename == "public_chest" then
+		core.log("[Public Chests] Registered overrides!")
+		protection_check_move = function(pos, from_list, from_index, to_list, to_index, count, player) return count end
+		protection_check_take = function(pos, listname, index, stack, player) return stack:get_count() end
+	end
+
 	-- Fallback for when there is no `title` field
 	if not d.title then d.title = {} end
 	d.title.small = d.title.small or d.desc
@@ -687,12 +696,6 @@ function mcl_chests.register_chest(basename, d)
 		end,
 		after_place_node = after_place_chest,
 	})
-
-	if basename == "public_chest" then
-		core.log("[Public Chests] Registered overrides!")
-		local protection_check_move = nil
-		local protection_check_take = nil
-	end
 
 	core.register_node(names.small.a, {
 		description = d.desc,
