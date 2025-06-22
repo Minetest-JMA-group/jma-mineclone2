@@ -505,17 +505,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		custom_sleep_message = fields.chatmessage
 	end
 
+	local player_name = player:get_player_name()
 	if custom_sleep_message or fields.defaultmessage then
 		if chatbuttonused then
 			local time_to_wait = math.ceil(10-globalstep_timer)
-			minetest.chat_send_player(player:get_player_name(),S("Sorry, but you have to wait @1 seconds until you may use this button again!", tostring(time_to_wait)))
+			minetest.chat_send_player(player_name,S("Sorry, but you have to wait @1 seconds until you may use this button again!", tostring(time_to_wait)))
 			return
 		end
-
-		if (not exceeded_rate_limit(player:get_player_name())) and shout_priv_check(player) then
+		local player_xban_entry = xban.find_entry(player_name, true) or {}
+		if (not exceeded_rate_limit(player_name)) and shout_priv_check(player) and (player_xban_entry.muted ~= true) then
 			chatbuttonused = true
 			local message = custom_sleep_message or S("Hey! Would you guys mind sleeping?")
-			minetest.chat_send_all(minetest.format_chat_message(player:get_player_name(), message))
+			minetest.chat_send_all(minetest.format_chat_message(player_name, message))
 		end
 		return
 	end
