@@ -1,54 +1,47 @@
 # textdomain: mobs_mc
-Agent=Akteur
+##[ axolotl.lua ]##
+Axolotl=Axolotl
+##[ bat.lua ]##
 Bat=Fledermaus
-Blaze=Lohe
+##[ rabbit.lua ]##
+Rabbit=Kaninchen
+Killer Bunny=Killerkaninchen
+##[ chicken.lua ]##
 Chicken=Huhn
+##[ cow+mooshroom.lua ]##
 Cow=Kuh
 Mooshroom=Pilzkuh
-Stalker=Stalker
-Ender Dragon=Enderdrache
-Enderman=Enderman
-Endermite=Endermilbe
-Ghast=Ghast
-Elder Guardian=Großer Wächter
-Guardian=Wächter
+##[ horse.lua ]##
 Horse=Pferd
 Skeleton Horse=Skelettpferd
 Zombie Horse=Zombiepferd
 Donkey=Esel
 Mule=Maultier
-Iron Golem=Eisengolem
+##[ llama.lua ]##
 Llama=Lama
+##[ ocelot.lua ]##
 Ocelot=Ozelot
+Cat=Katze
+##[ parrot.lua ]##
 Parrot=Papagei
+##[ pig.lua ]##
 Pig=Schwein
+##[ polar_bear.lua ]##
 Polar Bear=Eisbär
-Rabbit=Kaninchen
-Killer Bunny=Killerkaninchen
+##[ sheep.lua ]##
 Sheep=Schaf
-Shulker=Shulker
-Silverfish=Silberfischchen
-Skeleton=Skelett
-Stray=Eiswanderer
-Wither Skeleton=Witherskelett
-Magma Cube=Magmakubus
-Slime=Schleim
-Snow Golem=Schneegolem
-Spider=Spinne
-Cave Spider=Höhlenspinne
-Squid=Tintenfisch
-Vex=Plagegeist
-Evoker=Magier
-Illusioner=Illusionist
-Villager=Dorfbewohner
-Vindicator=Diener
-Zombie Villager=Dorfbewohnerzombie
-Witch=Hexe
-Wither=Wither
+##[ wolf.lua ]##
 Wolf=Wolf
-Husk=Wüstenzombie
-Zombie=Zombie
-Zombie Piglin=Schweinezombie
+Dog=Hund
+##[ squid.lua ]##
+Squid=Tintenfisch
+##[ villager.lua ]##
+Novice=Anfänger
+Apprentice=Lehrling
+Journeyman=Geselle
+Expert=Experte
+Master=Meister
+Unemployed=Arbeitslos
 Farmer=Bauer
 Fisherman=Fischer
 Fletcher=Pfeilmacher
@@ -61,4 +54,99 @@ Butcher=Metzger
 Weapon Smith=Waffenschmied
 Tool Smith=Werkzeugschmied
 Cleric=Priester
+Mason=Maurer
 Nitwit=Dorftrottel
+Villager=Dorfbewohner
+##[ pillager.lua ]##
+Pillager=Plünderer
+##[ villager_evoker.lua ]##
+Evoker=Magier
+##[ villager_vindicator.lua ]##
+Vindicator=Diener
+##[ villager_zombie.lua ]##
+Zombie Villager=Dorfbewohnerzombie
+##[ witch.lua ]##
+Witch=Hexe
+##[ blaze.lua ]##
+Blaze=Lohe
+##[ ender_dragon.lua ]##
+Ender Dragon=Enderdrache
+##[ endermite.lua ]##
+Endermite=Endermilbe
+##[ villager_illusioner.lua ]##
+Illusioner=Illusionist
+##[ ghast.lua ]##
+Ghast=Ghast
+##[ guardian.lua ]##
+Guardian=Wächter
+##[ guardian_elder.lua ]##
+Elder Guardian=Großer Wächter
+##[ snowman.lua ]##
+Snow Golem=Schneegolem
+##[ iron_golem.lua ]##
+Iron Golem=Eisengolem
+##[ rover.lua ]##
+Rover=Rover
+##[ shulker.lua ]##
+Shulker=Shulker
+##[ silverfish.lua ]##
+Silverfish=Silberfischchen
+##[ skeleton+stray.lua ]##
+Skeleton=Skelett
+Stray=Eiswanderer
+##[ skeleton_wither.lua ]##
+Wither Skeleton=Witherskelett
+##[ stalker.lua ]##
+Stalker=Stalker
+Overloaded Stalker=Geladener Stalker
+##[ zombie.lua ]##
+Zombie=Zombie
+Baby Zombie=Babiezombie
+Husk=Wüstenzombie
+Baby Husk=Baby-Wüstenzombie
+##[ slime+magma_cube.lua ]##
+Slime - big=Slime - groß
+Slime - small=Slime - klein
+Slime - tiny=Slime - winzig
+Magma Cube - big=Magmawürfel – groß
+Magma Cube - small=Magmawürfel – klein
+Magma Cube - tiny=Magmawürfel - winzig
+# choose one below
+Magma Cube=Magmakubus
+Slime=Schleim
+##[ spider.lua ]##
+Spider=Spinne
+Cave Spider=Höhlenspinne
+##[ vex.lua ]##
+Vex=Plagegeist
+##[ wither.lua ]##
+Wither=Wither
+##[ cod.lua ]##
+Cod=Kabeljau
+##[ salmon.lua ]##
+Salmon=Lachs
+##[ tropical_fish.lua ]##
+Tropical fish=Tropischer Fisch
+##[ dolphin.lua ]##
+Dolphin=Delfin
+##[ glow_squid.lua ]##
+Glow Squid=Leuchttintenfisch
+##[ piglin.lua ]##
+Piglin=Piglin
+Sword Piglin=Schwert-Piglin
+Zombie Piglin=Schweinezombie
+Baby Zombie Piglin=Baby-Schweinezombie
+Piglin Brute=Piglin-Grobian
+##[ hoglin+zoglin.lua ]##
+Hoglin=Hoglin
+Zoglin=Zoglin
+Baby hoglin=Baby-Hoglin
+##[ strider.lua ]##
+Strider=Strider
+Baby Strider=Baby-Strider
+
+
+##### not used anymore #####
+
+Agent=Akteur
+Enderman=Enderman

@@ -4,4 +4,4 @@ ranks.prefix_chat (Prefix Chat) bool true
 
 #    If this is enabled, player with a rank that has a prefix will have this
 #    prefix shown in their nametags.
-ranks.prefix_nametag (Prefix Nametag) bool true
+ranks.prefix_nametag (Prefix Nametag) bool false

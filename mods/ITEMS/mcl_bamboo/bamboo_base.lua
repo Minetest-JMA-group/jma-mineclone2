@@ -5,9 +5,6 @@
 --- Copyright (C) 2022 - 2023, Michieal. See License.txt
 
 -- CONSTS
-local DOUBLE_DROP_CHANCE = 8
--- Used everywhere. Often this is just the name, but it makes sense to me as BAMBOO, because that's how I think of it...
--- "BAMBOO" goes here.
 local BAMBOO = "mcl_bamboo:bamboo"
 local BAMBOO_ENDCAP_NAME = "mcl_bamboo:bamboo_endcap"
 local BAMBOO_PLANK = BAMBOO .. "_plank"
@@ -16,7 +13,7 @@ local BAMBOO_PLANK = BAMBOO .. "_plank"
 local modname = minetest.get_current_modname()
 local S = minetest.get_translator(modname)
 local node_sound = mcl_sounds.node_sound_wood_defaults()
-local pr = PseudoRandom((os.time() + 15766) * 12) -- switched from math.random() to PseudoRandom because the random wasn't very random.
+local pr = PseudoRandom((os.time() + 15766) * 12)
 
 local on_rotate
 if minetest.get_modpath("screwdriver") then
@@ -30,39 +27,17 @@ local bamboo_def = {
 	drawtype = "nodebox",
 	paramtype = "light",
 	groups = {handy = 1, axey = 1, choppy = 1, dig_by_piston = 1, plant = 1, non_mycelium_plant = 1, flammable = 3},
-	sounds = node_sound,
-
-	drop = {
-		max_items = 1,
-		-- From the API:
-		-- max_items: Maximum number of item lists to drop.
-		-- The entries in 'items' are processed in order. For each:
-		-- Item filtering is applied, chance of drop is applied, if both are
-		-- successful the entire item list is dropped.
-		-- Entry processing continues until the number of dropped item lists
-		-- equals 'max_items'.
-		-- Therefore, entries should progress from low to high drop chance.
-		items = {
-			-- Examples:
-			{
-				-- 1 in DOUBLE_DROP_CHANCE chance of dropping.
-				-- Default rarity is '1'.
-				rarity = DOUBLE_DROP_CHANCE,
-				items = {BAMBOO .. " 2"},
-			},
-			{
-				-- 1 in 1 chance of dropping. (Note: this means that it will drop 100% of the time.)
-				-- Default rarity is '1'.
-				rarity = 1,
-				items = {BAMBOO},
-			},
-		},
-	},
+	sounds = mcl_sounds.node_sound_wood_defaults(),
+	drop = BAMBOO,
 
 	inventory_image = "mcl_bamboo_bamboo_shoot.png",
 	wield_image = "mcl_bamboo_bamboo_shoot.png",
 	_mcl_blast_resistance = 1,
-	_mcl_hardness = 1.5,
+	_mcl_hardness = 1,
+	_on_bone_meal = function(itemstack, placer, pointed_thing)
+		local pos = pointed_thing.under
+		return mcl_bamboo.grow_bamboo(pos, true)
+	end,
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -86,7 +61,6 @@ local bamboo_def = {
 	on_rotate = on_rotate,
 
 	on_place = function(itemstack, placer, pointed_thing)
-
 		if not pointed_thing then
 			return itemstack
 		end
@@ -209,6 +183,11 @@ local bamboo_def = {
 			and node_above_name ~= "mcl_nether:nether_lava_source" then
 			local _, position = minetest.item_place(place_item, placer, pointed_thing, fdir)
 			if position then
+    		minetest.sound_play({name="default_wood_footstep", gain=1}, {
+   			pos = pos,
+			gain= 1,
+			max_hear_distance = 10,
+		}, true)
 				if not minetest.is_creative_enabled(placer:get_player_name()) then
 					itemstack:take_item(1)
 				end
@@ -240,10 +219,7 @@ local bamboo_def = {
 
 		if node_above and ((bamboo_node and bamboo_node > 0) or node_above.name == BAMBOO_ENDCAP_NAME) then
 			minetest.remove_node(new_pos)
-			minetest.sound_play(node_sound.dug, sound_params, true)
-			if pr:next(1, DOUBLE_DROP_CHANCE) == 1 then
-				minetest.add_item(new_pos, istack)
-			end
+		minetest.sound_play(mcl_sounds.node_sound_wood_defaults(), sound_params, true)
 			minetest.add_item(new_pos, istack)
 		end
 	end,
@@ -253,10 +229,12 @@ minetest.register_node(BAMBOO, bamboo_def)
 local bamboo_top = table.copy(bamboo_def)
 bamboo_top.groups = {not_in_creative_inventory = 1, handy = 1, axey = 1, choppy = 1, dig_by_piston = 1, plant = 1, non_mycelium_plant = 1, flammable = 3}
 bamboo_top.tiles = {"mcl_bamboo_endcap.png"}
-bamboo_top.drawtype = "plantlike_rooted" --"plantlike"
---bamboo_top.paramtype2 = "meshoptions"
---bamboo_top.param2 = 2
--- bamboo_top.waving = 2
+
+-- bamboo_top.drawtype = "plantlike_rooted" --"plantlike"
+bamboo_top.drawtype = "plantlike"
+bamboo_top.paramtype2 = "meshoptions"
+bamboo_top.param2 = 2
+bamboo_top.waving = 2
 bamboo_top.special_tiles = {{name = "mcl_bamboo_endcap.png"}}
 bamboo_top.nodebox = nil
 bamboo_top.selection_box = nil
@@ -277,7 +255,7 @@ local bamboo_block_def = {
 	sounds = node_sound,
 	paramtype2 = "facedir",
 	drops = "mcl_bamboo:bamboo_block",
-	_mcl_blast_resistance = 3,
+	_mcl_blast_resistance = 2,
 	_mcl_hardness = 2,
 	_mcl_stripped_variant = "mcl_bamboo:bamboo_block_stripped", -- this allows us to use the built in Axe's strip block.
 	on_place = mcl_util.rotate_axis,

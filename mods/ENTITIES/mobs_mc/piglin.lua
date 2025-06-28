@@ -50,14 +50,16 @@ local piglin = {
 	passive = false,
 	spawn_class = "hostile",
 	group_attack = {"mobs_mc:piglin", "mobs_mc:sword_piglin", "mobs_mc:piglin_brute"},
-	hp_min = 16,
-	hp_max = 16,
+	initial_properties = {
+		hp_min = 16,
+		hp_max = 16,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3},
+	},
 	xp_min = 9,
 	xp_max = 9,
 	armor = {fleshy = 90},
 	damage = 4,
 	reach = 3,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3},
 	visual = "mesh",
 	mesh = "extra_mobs_piglin.b3d",
 	spawn_in_group = 4,
@@ -110,16 +112,16 @@ local piglin = {
 			return
 		elseif self.trading == true then
 			self.state = "trading"
-			self.object:set_bone_position("Arm_Right_Pitch_Control", vector.new(-3,5.785,0), vector.new(20,-20,18))
-			self.object:set_bone_position("Head", vector.new(0,6.3,0), vector.new(-40,0,0))
+			mcl_util.set_bone_position(self.object, "Arm_Right_Pitch_Control", vector.new(-3,5.785,0), vector.new(0.35,-0.35,0.315))
+			mcl_util.set_bone_position(self.object, "Head", vector.new(0,6.3,0), vector.new(-0.7,0,0))
 			self.base_texture[2] = "default_gold_ingot.png"
 			self.object:set_properties({textures = self.base_texture})
 		else
-			self.object:set_bone_position("Wield_Item", vector.new(.5,4.5,-1.6), vector.new(90,0,20))
+			mcl_util.set_bone_position(self.object, "Wield_Item", vector.new(.5,4.5,-1.6), vector.new(1.57,0,0.35))
 			self.base_texture[2] = self.weapon
 			self.object:set_properties({textures = self.base_texture})
-			self.object:set_bone_position("Head", vector.new(0,6.3,0), vector.new(0,0,0))
-			self.object:set_bone_position("Arm_Right_Pitch_Control", vector.new(-3,5.785,0), vector.new(0,0,0))
+			mcl_util.set_bone_position(self.object, "Head", vector.new(0,6.3,0), vector.new(0,0,0))
+			mcl_util.set_bone_position(self.object, "Arm_Right_Pitch_Control", vector.new(-3,5.785,0), vector.new(0,0,0))
 		end
 
 		if self.state ~= "attack" then
@@ -139,7 +141,7 @@ local piglin = {
 			self.object:set_animation({x=0,y=79})
 			self.trading = true
 			self.gold_items = self.gold_items + 1
-			self.object:set_bone_position("Wield_Item", vector.new(-1.5,4.9,1.8), vector.new(135,0,90))
+			mcl_util.set_bone_position(self.object, "Wield_Item", vector.new(-1.5,4.9,1.8), vector.new(2.36,0,1.57))
 			minetest.after(5, function()
 				self.gold_items = self.gold_items - 1
 				if self.gold_items == 0 then
@@ -202,7 +204,7 @@ sword_piglin.textures = {"extra_mobs_piglin.png", "default_tool_goldsword.png"}
 sword_piglin.on_spawn = function(self)
 	self.gold_items = 0
 	self.weapon = self.base_texture[2]
-	self.object:set_bone_position("Wield_Item", vector.new(0,3.9,1.3), vector.new(90,0,0))
+	mcl_util.set_bone_position(self.object, "Wield_Item", vector.new(0,3.9,1.3), vector.new(1.57,0,0))
 end
 sword_piglin.drops = {
 	{name = "mcl_tools:sword_gold",
@@ -242,8 +244,11 @@ local zombified_piglin = {
 	type = "animal",
 	passive = false,
 	spawn_class = "passive",
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3}, -- same
+	},
 	xp_min = 6,
 	xp_max = 6,
 	armor = {undead = 90, fleshy = 90},
@@ -252,10 +257,9 @@ local zombified_piglin = {
 	damage = 9,
 	reach = 2,
 	head_swivel = "head.control",
-	bone_eye_height = 2.4,
+	head_bone_position = vector.new( 0, 2.417, 0 ), -- for minetest <= 5.8
 	head_eye_height = 1.4,
 	curiosity = 15,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3}, -- same
 	visual = "mesh",
 	mesh = "mobs_mc_zombie_pigman.b3d",
 	textures = { {
@@ -324,7 +328,8 @@ mcl_mobs.register_mob("mobs_mc:zombified_piglin", zombified_piglin)
 
 local baby_zombified_piglin = table.copy(zombified_piglin)
 baby_zombified_piglin.description = S("Baby Zombie Piglin")
-baby_zombified_piglin.collisionbox = {-0.25, -0.01, -0.25, 0.25, 0.94, 0.25}
+baby_zombified_piglin.initial_properties.collisionbox = {-0.25, -0.01, -0.25, 0.25, 0.94, 0.25}
+baby_zombified_piglin.head_eye_height = 0.8
 baby_zombified_piglin.xp_min = 13
 baby_zombified_piglin.xp_max = 13
 baby_zombified_piglin.textures = {
@@ -356,11 +361,12 @@ mcl_mobs.register_mob("mobs_mc:baby_pigman", baby_pigman_unused)
 
 local piglin_brute = table.copy(piglin)
 piglin_brute.description = S("Piglin Brute")
+piglin_brute.initial_properties = table.copy(piglin.initial_properties)
+piglin_brute.initial_properties.hp_min = 50
+piglin_brute.initial_properties.hp_max = 50
 piglin_brute.xp_min = 20
 piglin_brute.xp_max = 20
-piglin_brute.hp_min = 50
-piglin_brute.hp_max = 50
-piglin_brute.fire_resistant = 1
+piglin_brute.fire_resistant = false
 piglin_brute.do_custom = function()
 	return
 end
@@ -371,8 +377,8 @@ piglin_brute.on_rightclick = function()
 	return
 end
 piglin_brute.attacks_monsters = true
-piglin_brute.lava_damage = 0
-piglin_brute.fire_damage = 0
+piglin_brute.lava_damage = 4
+piglin_brute.fire_damage = 2
 piglin_brute.attack_animals = true
 piglin_brute.mesh = "extra_mobs_sword_piglin.b3d"
 piglin_brute.textures = {"extra_mobs_piglin_brute.png", "default_tool_goldaxe.png", "extra_mobs_trans.png"}
@@ -401,73 +407,75 @@ piglin_brute.drops = {
 }
 mcl_mobs.register_mob("mobs_mc:piglin_brute", piglin_brute)
 
-
-
 -- Regular spawning in the Nether
-mcl_mobs:spawn_specific(
-"mobs_mc:piglin",
-"nether",
-"ground",
-{
-"Nether",
-"CrimsonForest"
-},
-0,
-minetest.LIGHT_MAX+1,
-30,
-150,
-3,
-mcl_vars.mg_lava_nether_max,
-mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:piglin",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {
+		"Nether",
+		"CrimsonForest"
+	},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 150,
+	interval = 30,
+	aoc = 3,
+	min_height = mcl_vars.mg_lava_nether_max,
+	max_height = mcl_vars.mg_nether_max
+})
 
-mcl_mobs:spawn_specific(
-"mobs_mc:sword_piglin",
-"nether",
-"ground",
-{
-			"Nether",
-			"CrimsonForest"
-		},
-0,
-minetest.LIGHT_MAX+1,
-30,
-150,
-3,
-mcl_vars.mg_lava_nether_max,
-mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:sword_piglin",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {
+		"Nether",
+		"CrimsonForest"
+	},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 150,
+	interval = 30,
+	aoc = 3,
+	min_height = mcl_vars.mg_lava_nether_max,
+	max_height = mcl_vars.mg_nether_max
+})
 
-mcl_mobs:spawn_specific(
-		"mobs_mc:zombified_piglin",
-		"nether",
-		"ground",
-		{
-			"Nether",
-			"CrimsonForest",
-		},
-		0,
-		minetest.LIGHT_MAX+1,
-		30,
-		1000,
-		3,
-		mcl_vars.mg_nether_min,
-		mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:zombified_piglin",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {
+		"Nether",
+		"CrimsonForest",
+	},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 1000,
+	interval = 30,
+	aoc = 3,
+	min_height = mcl_vars.mg_nether_min,
+	max_height = mcl_vars.mg_nether_max
+})
 
 -- Baby zombie is 20 times less likely than regular zombies
-mcl_mobs:spawn_specific(
-		"mobs_mc:baby_zombified_piglin",
-		"nether",
-		"ground",
-		{
-			"Nether",
-			"CrimsonForest",
-		},
-		0,
-		minetest.LIGHT_MAX+1,
-		30,
-		50,
-		4,
-		mcl_vars.mg_nether_min,
-		mcl_vars.mg_nether_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:baby_zombified_piglin",
+	dimension = "nether",
+	type_of_spawning = "ground",
+	biomes = {
+		"Nether",
+		"CrimsonForest",
+	},
+	min_light = 0,
+	max_light = minetest.LIGHT_MAX+1,
+	chance = 50,
+	interval = 30,
+	aoc = 4,
+	min_height = mcl_vars.mg_nether_min,
+	max_height = mcl_vars.mg_nether_max
+})
 
 mcl_mobs:non_spawn_specific("mobs_mc:piglin","overworld",0,7)
 mcl_mobs:non_spawn_specific("mobs_mc:sword_piglin","overworld",0,7)

@@ -14,7 +14,21 @@ function mcl_burning.is_burning(obj)
 end
 
 function mcl_burning.is_affected_by_rain(obj)
-	return mcl_weather.get_weather() == "rain" and mcl_weather.is_outdoor(obj:get_pos())
+	local pos = obj:get_pos()
+	if not pos then return false end
+	return mcl_weather.rain.raining and mcl_weather.is_outdoor(pos) and mcl_weather.has_rain(pos)
+end
+
+function mcl_burning.is_affected_by_sunlight(obj, threshold)
+	threshold = threshold or core.LIGHT_MAX
+
+	local pos = obj:get_pos()
+	if not pos then return false end
+	local _,dim = mcl_worlds.y_to_layer(pos.y)
+	if dim ~= "overworld" then return false end
+
+	local sunlight = mcl_util.get_natural_light(pos, core.get_timeofday()) or 0
+	if sunlight > threshold then return true end
 end
 
 function mcl_burning.get_collisionbox(obj, smaller, storage)
@@ -37,10 +51,14 @@ local find_nodes_in_area = minetest.find_nodes_in_area
 
 function mcl_burning.get_touching_nodes(obj, nodenames, storage)
 	local pos = obj:get_pos()
+	if not pos then return {} end
+
 	local minp, maxp = mcl_burning.get_collisionbox(obj, true, storage)
 	local nodes = find_nodes_in_area(vector.add(pos, minp), vector.add(pos, maxp), nodenames)
 	return nodes
 end
+
+local hud_type_field = mcl_vars.hud_type_field
 
 -- Manages the fire animation on a burning player's HUD
 --
@@ -58,7 +76,7 @@ function mcl_burning.update_hud(player)
 	if not storage.fire_hud_id then
 		storage.animation_frame = 1
 		storage.fire_hud_id = player:hud_add({
-			hud_elem_type = "image",
+			[hud_type_field] = "image",
 			position = {x = 0.5, y = 0.5},
 			scale = {x = -100, y = -100},
 			text = hud_flame_animated .. storage.animation_frame,

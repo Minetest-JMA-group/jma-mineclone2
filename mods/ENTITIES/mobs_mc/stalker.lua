@@ -7,12 +7,13 @@ local S = minetest.get_translator("mobs_mc")
 --###################
 
 
-local function get_texture(self)
-	local on_name = self.standing_on
+local function get_texture(self, prev)
+	local standing_on = minetest.registered_nodes[self.standing_on]
+	-- TODO: we do not have access to param2 here (color palette index) yet
 	local texture
 	local texture_suff = ""
-	if on_name and on_name ~= "air" then
-		local tiles = minetest.registered_nodes[on_name].tiles
+	if standing_on and (standing_on.walkable or standing_on.groups.liquid) then
+		local tiles = standing_on.tiles
 		if tiles then
 			local tile = tiles[1]
 			local color
@@ -25,7 +26,7 @@ local function get_texture(self)
 				texture = tile
 			end
 			if not color then
-				color = minetest.colorspec_to_colorstring(minetest.registered_nodes[on_name].color)
+				color = minetest.colorspec_to_colorstring(standing_on.color)
 			end
 			if color then
 				texture_suff = "^[multiply:" .. color .. "^[hsl:0:0:20"
@@ -33,14 +34,19 @@ local function get_texture(self)
 		end
 	end
 	if not texture or texture == "" then
+		-- try to keep last texture when, e.g., falling
+		if prev and (not (not self.attack)) == (string.find(prev, "vl_mobs_stalker_overlay_angry.png") ~= nil) then
+			return prev
+		end
 		texture = "vl_stalker_default.png"
-	end
-	texture = texture:gsub("([\\^:\\[])","\\%1") -- escape texture modifiers
-	texture = "([combine:16x24:0,0=(" .. texture .. "):0,16=(" .. texture ..")".. texture_suff
-	if self.attack then
-		texture = texture .. ")^vl_mobs_stalker_overlay_angry.png"
 	else
-		texture = texture .. ")^vl_mobs_stalker_overlay.png"
+		texture = texture:gsub("([\\^:\\[])", "\\%1") -- escape texture modifiers
+		texture = "(vl_stalker_default.png^[combine:16x24:0,0=(" .. texture .. "):0,16=(" .. texture .. ")" .. texture_suff .. ")"
+	end
+	if self.attack then
+		texture = texture .. "^vl_mobs_stalker_overlay_angry.png"
+	else
+		texture = texture .. "^vl_mobs_stalker_overlay.png"
 	end
 	return texture
 end
@@ -60,17 +66,19 @@ mcl_mobs.register_mob("mobs_mc:stalker", {
 	type = "monster",
 	spawn_class = "hostile",
 	spawn_in_group = 1,
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.69, 0.3},
+	},
 	xp_min = 5,
 	xp_max = 5,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.69, 0.3},
 	pathfinding = 1,
 	visual = "mesh",
 	mesh = "vl_stalker.b3d",
 -- 	head_swivel = "Head_Control",
-	bone_eye_height = 2.35,
-	head_eye_height = 1.8;
+	head_eye_height = 1.2;
+	head_bone_position = vector.new( 0, 2.35, 0 ), -- for minetest <= 5.8
 	curiosity = 2,
 	textures = {
 		{get_texture({}),
@@ -132,7 +140,7 @@ mcl_mobs.register_mob("mobs_mc:stalker", {
 				self:boom(mcl_util.get_object_center(self.object), self.explosion_strength)
 			end
 		end
-		local new_texture = get_texture(self)
+		local new_texture = get_texture(self, self._stalker_texture)
 		if self._stalker_texture ~= new_texture then
 			self.object:set_properties({textures={new_texture, "mobs_mc_empty.png"}})
 			self._stalker_texture = new_texture
@@ -197,11 +205,13 @@ mcl_mobs.register_mob("mobs_mc:stalker_overloaded", {
 	description = S("Overloaded Stalker"),
 	type = "monster",
 	spawn_class = "hostile",
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.69, 0.3},
+	},
 	xp_min = 5,
 	xp_max = 5,
-	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.69, 0.3},
 	pathfinding = 1,
 	visual = "mesh",
 	mesh = "vl_stalker.b3d",
@@ -337,153 +347,154 @@ mcl_mobs.register_mob("mobs_mc:stalker_overloaded", {
 mcl_mobs.register_conversion("mobs_mc:creeper", "mobs_mc:stalker")
 mcl_mobs.register_conversion("mobs_mc:creeper_charged", "mobs_mc:stalker_overloaded")
 
-mcl_mobs:spawn_specific(
-"mobs_mc:stalker",
-"overworld",
-"ground",
-{
-"Mesa",
-"FlowerForest",
-"Swampland",
-"Taiga",
-"ExtremeHills",
-"Jungle",
-"Savanna",
-"BirchForest",
-"MegaSpruceTaiga",
-"MegaTaiga",
-"ExtremeHills+",
-"Forest",
-"Plains",
-"Desert",
-"ColdTaiga",
-"IcePlainsSpikes",
-"SunflowerPlains",
-"IcePlains",
-"RoofedForest",
-"ExtremeHills+_snowtop",
-"MesaPlateauFM_grasstop",
-"JungleEdgeM",
-"ExtremeHillsM",
-"JungleM",
-"BirchForestM",
-"MesaPlateauF",
-"MesaPlateauFM",
-"MesaPlateauF_grasstop",
-"MesaBryce",
-"JungleEdge",
-"SavannaM",
-"FlowerForest_beach",
-"Forest_beach",
-"StoneBeach",
-"ColdTaiga_beach_water",
-"Taiga_beach",
-"Savanna_beach",
-"Plains_beach",
-"ExtremeHills_beach",
-"ColdTaiga_beach",
-"Swampland_shore",
-"JungleM_shore",
-"Jungle_shore",
-"MesaPlateauFM_sandlevel",
-"MesaPlateauF_sandlevel",
-"MesaBryce_sandlevel",
-"Mesa_sandlevel",
-"RoofedForest_ocean",
-"JungleEdgeM_ocean",
-"BirchForestM_ocean",
-"BirchForest_ocean",
-"IcePlains_deep_ocean",
-"Jungle_deep_ocean",
-"Savanna_ocean",
-"MesaPlateauF_ocean",
-"ExtremeHillsM_deep_ocean",
-"Savanna_deep_ocean",
-"SunflowerPlains_ocean",
-"Swampland_deep_ocean",
-"Swampland_ocean",
-"MegaSpruceTaiga_deep_ocean",
-"ExtremeHillsM_ocean",
-"JungleEdgeM_deep_ocean",
-"SunflowerPlains_deep_ocean",
-"BirchForest_deep_ocean",
-"IcePlainsSpikes_ocean",
-"Mesa_ocean",
-"StoneBeach_ocean",
-"Plains_deep_ocean",
-"JungleEdge_deep_ocean",
-"SavannaM_deep_ocean",
-"Desert_deep_ocean",
-"Mesa_deep_ocean",
-"ColdTaiga_deep_ocean",
-"Plains_ocean",
-"MesaPlateauFM_ocean",
-"Forest_deep_ocean",
-"JungleM_deep_ocean",
-"FlowerForest_deep_ocean",
-"MegaTaiga_ocean",
-"StoneBeach_deep_ocean",
-"IcePlainsSpikes_deep_ocean",
-"ColdTaiga_ocean",
-"SavannaM_ocean",
-"MesaPlateauF_deep_ocean",
-"MesaBryce_deep_ocean",
-"ExtremeHills+_deep_ocean",
-"ExtremeHills_ocean",
-"Forest_ocean",
-"MegaTaiga_deep_ocean",
-"JungleEdge_ocean",
-"MesaBryce_ocean",
-"MegaSpruceTaiga_ocean",
-"ExtremeHills+_ocean",
-"Jungle_ocean",
-"RoofedForest_deep_ocean",
-"IcePlains_ocean",
-"FlowerForest_ocean",
-"ExtremeHills_deep_ocean",
-"MesaPlateauFM_deep_ocean",
-"Desert_ocean",
-"Taiga_ocean",
-"BirchForestM_deep_ocean",
-"Taiga_deep_ocean",
-"JungleM_ocean",
-"FlowerForest_underground",
-"JungleEdge_underground",
-"StoneBeach_underground",
-"MesaBryce_underground",
-"Mesa_underground",
-"RoofedForest_underground",
-"Jungle_underground",
-"Swampland_underground",
-"BirchForest_underground",
-"Plains_underground",
-"MesaPlateauF_underground",
-"ExtremeHills_underground",
-"MegaSpruceTaiga_underground",
-"BirchForestM_underground",
-"SavannaM_underground",
-"MesaPlateauFM_underground",
-"Desert_underground",
-"Savanna_underground",
-"Forest_underground",
-"SunflowerPlains_underground",
-"ColdTaiga_underground",
-"IcePlains_underground",
-"IcePlainsSpikes_underground",
-"MegaTaiga_underground",
-"Taiga_underground",
-"ExtremeHills+_underground",
-"JungleM_underground",
-"ExtremeHillsM_underground",
-"JungleEdgeM_underground",
-},
-0,
-7,
-20,
-1000,
-2,
-mcl_vars.mg_overworld_min,
-mcl_vars.mg_overworld_max)
+mcl_mobs:spawn_setup({
+	name = "mobs_mc:stalker",
+	dimension = "overworld",
+	type_of_spawning = "ground",
+	biomes = {
+		"Mesa",
+		"FlowerForest",
+		"Swampland",
+		"Taiga",
+		"ExtremeHills",
+		"Jungle",
+		"Savanna",
+		"BirchForest",
+		"MegaSpruceTaiga",
+		"MegaTaiga",
+		"ExtremeHills+",
+		"Forest",
+		"Plains",
+		"Desert",
+		"ColdTaiga",
+		"IcePlainsSpikes",
+		"SunflowerPlains",
+		"IcePlains",
+		"RoofedForest",
+		"ExtremeHills+_snowtop",
+		"MesaPlateauFM_grasstop",
+		"JungleEdgeM",
+		"ExtremeHillsM",
+		"JungleM",
+		"BirchForestM",
+		"MesaPlateauF",
+		"MesaPlateauFM",
+		"MesaPlateauF_grasstop",
+		"MesaBryce",
+		"JungleEdge",
+		"SavannaM",
+		"FlowerForest_beach",
+		"Forest_beach",
+		"StoneBeach",
+		"ColdTaiga_beach_water",
+		"Taiga_beach",
+		"Savanna_beach",
+		"Plains_beach",
+		"ExtremeHills_beach",
+		"ColdTaiga_beach",
+		"Swampland_shore",
+		"JungleM_shore",
+		"Jungle_shore",
+		"MesaPlateauFM_sandlevel",
+		"MesaPlateauF_sandlevel",
+		"MesaBryce_sandlevel",
+		"Mesa_sandlevel",
+		"RoofedForest_ocean",
+		"JungleEdgeM_ocean",
+		"BirchForestM_ocean",
+		"BirchForest_ocean",
+		"IcePlains_deep_ocean",
+		"Jungle_deep_ocean",
+		"Savanna_ocean",
+		"MesaPlateauF_ocean",
+		"ExtremeHillsM_deep_ocean",
+		"Savanna_deep_ocean",
+		"SunflowerPlains_ocean",
+		"Swampland_deep_ocean",
+		"Swampland_ocean",
+		"MegaSpruceTaiga_deep_ocean",
+		"ExtremeHillsM_ocean",
+		"JungleEdgeM_deep_ocean",
+		"SunflowerPlains_deep_ocean",
+		"BirchForest_deep_ocean",
+		"IcePlainsSpikes_ocean",
+		"Mesa_ocean",
+		"StoneBeach_ocean",
+		"Plains_deep_ocean",
+		"JungleEdge_deep_ocean",
+		"SavannaM_deep_ocean",
+		"Desert_deep_ocean",
+		"Mesa_deep_ocean",
+		"ColdTaiga_deep_ocean",
+		"Plains_ocean",
+		"MesaPlateauFM_ocean",
+		"Forest_deep_ocean",
+		"JungleM_deep_ocean",
+		"FlowerForest_deep_ocean",
+		"MegaTaiga_ocean",
+		"StoneBeach_deep_ocean",
+		"IcePlainsSpikes_deep_ocean",
+		"ColdTaiga_ocean",
+		"SavannaM_ocean",
+		"MesaPlateauF_deep_ocean",
+		"MesaBryce_deep_ocean",
+		"ExtremeHills+_deep_ocean",
+		"ExtremeHills_ocean",
+		"Forest_ocean",
+		"MegaTaiga_deep_ocean",
+		"JungleEdge_ocean",
+		"MesaBryce_ocean",
+		"MegaSpruceTaiga_ocean",
+		"ExtremeHills+_ocean",
+		"Jungle_ocean",
+		"RoofedForest_deep_ocean",
+		"IcePlains_ocean",
+		"FlowerForest_ocean",
+		"ExtremeHills_deep_ocean",
+		"MesaPlateauFM_deep_ocean",
+		"Desert_ocean",
+		"Taiga_ocean",
+		"BirchForestM_deep_ocean",
+		"Taiga_deep_ocean",
+		"JungleM_ocean",
+		"FlowerForest_underground",
+		"JungleEdge_underground",
+		"StoneBeach_underground",
+		"MesaBryce_underground",
+		"Mesa_underground",
+		"RoofedForest_underground",
+		"Jungle_underground",
+		"Swampland_underground",
+		"BirchForest_underground",
+		"Plains_underground",
+		"MesaPlateauF_underground",
+		"ExtremeHills_underground",
+		"MegaSpruceTaiga_underground",
+		"BirchForestM_underground",
+		"SavannaM_underground",
+		"MesaPlateauFM_underground",
+		"Desert_underground",
+		"Savanna_underground",
+		"Forest_underground",
+		"SunflowerPlains_underground",
+		"ColdTaiga_underground",
+		"IcePlains_underground",
+		"IcePlainsSpikes_underground",
+		"MegaTaiga_underground",
+		"Taiga_underground",
+		"ExtremeHills+_underground",
+		"JungleM_underground",
+		"ExtremeHillsM_underground",
+		"JungleEdgeM_underground",
+	},
+	min_light = 0,
+	max_light = 7,
+	chance = 1000,
+	interval = 20,
+	aoc = 2,
+	min_height = mcl_vars.mg_overworld_min,
+	max_height = mcl_vars.mg_overworld_max
+})
 
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:stalker", S("Stalker"), "#0da70a", "#000000", 0)

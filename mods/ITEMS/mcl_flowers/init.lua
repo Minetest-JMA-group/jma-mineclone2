@@ -11,20 +11,6 @@ mcl_flowers.registered_simple_flowers = {}
 local smallflowerlongdesc = S("This is a small flower. Small flowers are mainly used for dye production and can also be potted.")
 local plant_usage_help = S("It can only be placed on a block on which it would also survive.")
 
-local get_palette_color_from_pos = function(pos)
-	local biome_data = minetest.get_biome_data(pos)
-	local index = 0
-	if biome_data then
-		local biome = biome_data.biome
-		local biome_name = minetest.get_biome_name(biome)
-		local reg_biome = minetest.registered_biomes[biome_name]
-		if reg_biome then
-			index = reg_biome._mcl_grass_palette_index
-		end
-	end
-	return index
-end
-
 -- on_place function for flowers
 local on_place_flower = mcl_util.generate_on_place_plant_function(function(pos, node, itemstack)
 	local below = {x=pos.x, y=pos.y-1, z=pos.z}
@@ -32,13 +18,7 @@ local on_place_flower = mcl_util.generate_on_place_plant_function(function(pos, 
 	if not soil_node then return false end
 
 	local has_palette = minetest.registered_nodes[itemstack:get_name()].palette ~= nil
-	local colorize
-	if has_palette then
-		colorize = get_palette_color_from_pos(pos)
-	end
-	if not colorize then
-		colorize = 0
-	end
+	local colorize = has_palette and mcl_util.get_palette_indexes_from_pos(pos).grass_palette_index or 0
 
 --[[	Placement requirements:
 	* Dirt or grass block
@@ -47,10 +27,7 @@ local on_place_flower = mcl_util.generate_on_place_plant_function(function(pos, 
 ]]
 	local light_night = minetest.get_node_light(pos, 0.0)
 	local light_day = minetest.get_node_light(pos, 0.5)
-	local light_ok = false
-	if (light_night and light_night >= 8) or (light_day and light_day >= minetest.LIGHT_MAX) then
-		light_ok = true
-	end
+	local light_ok = (light_night and light_night >= 8) or (light_day and light_day >= minetest.LIGHT_MAX)
 	if itemstack:get_name() == "mcl_flowers:wither_rose" and (  minetest.get_item_group(soil_node.name, "grass_block") > 0 or soil_node.name == "mcl_core:dirt" or soil_node.name == "mcl_core:coarse_dirt" or soil_node.name == "mcl_mud:mud" or soil_node.name == "mcl_moss:moss" or soil_node.name == "mcl_nether:netherrack" or minetest.get_item_group(soil_node.name, "soul_block") > 0  ) then
 		return true,colorize
 	end
@@ -81,6 +58,7 @@ function mcl_flowers.register_simple_flower(name, def)
 		sunlight_propagates = true,
 		paramtype = "light",
 		walkable = false,
+		buildable_to = true,
 		stack_max = 64,
 		drop = def.drop,
 		groups = {
@@ -162,6 +140,18 @@ local def_tallgrass = {
 	_mcl_fortune_drop = fortune_wheat_seed_drop,
 	node_placement_prediction = "",
 	on_place = on_place_flower,
+	_on_bone_meal = function(itemstack, placer, pointed_thing)
+		local pos = pointed_thing.under
+		local n = minetest.get_node(pos)
+		-- Grow into double tallgrass
+		local toppos = vector.offset(pos, 0, 1, 0)
+		local topnode = minetest.get_node(toppos)
+		if minetest.registered_nodes[topnode.name].buildable_to then
+			minetest.set_node(pos, { name = "mcl_flowers:double_grass", param2 = n.param2 })
+			minetest.set_node(toppos, { name = "mcl_flowers:double_grass_top", param2 = n.param2 })
+			return true
+		end
+	end,
 	_mcl_blast_resistance = 0,
 	_mcl_hardness = 0,
 }
@@ -180,6 +170,18 @@ def_fern.selection_box = {
 	fixed = { -6/16, -0.5, -6/16, 6/16, 5/16, 6/16 },
 }
 def_fern.groups.compostability = 65
+def_fern._on_bone_meal = function(itemstack, placer, pointed_thing)
+		local pos = pointed_thing.under
+		local n = minetest.get_node(pos)
+		-- Grow into double fern.
+		local toppos = vector.offset(pos, 0, 1, 0)
+		local topnode = minetest.get_node(toppos)
+		if minetest.registered_nodes[topnode.name].buildable_to then
+			minetest.set_node(pos, { name = "mcl_flowers:double_fern", param2 = n.param2 })
+			minetest.set_node(toppos, { name = "mcl_flowers:double_fern_top", param2 = n.param2 })
+			return true
+		end
+	end
 
 minetest.register_node("mcl_flowers:fern", def_fern)
 
@@ -243,10 +245,16 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 	if name == "double_grass" then
 		bottom_groups.compostability = 50
 	end
+	local on_bonemealing
 	if is_flower then
 		bottom_groups.flower = 1
 		bottom_groups.place_flowerlike = 1
 		bottom_groups.dig_immediate = 3
+		on_bonemealing = function(itemstack, placer, pointed_thing)
+			local pos = pointed_thing.under
+			minetest.add_item(pos, "mcl_flowers:"..name)
+			return true
+		end
 	else
 		bottom_groups.place_flowerlike = 2
 		bottom_groups.handy = 1
@@ -359,10 +367,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 			-- * Only with light level >= 8
 			-- * Only if two enough space
 			if (floor.name == "mcl_core:dirt" or minetest.get_item_group(floor.name, "grass_block") == 1 or (not is_flower and (floor.name == "mcl_core:coarse_dirt" or floor.name == "mcl_core:podzol" or floor.name == "mcl_core:podzol_snow"))) and bottom_buildable and top_buildable and light_ok then
-				local param2
-				if grass_color then
-					param2 = get_palette_color_from_pos(bottom)
-				end
+				local param2 = grass_color and mcl_util.get_palette_indexes_from_pos(bottom).grass_palette_index
 				-- Success! We can now place the flower
 				minetest.sound_play(minetest.registered_nodes[itemstring].sounds.place, {pos = bottom, gain=1}, true)
 				minetest.set_node(bottom, {name=itemstring, param2=param2})
@@ -381,6 +386,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 				minetest.remove_node(top)
 			end
 		end,
+		_on_bone_meal = on_bonemealing,
 		groups = bottom_groups,
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 		mesh = mesh
@@ -419,6 +425,7 @@ local function add_large_plant(name, desc, longdesc, bottom_img, top_img, inv_im
 				minetest.remove_node(bottom)
 			end
 		end,
+		_on_bone_meal = on_bonemealing,
 		groups = top_groups,
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 	})
@@ -572,3 +579,6 @@ if mod_mcimport and mg_name == "singlenode" and fix_doubleplants == true then
 end
 
 dofile(modpath.."/register.lua")
+
+-- Bonemealing handler and override for "mcl_core:dirt_with_grass":
+dofile(modpath.."/bonemealing.lua")

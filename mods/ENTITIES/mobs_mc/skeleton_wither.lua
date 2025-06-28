@@ -13,19 +13,22 @@ mcl_mobs.register_mob("mobs_mc:witherskeleton", {
 	description = S("Wither Skeleton"),
 	type = "monster",
 	spawn_class = "hostile",
-	hp_min = 20,
-	hp_max = 20,
+	initial_properties = {
+		hp_min = 20,
+		hp_max = 20,
+		breath_max = -1,
+		collisionbox = {-0.35, -0.01, -0.35, 0.35, 2.39, 0.35},
+	},
 	xp_min = 6,
 	xp_max = 6,
-	breath_max = -1,
 	armor = {undead = 100, fleshy = 100},
 	pathfinding = 1,
 	group_attack = true,
-	collisionbox = {-0.35, -0.01, -0.35, 0.35, 2.39, 0.35},
 	visual = "mesh",
 	mesh = "mobs_mc_witherskeleton.b3d",
 	head_swivel = "head.control",
-	bone_eye_height = 2.38,
+	head_eye_height = 1.5,
+	head_bone_position = vector.new( 0, 2.38, 0 ), -- for minetest <= 5.8
 	curiosity = 60,
 	textures = {
 		{
@@ -94,6 +97,7 @@ mcl_mobs.register_mob("mobs_mc:witherskeleton", {
 	dogshoot_switch = 1,
 	dogshoot_count_max =0.5,
 	fear_height = 4,
+	floats = 0,
 	harmed_by_heal = true,
 	fire_resistant = true,
 	dealt_effect = {
@@ -103,24 +107,6 @@ mcl_mobs.register_mob("mobs_mc:witherskeleton", {
 	},
 })
 
---spawn
---[[]
-mcl_mobs:spawn_specific(
-"mobs_mc:witherskeleton",
-"nether",
-"ground",
-{
-"Nether",
-"SoulsandValley",
-},
-0,
-7,
-30,
-500,
-5,
-mcl_vars.mg_nether_min,
-mcl_vars.mg_nether_max)
---]]
 -- spawn eggs
 mcl_mobs.register_egg("mobs_mc:witherskeleton", S("Wither Skeleton"), "#141414", "#474d4d", 0)
 mcl_mobs:non_spawn_specific("mobs_mc:witherskeleton","overworld",0,7)

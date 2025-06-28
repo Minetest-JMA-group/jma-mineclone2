@@ -9,8 +9,29 @@ for i=0, 3 do
 	if i > 0 then
 		groups.sweet_berry_thorny = 1
 	end
-	local drop_berries = (i >= 2)
-	local berries_to_drop = drop_berries and {i - 1, i} or nil
+	local berries_to_drop = (i >= 2) and {i - 1, i} or nil
+	local function do_berry_drop(pos)
+		if not berries_to_drop then return false end
+
+		for _=1, berries_to_drop[math.random(2)] do
+			minetest.add_item(pos, "mcl_farming:sweet_berry")
+		end
+		minetest.swap_node(pos, {name = "mcl_farming:sweet_berry_bush_1"})
+		return true
+	end
+
+	local on_bonemealing = nil
+	if i ~= 3 then
+		on_bonemealing = function(_, _, pointed_thing)
+			local pos = pointed_thing.under
+			local node = minetest.get_node(pos)
+			return mcl_farming:grow_plant("plant_sweet_berry_bush", pos, node, 1, true)
+		end
+	else
+		on_bonemealing = function(_, _, pointed_thing)
+			do_berry_drop(pointed_thing.under)
+		end
+	end
 
 	minetest.register_node(node_name, {
 		drawtype = "plantlike",
@@ -28,13 +49,13 @@ for i=0, 3 do
 		liquid_range = 0,
 		walkable = false,
 		-- Dont even create a table if no berries are dropped.
-		drop = not drop_berries and "" or {
+		drop = berries_to_drop and {
 			max_items = 1,
 			items = {
 				{ items = {"mcl_farming:sweet_berry " .. berries_to_drop[1] }, rarity = 2 },
 				{ items = {"mcl_farming:sweet_berry " .. berries_to_drop[2] } }
 			}
-		},
+		} or "",
 		selection_box = {
 			type = "fixed",
 			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, (-0.30 + (i*0.25)), 6 / 16},
@@ -45,26 +66,19 @@ for i=0, 3 do
 		sounds = mcl_sounds.node_sound_leaves_defaults(),
 		_mcl_blast_resistance = 0,
 		_mcl_hardness = 0,
-		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		_on_bone_meal = on_bonemealing,
+		on_rightclick = function(pos, _, clicker, itemstack, pointed_thing)
 			local pn = clicker:get_player_name()
 			if clicker:is_player() and minetest.is_protected(pos, pn) then
 				minetest.record_protection_violation(pos, pn)
 				return itemstack
 			end
-			if 3 ~= i and mcl_dye and
-					clicker:get_wielded_item():get_name() == "mcl_bone_meal:bone_meal" then
-				mcl_dye.apply_bone_meal({under=pos, above=vector.offset(pos,0,1,0)},clicker)
-				if not minetest.is_creative_enabled(pn) then
-					itemstack:take_item()
-				end
-				return
-			end
 
-			if drop_berries then
-				for j=1, berries_to_drop[math.random(2)] do
-					minetest.add_item(pos, "mcl_farming:sweet_berry")
-				end
-				minetest.swap_node(pos, {name = "mcl_farming:sweet_berry_bush_1"})
+			if do_berry_drop(pos) then return itemstack end
+
+			-- Use bonemeal
+			if mcl_bone_meal and clicker:get_wielded_item():get_name() == "mcl_bone_meal:bone_meal" then
+				return mcl_bone_meal.use_bone_meal(itemstack, clicker, pointed_thing)
 			end
 			return itemstack
 		end,
@@ -99,8 +113,8 @@ minetest.register_craftitem("mcl_farming:sweet_berry", {
 })
 minetest.register_alias("mcl_sweet_berry:sweet_berry", "mcl_farming:sweet_berry")
 
--- TODO: Find proper interval and chance values for sweet berry bushes. Current interval and chance values are copied from mcl_farming:beetroot which has similar growth stages.
-mcl_farming:add_plant("plant_sweet_berry_bush", "mcl_farming:sweet_berry_bush_3", {"mcl_farming:sweet_berry_bush_0", "mcl_farming:sweet_berry_bush_1", "mcl_farming:sweet_berry_bush_2"}, 68, 3)
+-- TODO: Find proper interval and chance values for sweet berry bushes. Current interval and chance values are copied from mcl_farming:beetroot which has similar growth stages, 2/3rd of the default.
+mcl_farming:add_plant("plant_sweet_berry_bush", "mcl_farming:sweet_berry_bush_3", {"mcl_farming:sweet_berry_bush_0", "mcl_farming:sweet_berry_bush_1", "mcl_farming:sweet_berry_bush_2"}, 8.7019, 35)
 
 local function berry_damage_check(obj)
 	local p = obj:get_pos()
