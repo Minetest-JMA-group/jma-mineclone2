@@ -54,7 +54,7 @@ minetest.register_tool("mcl_tools:pick_wood", {
 	_repair_material = "group:wood",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 2, level = 1, uses = 60 }
+		pickaxey = { speed = 2, level = 1, uses = 40 }
 	},
 })
 minetest.register_tool("mcl_tools:pick_stone", {
@@ -74,7 +74,7 @@ minetest.register_tool("mcl_tools:pick_stone", {
 	_repair_material = "group:cobble",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 4, level = 3, uses = 132 }
+		pickaxey = { speed = 4, level = 3, uses = 112 }
 	},
 })
 minetest.register_tool("mcl_tools:pick_iron", {
@@ -94,7 +94,7 @@ minetest.register_tool("mcl_tools:pick_iron", {
 	_repair_material = "mcl_core:iron_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 6, level = 4, uses = 251 }
+		pickaxey = { speed = 6, level = 4, uses = 180 }
 	},
 })
 minetest.register_tool("mcl_tools:pick_gold", {
@@ -114,7 +114,7 @@ minetest.register_tool("mcl_tools:pick_gold", {
 	_repair_material = "mcl_core:gold_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 12, level = 2, uses = 33 }
+		pickaxey = { speed = 12, level = 2, uses = 23 }
 	},
 })
 minetest.register_tool("mcl_tools:pick_diamond", {
@@ -134,7 +134,7 @@ minetest.register_tool("mcl_tools:pick_diamond", {
 	_repair_material = "mcl_core:diamond",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 8, level = 5, uses = 1562 }
+		pickaxey = { speed = 8, level = 5, uses = 1200 }
 	},
 	_mcl_upgradable = true,
 	_mcl_upgrade_item = "mcl_tools:pick_netherite"
@@ -157,7 +157,7 @@ minetest.register_tool("mcl_tools:pick_netherite", {
 	_repair_material = "mcl_nether:netherite_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		pickaxey = { speed = 9.5, level = 6, uses = 2031 }
+		pickaxey = { speed = 9.5, level = 6, uses = 1800 }
 	},
 })
 
@@ -281,7 +281,7 @@ minetest.register_tool("mcl_tools:shovel_wood", {
 	_repair_material = "group:wood",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 2, level = 2, uses = 60 }
+		shovely = { speed = 2, level = 2, uses = 40 }
 	},
 })
 minetest.register_tool("mcl_tools:shovel_stone", {
@@ -302,7 +302,7 @@ minetest.register_tool("mcl_tools:shovel_stone", {
 	_repair_material = "group:cobble",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 4, level = 3, uses = 132 }
+		shovely = { speed = 4, level = 3, uses = 112 }
 	},
 })
 minetest.register_tool("mcl_tools:shovel_iron", {
@@ -323,7 +323,7 @@ minetest.register_tool("mcl_tools:shovel_iron", {
 	_repair_material = "mcl_core:iron_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 6, level = 4, uses = 251 }
+		shovely = { speed = 6, level = 4, uses = 180 }
 	},
 })
 minetest.register_tool("mcl_tools:shovel_gold", {
@@ -344,7 +344,7 @@ minetest.register_tool("mcl_tools:shovel_gold", {
 	_repair_material = "mcl_core:gold_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 12, level = 2, uses = 33 }
+		shovely = { speed = 12, level = 2, uses = 23 }
 	},
 })
 minetest.register_tool("mcl_tools:shovel_diamond", {
@@ -365,7 +365,7 @@ minetest.register_tool("mcl_tools:shovel_diamond", {
 	_repair_material = "mcl_core:diamond",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 8, level = 5, uses = 1562 }
+		shovely = { speed = 8, level = 5, uses = 1200 }
 	},
 	_mcl_upgradable = true,
 	_mcl_upgrade_item = "mcl_tools:shovel_netherite"
@@ -389,7 +389,7 @@ minetest.register_tool("mcl_tools:shovel_netherite", {
 	_repair_material = "mcl_nether:netherite_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shovely = { speed = 9, level = 6, uses = 2031 }
+		shovely = { speed = 9, level = 6, uses = 1800 }
 	},
 })
 
@@ -453,7 +453,7 @@ minetest.register_tool("mcl_tools:axe_wood", {
 	_repair_material = "group:wood",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 2, level = 1, uses = 60 }
+		axey = { speed = 2, level = 1, uses = 40 }
 	},
 })
 minetest.register_tool("mcl_tools:axe_stone", {
@@ -473,7 +473,7 @@ minetest.register_tool("mcl_tools:axe_stone", {
 	_repair_material = "group:cobble",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 4, level = 3, uses = 132 }
+		axey = { speed = 4, level = 3, uses = 112 }
 	},
 })
 minetest.register_tool("mcl_tools:axe_iron", {
@@ -494,7 +494,7 @@ minetest.register_tool("mcl_tools:axe_iron", {
 	_repair_material = "mcl_core:iron_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 6, level = 4, uses = 251 }
+		axey = { speed = 6, level = 4, uses = 180 }
 	},
 })
 minetest.register_tool("mcl_tools:axe_gold", {
@@ -514,7 +514,7 @@ minetest.register_tool("mcl_tools:axe_gold", {
 	_repair_material = "mcl_core:gold_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 12, level = 2, uses = 33 }
+		axey = { speed = 12, level = 2, uses = 23 }
 	},
 })
 minetest.register_tool("mcl_tools:axe_diamond", {
@@ -534,7 +534,7 @@ minetest.register_tool("mcl_tools:axe_diamond", {
 	_repair_material = "mcl_core:diamond",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 8, level = 5, uses = 1562 }
+		axey = { speed = 8, level = 5, uses = 1200 }
 	},
 	_mcl_upgradable = true,
 	_mcl_upgrade_item = "mcl_tools:axe_netherite"
@@ -557,7 +557,7 @@ minetest.register_tool("mcl_tools:axe_netherite", {
 	_repair_material = "mcl_nether:netherite_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		axey = { speed = 9, level = 6, uses = 2031 }
+		axey = { speed = 9, level = 6, uses = 1800 }
 	},
 })
 
@@ -579,8 +579,8 @@ minetest.register_tool("mcl_tools:sword_wood", {
 	_repair_material = "group:wood",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 2, level = 1, uses = 60 },
-		swordy_cobweb = { speed = 2, level = 1, uses = 60 }
+		swordy = { speed = 2, level = 1, uses = 40 },
+		swordy_cobweb = { speed = 2, level = 1, uses = 40 }
 	},
 })
 minetest.register_tool("mcl_tools:sword_stone", {
@@ -599,8 +599,8 @@ minetest.register_tool("mcl_tools:sword_stone", {
 	_repair_material = "group:cobble",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 4, level = 3, uses = 132 },
-		swordy_cobweb = { speed = 4, level = 3, uses = 132 }
+		swordy = { speed = 4, level = 3, uses = 112 },
+		swordy_cobweb = { speed = 4, level = 3, uses = 112 }
 	},
 })
 minetest.register_tool("mcl_tools:sword_iron", {
@@ -619,8 +619,8 @@ minetest.register_tool("mcl_tools:sword_iron", {
 	_repair_material = "mcl_core:iron_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 6, level = 4, uses = 251 },
-		swordy_cobweb = { speed = 6, level = 4, uses = 251 }
+		swordy = { speed = 6, level = 4, uses = 180 },
+		swordy_cobweb = { speed = 6, level = 4, uses = 180 }
 	},
 })
 minetest.register_tool("mcl_tools:sword_gold", {
@@ -639,8 +639,8 @@ minetest.register_tool("mcl_tools:sword_gold", {
 	_repair_material = "mcl_core:gold_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 12, level = 2, uses = 33 },
-		swordy_cobweb = { speed = 12, level = 2, uses = 33 }
+		swordy = { speed = 12, level = 2, uses = 23 },
+		swordy_cobweb = { speed = 12, level = 2, uses = 23 }
 	},
 })
 minetest.register_tool("mcl_tools:sword_diamond", {
@@ -659,8 +659,8 @@ minetest.register_tool("mcl_tools:sword_diamond", {
 	_repair_material = "mcl_core:diamond",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 8, level = 5, uses = 1562 },
-		swordy_cobweb = { speed = 8, level = 5, uses = 1562 }
+		swordy = { speed = 8, level = 5, uses = 1200 },
+		swordy_cobweb = { speed = 8, level = 5, uses = 1200 }
 	},
 	_mcl_upgradable = true,
 	_mcl_upgrade_item = "mcl_tools:sword_netherite"
@@ -681,8 +681,8 @@ minetest.register_tool("mcl_tools:sword_netherite", {
 	_repair_material = "mcl_nether:netherite_ingot",
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		swordy = { speed = 8, level = 5, uses = 2031 },
-		swordy_cobweb = { speed = 8, level = 5, uses = 2031 }
+		swordy = { speed = 8, level = 5, uses = 1800 },
+		swordy_cobweb = { speed = 8, level = 5, uses = 1800 }
 	},
 })
 
@@ -703,9 +703,9 @@ minetest.register_tool("mcl_tools:shears", {
 	sound = { breaks = "default_tool_breaks" },
 	_mcl_toollike_wield = true,
 	_mcl_diggroups = {
-		shearsy = { speed = 1.5, level = 1, uses = 238 },
-		shearsy_wool = { speed = 5, level = 1, uses = 238 },
-		shearsy_cobweb = { speed = 15, level = 1, uses = 238 }
+		shearsy = { speed = 1.5, level = 1, uses = 190 },
+		shearsy_wool = { speed = 5, level = 1, uses = 190 },
+		shearsy_cobweb = { speed = 15, level = 1, uses = 190 }
 	},
 })
 
