@@ -7,7 +7,12 @@ mcl_armor = {
 		head = {
 			name = "helmet",
 			description = "Helmet",
-			durability = 0.6857,
+durabilities = {
+		head = 200,
+		torso = 500,
+		legs = 400,
+		feet = 300,
+	},
 			index = 2,
 			craft = function(m)
 				return {
