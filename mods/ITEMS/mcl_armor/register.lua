@@ -4,6 +4,12 @@ mcl_armor.register_set({
 	name = "gold",
 	description = "Golden",
 	durability = 112,
+	durabilities = {
+		head = 70,
+		torso = 100,
+ 	legs = 90,
+		feet = 85,
+	},
 	enchantability = 25,
 	points = {
 		head = 2,
@@ -21,6 +27,12 @@ mcl_armor.register_set({
 	name = "chain",
 	description = "Chain",
 	durability = 240,
+	durabilities = {
+		head = 145,
+		torso = 210,
+ 	legs = 200,
+		feet = 150,
+	},
 	enchantability = 12,
 	points = {
 		head = 2,
@@ -38,6 +50,12 @@ mcl_armor.register_set({
 	name = "iron",
 	description = "Iron",
 	durability = 240,
+	durabilities = {
+		head = 150,
+		torso = 120,
+ 	legs = 200,
+		feet = 180,
+	},
 	enchantability = 9,
 	points = {
 		head = 2,
@@ -55,6 +73,12 @@ mcl_armor.register_set({
 	name = "diamond",
 	description = "Diamond",
 	durability = 528,
+	durabilities = {
+		head = 320,
+		torso = 500,
+ 	legs = 470,
+		feet = 400,
+	},
 	enchantability = 10,
 	points = {
 		head = 3,
@@ -74,6 +98,12 @@ mcl_armor.register_set({
 	name = "netherite",
 	description = "Netherite",
 	durability = 555,
+	durabilities = {
+		head = 320,
+		torso = 500,
+ 	legs = 490,
+		feet = 3400,
+	},
 	enchantability = 10,
 	points = {
 		head = 3,
