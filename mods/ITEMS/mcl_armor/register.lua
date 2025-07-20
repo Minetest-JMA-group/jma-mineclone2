@@ -7,7 +7,7 @@ mcl_armor.register_set({
 	durabilities = {
 		head = 70,
 		torso = 100,
- 	legs = 90,
+ 		legs = 90,
 		feet = 85,
 	},
 	enchantability = 25,
@@ -30,7 +30,7 @@ mcl_armor.register_set({
 	durabilities = {
 		head = 145,
 		torso = 210,
- 	legs = 200,
+ 		legs = 200,
 		feet = 150,
 	},
 	enchantability = 12,
@@ -53,7 +53,7 @@ mcl_armor.register_set({
 	durabilities = {
 		head = 150,
 		torso = 120,
- 	legs = 200,
+ 		legs = 200,
 		feet = 180,
 	},
 	enchantability = 9,
@@ -76,7 +76,7 @@ mcl_armor.register_set({
 	durabilities = {
 		head = 320,
 		torso = 500,
- 	legs = 470,
+ 		legs = 470,
 		feet = 400,
 	},
 	enchantability = 10,
@@ -101,7 +101,7 @@ mcl_armor.register_set({
 	durabilities = {
 		head = 320,
 		torso = 500,
- 	legs = 490,
+ 		legs = 490,
 		feet = 3400,
 	},
 	enchantability = 10,
