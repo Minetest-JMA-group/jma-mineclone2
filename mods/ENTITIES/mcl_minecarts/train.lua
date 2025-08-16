@@ -130,8 +130,8 @@ end
 function mod.link_cart_ahead(staticdata, ca_staticdata)
 	minetest.log("action","Linking cart #"..staticdata.uuid.." to cart #"..ca_staticdata.uuid)
 
-	staticdata.ahead = ca_staticdata.uuid
-	ca_staticdata.behind = staticdata.uuid
+	-- staticdata.ahead = ca_staticdata.uuid
+	-- ca_staticdata.behind = staticdata.uuid
 end
 
 function mod.reverse_train(cart)
