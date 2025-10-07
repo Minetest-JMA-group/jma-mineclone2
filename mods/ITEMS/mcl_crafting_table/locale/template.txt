@@ -4,5 +4,11 @@ Inventory=
 Recipe book=
 Crafting Table=
 3×3 crafting grid=
+<<<<<<< HEAD
 A crafting table is a block which grants you access to a 3×3 crafting grid which allows you to perform advanced crafts.=
+=======
+
+A crafting table is a block which grants you access to a 3×3 crafting grid which allows you to perform advanced crafts.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Rightclick the crafting table to access the 3×3 crafting grid.=

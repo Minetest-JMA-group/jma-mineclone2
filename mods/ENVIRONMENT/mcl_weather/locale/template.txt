@@ -1,9 +1,27 @@
 # textdomain: mcl_weather
+<<<<<<< HEAD
 ##[ weather_core.lua ]##
+=======
+##[ skycolor.lua ]##
+Time of day to use when gamerule:doDaylightCycle @=@= false=
+Whether the daylight cycle and moon phases progress=
+##[ weather_core.lua ]##
+
+Whether the weather can change naturally. The /weather command can still change weather.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Gives ability to control weather=
 Changes the weather to the specified parameter.=
 Error: No weather specified.=
 Error: Invalid parameters.=
 Error: Duration can't be less than 1 second.=
 Error: Invalid weather specified. Use “clear”, “rain”, “snow” or “thunder”.=
+<<<<<<< HEAD
 Toggles between clear weather and weather with downfall (randomly rain, thunderstorm or snow)=
+=======
+
+Toggles between clear weather and weather with downfall (randomly rain, thunderstorm or snow)=
+
+##[ snow.lua ]##
+The maximum number of snow layers that can be accumulated on each block=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

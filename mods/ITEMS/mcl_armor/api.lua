@@ -1,3 +1,5 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 function mcl_armor.play_equip_sound(stack, obj, pos, unequip)
 	local def = stack:get_definition()
 	local estr = "equip"
@@ -112,7 +114,6 @@ end
 
 function mcl_armor.register_set(def)
 	local modname = minetest.get_current_modname()
-	local S = minetest.get_translator(modname)
 	local descriptions = def.descriptions or {}
 	local groups = def.groups or {}
 	local on_equip_callbacks = def.on_equip_callbacks or {}
@@ -146,7 +147,7 @@ function mcl_armor.register_set(def)
 		end
 
 		minetest.register_tool(itemstring, {
-			description = S(def.description .. " " .. (descriptions[name] or element.description)),
+			description = descriptions[name],
 			_doc_items_longdesc = mcl_armor.longdesc,
 			_doc_items_usagehelp = mcl_armor.usage,
 			inventory_image = modname .. "_inv_" .. itemname .. ".png",
@@ -183,6 +184,34 @@ function mcl_armor.register_set(def)
 			})
 		end
 	end
+end
+
+local old_get_craft = core.get_craft_result
+function core.get_craft_result(input)
+	local output, dec_input = old_get_craft(input)
+	if input.method == "cooking" and input.width == 1
+			and not output.item:is_empty() then
+		local stack = ItemStack(input.items[1])
+		local grp = stack:get_definition().groups
+		local mult = 1
+		if (grp.armor_head or 0) > 0 then
+			mult = 5
+		elseif (grp.armor_torso or 0) > 0 then
+			mult = 8
+		elseif (grp.armor_legs or 0) > 0 then
+			mult = 7
+		elseif (grp.armor_feet or 0) > 0 then
+			mult = 4
+		end
+		if mult > 1 then
+			mult = mult * 0.75
+			local dur = (65536 - stack:get_wear()) / 65536
+			local amount = math.ceil(dur * mult * output.item:get_count())
+			output.item:set_count(amount)
+		end
+		tt.reload_itemstack_description(output.item)
+	end
+	return output, dec_input
 end
 
 mcl_armor.protection_enchantments = {
@@ -333,7 +362,8 @@ tt.register_snippet(function(itemstring, toolcaps, stack)
 	-- this is fine here as this code gets only executed when you put armor and a trim in a smithing table
 	local full_overlay = meta:get_string("mcl_armor:trim_overlay")
 	local trim_name = full_overlay:match("%((.-)%_")
-	return "Upgrade:\n " .. trim_name:gsub("^%l", string.upper) .. " Armor Trim"
+	trim_name = trim_name:gsub("^%l", string.upper)
+	return S("Upgrade:") .. "\n " .. S("@1 Armor Trim", S(trim_name))
 end)
 
 function mcl_armor.is_trimmed(itemstack)

@@ -19,6 +19,7 @@ Donkey=Âne
 Mule=Mule
 ##[ llama.lua ]##
 Llama=Lama
+ - Strength @1=
 ##[ ocelot.lua ]##
 Ocelot=Ocelot
 Cat=Chat
@@ -67,8 +68,8 @@ Vindicator=Vindicateur
 Zombie Villager=Zombie Villageois
 ##[ witch.lua ]##
 Witch=Sorcière
-##[ blaze.lua ]##
-Blaze=Blaze
+##[ elementals.lua ]##
+Fire Elemental=
 ##[ ender_dragon.lua ]##
 Ender Dragon=Ender Dragon
 ##[ endermite.lua ]##
@@ -147,6 +148,7 @@ Baby Strider=
 
 ##### not used anymore #####
 
+Blaze=Blaze
 Agent=Agent
 Enderman=Enderman
 Baby Piglin=Bébé Piglin

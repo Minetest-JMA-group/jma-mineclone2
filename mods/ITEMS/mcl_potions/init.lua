@@ -31,6 +31,14 @@ dofile(modpath .. "/tipped_arrow.lua")
 dofile(modpath .. "/potions.lua")
 local potions = mcl_potions.registered_potions
 
+minetest.register_craftitem("mcl_potions:dragon_breath", {
+	description = S("Dragon's Breath"),
+	_longdesc = S("This item is used in brewing and can be combined with splash potions to create lingering potions."),
+	inventory_image = "mcl_potions_dragon_breath.png",
+	groups = { brewitem = 1, bottle = 1 },
+	stack_max = 64,
+})
+
 minetest.register_craftitem("mcl_potions:fermented_spider_eye", {
 	description = S("Fermented Spider Eye"),
 	_doc_items_longdesc = S("Try different combinations to create potions."),
@@ -255,7 +263,7 @@ minetest.register_craftitem("mcl_potions:water", {
 	_tt_help = S("No effect"),
 	_doc_items_longdesc = S("Water bottles can be used to fill cauldrons. Drinking water has no effect."),
 	_doc_items_usagehelp = S("Use the “Place” key to drink. Place this item on a cauldron to pour the water into the cauldron."),
-	stack_max = 1,
+	stack_max = 16,
 	inventory_image = potion_image("#0022FF"),
 	wield_image = potion_image("#0022FF"),
 	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1, bottle=1},
@@ -272,7 +280,7 @@ minetest.register_craftitem("mcl_potions:river_water", {
 	_doc_items_longdesc = S("River water bottles can be used to fill cauldrons. Drinking it has no effect."),
 	_doc_items_usagehelp = S("Use the “Place” key to drink. Place this item on a cauldron to pour the river water into the cauldron."),
 
-	stack_max = 1,
+	stack_max = 16,
 	inventory_image = potion_image("#0044FF"),
 	wield_image = potion_image("#0044FF"),
 	groups = {brewitem=1, food=3, can_eat_when_full=1, water_bottle=1, bottle=1},
@@ -359,7 +367,7 @@ local water_table = {
 	["mcl_potions:speckled_melon"] = "mcl_potions:mundane",
 	["mcl_core:sugar"] = "mcl_potions:mundane",
 	["mcl_mobitems:magma_cream"] = "mcl_potions:mundane",
-	["mcl_mobitems:blaze_powder"] = "mcl_potions:mundane",
+	["mcl_mobitems:flaming_powder"] = "mcl_potions:mundane",
 	["mesecons:wire_00000000_off"] = "mcl_potions:mundane",
 	["mcl_mobitems:ghast_tear"] = "mcl_potions:mundane",
 	["mcl_mobitems:spider_eye"] = "mcl_potions:mundane",
@@ -389,7 +397,7 @@ local awkward_table = {
 	["mcl_farming:carrot_item_gold"] = "mcl_potions:night_vision",
 	["mcl_core:sugar"] = "mcl_potions:swiftness",
 	["mcl_mobitems:magma_cream"] = "mcl_potions:fire_resistance",
-	["mcl_mobitems:blaze_powder"] = "mcl_potions:strength",
+	["mcl_mobitems:flaming_powder"] = "mcl_potions:strength",
 	["mcl_fishing:pufferfish_raw"] = "mcl_potions:water_breathing",
 	["mcl_mobitems:ghast_tear"] = "mcl_potions:regeneration",
 	["mcl_mobitems:spider_eye"] = "mcl_potions:poison",
@@ -557,7 +565,7 @@ function mcl_potions.register_meta_modifier(ingr, mod_func)
 end
 
 local function extend_dur(potionstack)
-	local def = potions[potionstack:get_name()]
+	local def = core.registered_items[potionstack:get_name()]
 	if not def then return false end
 	if not def.has_plus then return false end -- bail out if can't be extended
 	local potionstack = ItemStack(potionstack)
@@ -577,7 +585,7 @@ end
 mcl_potions.register_meta_modifier("mesecons:wire_00000000_off", extend_dur)
 
 local function enhance_pow(potionstack)
-	local def = potions[potionstack:get_name()]
+	local def = core.registered_items[potionstack:get_name()]
 	if not def then return false end
 	if not def.has_potent then return false end -- bail out if has no potent variant
 	local potionstack = ItemStack(potionstack)

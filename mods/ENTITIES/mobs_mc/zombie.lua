@@ -37,12 +37,13 @@ local drops_common = {
 
 local drops_zombie = table.copy(drops_common)
 table.insert(drops_zombie, {
-	-- Zombie Head
-	-- TODO: Only drop if killed by charged stalker
 	name = "mcl_heads:zombie",
 	chance = 200, -- 0.5%
 	min = 1,
 	max = 1,
+	conditions = {
+		guarantee_if_killed_by = { "mobs_mc:stalker_overloaded" }
+	}
 })
 
 local zombie = {
@@ -246,7 +247,7 @@ mcl_mobs:spawn_setup({
 	},
 	min_light = 0,
 	max_light = 7,
-	chance = 1000,
+	chance = 1500,
 	interval = 30,
 	aoc = 4,
 	min_height = mcl_vars.mg_overworld_min,
@@ -353,7 +354,7 @@ mcl_mobs:spawn_setup({
 	},
 	min_light = 0,
 	max_light = 7,
-	chance = 2400,
+	chance = 3400,
 	interval = 30,
 	aoc = 4,
 	min_height = mcl_vars.mg_overworld_min,

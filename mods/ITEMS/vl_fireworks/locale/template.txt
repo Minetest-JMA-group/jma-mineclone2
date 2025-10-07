@@ -1,7 +1,13 @@
 # textdomain: vl_fireworks
 ##[ star.lua ]##
 Firework Star=
+<<<<<<< HEAD
 A firework star is the key component of a firework rocket which is responsible for the visible explosion.=
+=======
+
+A firework star is the key component of a firework rocket which is responsible for the visible explosion.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Generic Firework Star=
 Size:=
 ##[ rockets.lua ]##

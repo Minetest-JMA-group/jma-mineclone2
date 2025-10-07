@@ -1,7 +1,5 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 
--- Taken from https://minecraft.gamepedia.com/Enchanting
-
 local function increase_damage(damage_group, factor)
 	return function(itemstack, level)
 		local tool_capabilities = itemstack:get_tool_capabilities()
@@ -9,7 +7,6 @@ local function increase_damage(damage_group, factor)
 		itemstack:get_meta():set_tool_capabilities(tool_capabilities)
 	end
 end
-
 
 mcl_enchanting.enchantments.drill = {
 	name = S("Drill"),
@@ -154,8 +151,8 @@ minetest.register_on_dignode(
 mcl_enchanting.enchantments.bane_of_arthropods = {
 	name = S("Bane of Arthropods"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {smite = true, sharpness = true},
 	weight = 5,
@@ -230,7 +227,7 @@ mcl_enchanting.enchantments.depth_strider = {
 mcl_enchanting.enchantments.efficiency = {
 	name = S("Efficiency"),
 	max_level = 5,
-	primary = {pickaxe = true, shovel = true, axe = true, hoe = true},
+	primary = {pickaxe = true, shovel = true, axe = true, hoe = true, hammer = true},
 	secondary = {shears = true},
 	disallow = {},
 	incompatible = {},
@@ -252,8 +249,8 @@ mcl_enchanting.enchantments.efficiency = {
 mcl_enchanting.enchantments.fire_aspect = {
 	name = S("Fire Aspect"),
 	max_level = 2,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {},
 	weight = 2,
@@ -399,8 +396,8 @@ mcl_enchanting.enchantments.infinity = {
 mcl_enchanting.enchantments.knockback = {
 	name = S("Knockback"),
 	max_level = 2,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, hammer = true},
+	secondary = {axe = true, spear = true},
 	disallow = {},
 	incompatible = {},
 	weight = 5,
@@ -497,8 +494,8 @@ end
 mcl_enchanting.enchantments.looting = {
 	name = S("Looting"),
 	max_level = 3,
-	primary = {sword = true},
-	secondary = {},
+	primary = {sword = true, spear = true, hammer = true},
+	secondary = {axe = true},
 	disallow = {},
 	incompatible = {},
 	weight = 2,
@@ -771,8 +768,8 @@ mcl_enchanting.enchantments.quick_charge = {
 mcl_enchanting.enchantments.sharpness = {
 	name = S("Sharpness"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, spear = true},
+	secondary = {axe = true, hammer = true},
 	disallow = {},
 	incompatible = {bane_of_arthropods = true, smite = true},
 	weight = 5,
@@ -809,8 +806,8 @@ mcl_enchanting.enchantments.silk_touch = {
 mcl_enchanting.enchantments.smite = {
 	name = S("Smite"),
 	max_level = 5,
-	primary = {sword = true},
-	secondary = {axe = true},
+	primary = {sword = true, hammer = true},
+	secondary = {axe = true, spear = true},
 	disallow = {},
 	incompatible = {bane_of_arthropods = true, sharpness = true},
 	weight = 5,
@@ -866,7 +863,7 @@ mcl_enchanting.enchantments.soul_speed = {
 mcl_enchanting.enchantments.unbreaking = {
 	name = S("Unbreaking"),
 	max_level = 3,
-	primary = {armor_head = true, armor_torso = true, armor_legs = true, armor_feet = true, pickaxe = true, shovel = true, axe = true, hoe = true, sword = true, fishing_rod = true, bow = true},
+	primary = {armor_head = true, armor_torso = true, armor_legs = true, armor_feet = true, pickaxe = true, shovel = true, axe = true, hoe = true, fishing_rod = true, weapon = true},
 	secondary = {tool = true},
 	-- Commented to allow elytra to be enchanted
 	--disallow = {non_combat_armor = true},

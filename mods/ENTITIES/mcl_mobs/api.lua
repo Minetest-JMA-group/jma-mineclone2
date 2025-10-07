@@ -129,6 +129,11 @@ function mob_class:mob_activate(staticdata, def, dtime)
 		for _, stat in pairs(tmp) do self[_] = stat end
 	end
 
+	if self._removed then
+		self.object:remove()
+		return
+	end
+
 	--If textures in definition change, reload textures
 	if not valid_texture(self, def.textures) then
 		if mobs_debug and staticdata ~= "" then
@@ -140,13 +145,13 @@ function mob_class:mob_activate(staticdata, def, dtime)
 
 		self.texture_selected = self.texture_selected or math.random(#def.textures)
 		self.base_texture = def.textures[self.texture_selected]
-		self.base_mesh = self.initial_properties.mesh
-		self.base_size = self.initial_properties.visual_size
-		self.base_colbox = self.initial_properties.collisionbox
-		self.base_selbox = self.initial_properties.selectionbox
 	end
 
-	self.base_selbox = self.base_selbox or self.initial_properties.selectionbox or self.base_colbox
+	-- Fix entity fields if missing
+	self.base_colbox = self.base_colbox or def.initial_properties.collisionbox
+	self.base_selbox = self.base_selbox or def.initial_properties.selectionbox or self.base_colbox
+	self.base_mesh = self.base_mesh or def.initial_properties.mesh
+	self.base_size = self.base_size or def.initial_properties.visual_size or self.initial_properties.visual_size
 
 	local textures = self.base_texture
 	local mesh = self.base_mesh
@@ -217,7 +222,8 @@ function mob_class:mob_activate(staticdata, def, dtime)
 	self.texture_mods = {}
 	self.object:set_texture_mod("")
 
-	self.v_start = false
+	self.force_attack = false
+	self.fuse = false
 	self.timer = 0
 	self.blinktimer = 0
 	self.blinkstatus = false

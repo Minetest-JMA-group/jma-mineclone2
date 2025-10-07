@@ -1,7 +1,17 @@
 # textdomain: mcl_fences
+<<<<<<< HEAD
 Fences are structures which block the way. Fences will connect to each other and solid blocks. They cannot be jumped over with a simple jump.=
 Openable by players and redstone power=
 Fence gates can be opened or closed and can't be jumped over. Fences will connect nicely to fence gates.=
+=======
+
+Fences are structures which block the way. Fences will connect to each other and solid blocks. They cannot be jumped over with a simple jump.=
+
+Openable by players and redstone power=
+
+Fence gates can be opened or closed and can't be jumped over. Fences will connect nicely to fence gates.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Right-click the fence gate to open or close it.=
 Oak Fence=
 Oak Fence Gate=

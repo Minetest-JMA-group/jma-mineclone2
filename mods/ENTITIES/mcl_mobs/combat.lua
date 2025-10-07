@@ -1,8 +1,8 @@
 local math, vector, minetest, mcl_mobs = math, vector, minetest, mcl_mobs
 local mob_class = mcl_mobs.mob_class
 
-local damage_enabled = minetest.settings:get_bool("enable_damage")
-local mobs_griefing = minetest.settings:get_bool("mobs_griefing") ~= false
+local damage_enabled = core.settings:get_bool("enable_damage")
+local mobs_griefing = core.settings:get_bool("mobs_griefing") ~= false
 
 -- pathfinding settings
 local stuck_timeout = 3 -- how long before mob gets stuck in place and starts searching
@@ -33,8 +33,12 @@ end
 
 -- get this mob to attack the object
 function mob_class:do_attack(object)
-	if self.state == "attack" or self.state == "die" then return end
-	if object:is_player() and not minetest.settings:get_bool("enable_damage") then return end
+	if self.state == "attack" or self.state == "die" then
+		return
+	end
+	if object:is_player() and not damage_enabled and not self.force_attack then
+		return
+	end
 
 	self.attack = object
 	self.state = "attack"
@@ -44,31 +48,6 @@ function mob_class:do_attack(object)
 		--self:mob_sound("war_cry", true)
 	--end
 end
-
--- blast damage to entities nearby
-local function entity_physics(pos, radius)
-	radius = radius * 2
-
-	local objs = minetest.get_objects_inside_radius(pos, radius)
-	local obj_pos, dist
-	for n = 1, #objs do
-		obj_pos = objs[n]:get_pos()
-
-		dist = vector_distance(pos, obj_pos)
-		if dist < 1 then dist = 1 end
-
-		local damage = floor((4 / dist) * radius)
-		local ent = objs[n]:get_luaentity()
-
-		-- punches work on entities AND players
-		objs[n]:punch(objs[n], 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = damage},
-		}, pos)
-	end
-end
-
-function mob_class:entity_physics(pos,radius) return entity_physics(pos,radius) end
 
 local los_switcher = false
 local height_switcher = false
@@ -274,7 +253,12 @@ end
 
 -- find someone to attack
 function mob_class:monster_attack()
-	if not damage_enabled or self.passive ~= false or self.state == "attack" or self:day_docile() then return end
+	if not damage_enabled and not self.force_attack then
+		return
+	end
+	if self.passive ~= false or self.state == "attack" or self:day_docile() then
+		return
+	end
 
 	local s = self.object:get_pos()
 	local p, sp, dist
@@ -421,29 +405,52 @@ function mob_class:dogswitch(dtime)
 	return self.dogshoot_switch
 end
 
--- no damage to nodes explosion
-function mob_class:safe_boom(pos, strength)
-	minetest.sound_play(self.sounds and self.sounds.explode or "tnt_explode", {
-		pos = pos,
-		gain = 1.0,
-		max_hear_distance = self.sounds and self.sounds.distance or 32
-	}, true)
-	local radius = strength
-	entity_physics(pos, radius)
-	mcl_mobs.effect(pos, 32, "mcl_particles_smoke.png", radius * 3, radius * 5, radius, 1, 0)
+--- make explosion with protection and tnt mod check
+---@param pos            {x: number, y: number, z: number}
+---@param strength       number
+---@param info_overrides table?
+---@param preserve_self  boolean? If after the explosion, the entity should continue existing
+function mob_class:boom(pos, strength, info_overrides, preserve_self)
+	local info = {
+		drop_chance     = 1.0,
+		griefing        = mobs_griefing == true,
+		grief_protected = false,
+	}
+	if info_overrides then
+		mcl_util.table_merge(info, info_overrides)
+	end
+	mcl_explosions.explode(pos, strength, info, self.object)
+
+	if not preserve_self then
+		-- delete the object after it punched the player to avoid nil entities in e.g. mcl_shields!!
+		mcl_util.remove_entity(self)
+	end
 end
 
-
--- make explosion with protection and tnt mod check
-function mob_class:boom(pos, strength, fire)
-	if mobs_griefing and not minetest.is_protected(pos, "") then
-		mcl_explosions.explode(pos, strength, { drop_chance = 1.0, fire = fire }, self.object)
-	else
-		mcl_mobs.mob_class.safe_boom(self, pos, strength) --need to call it this way bc self is the "arrow" object here
+---Returns the name of an attacker.
+local function get_attacker_name(hitter)
+	if not hitter then
+		return nil
 	end
-
-	-- delete the object after it punched the player to avoid nil entities in e.g. mcl_shields!!
-	mcl_util.remove_entity(self)
+	if hitter:is_player() then
+		return "player"
+	end
+	local e = hitter.get_luaentity and hitter:get_luaentity()
+	if e then
+		if e._source_object then
+			if e._source_object:is_player() then
+				return "player"
+			end
+			local se = e._source_object:get_luaentity()
+			if se and se.name then
+				return se.name
+			end
+		end
+		if e.name then
+			return e.name
+		end
+	end
+	return nil
 end
 
 -- deal damage and effects when mob punched
@@ -455,7 +462,7 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 
 	if is_player then
 		-- is mob out of reach?
-		if vector.distance(mob_pos, player_pos) > (weapon:get_definition().range or 3) then
+		if (vector.distance(mob_pos, player_pos) - self._avg_radius) > (weapon:get_definition().range or 3) then
 			return
 		end
 		-- is mob protected?
@@ -549,6 +556,10 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 		punch_interval = tool_capabilities.full_punch_interval or 1.4
 	end
 
+	if not tflp then
+		tflp = punch_interval
+	end
+
 	-- add weapon wear manually
 	-- Required because we have custom health handling ("health" property)
 	if minetest.is_creative_enabled("") ~= true
@@ -573,6 +584,37 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 	local die = false
 
 	if damage >= 0 then
+		local hv = hitter:get_velocity() or vector.zero()
+		if hv.y < 0 then
+			self:crit_effect()
+			minetest.sound_play("mcl_criticals_hit", {object = self.object})
+			local crit_mod
+			local CRIT_MIN = 1.5
+			local CRIT_DIFF = 1
+			if is_player then
+				local luck = mcl_luck.get_luck(hitter:get_player_name())
+				if luck ~= 0 then
+					local a, d
+					if luck > 0 then
+						d = -0.5
+						a = d - math.abs(luck)
+					elseif luck < 0 then
+						a = -0.5
+						d = a - math.abs(luck)
+					else
+						minetest.log("warning", "[mcl_mobs] luck is not a number") -- this technically can't happen, but want to catch such cases
+					end
+					if a then
+						local x = math.random()
+						crit_mod = CRIT_DIFF * (a * x) / (d - luck * x) + CRIT_MIN
+					end
+				end
+			end
+			if not crit_mod then
+				crit_mod = math.random(CRIT_MIN, CRIT_MIN + CRIT_DIFF)
+			end
+			damage = damage * crit_mod
+		end
 		-- only play hit sound and show blood effects if damage is 1 or over; lower to 0.1 to ensure armor works appropriately.
 		if damage >= 0.1 then
 			-- weapon sounds
@@ -599,51 +641,52 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 			self.invul_timestamp = time_now
 
 			-- skip future functions if dead, except alerting others
-			if self:check_for_death( "hit", {type = "punch", puncher = hitter}) then
+			local cause     = "hit"
+			local cmi_cause = { type = "punch", puncher = hitter }
+			local info      = { attacker_name = get_attacker_name(hitter) }
+			if self:check_for_death(cause, cmi_cause, info) then
 				die = true
 			end
 		end
-		-- knock back effect (only on full punch)
-		if self.knock_back and tflp >= punch_interval then
+		-- knock back effect
+		if self.knock_back then
 			-- direction error check
 			dir = dir or vector_zero()
 
 			local v = self.object:get_velocity()
 			if not v then return end
-			local r = 1.4 - min(punch_interval, 1.4)
-			local kb = r * (abs(v.x)+abs(v.z))
-			local up = 2.625
-
-			if die then kb = kb * 1.25 end
-
-			-- if already in air then dont go up anymore when hit
-			if abs(v.y) > 0.1 or self.fly then up = 0 end
-
-			-- check if tool already has specific knockback value
+			local rate = min(tflp, punch_interval) / punch_interval
+			local kb = 1.25
 			if tool_capabilities.damage_groups["knockback"] then
 				kb = tool_capabilities.damage_groups["knockback"]
-			else
-				kb = kb * 1.25
 			end
-
 			local luaentity = hitter and hitter:get_luaentity()
 			if hitter and is_player then
 				local wielditem = hitter:get_wielded_item()
-				kb = kb + 9 * mcl_enchanting.get_enchantment(wielditem, "knockback")
-				kb = kb + 9 * minetest.get_item_group(wielditem:get_name(), "hammer")
+				kb = kb + 3 * core.get_item_group(wielditem:get_name(), "hammer")
 				-- add player velocity to mob knockback
-				local hv = hitter:get_velocity()
 				local dir_dot = (hv.x * dir.x) + (hv.z * dir.z)
 				local player_mag = ((hv.x * hv.x) + (hv.z * hv.z))^0.5
 				local mob_mag = ((v.x * v.x) + (v.z * v.z))^0.5
 				if dir_dot > 0 and mob_mag <= player_mag * 0.625 then
-					kb = kb + (abs(hv.x) + abs(hv.z)) * r
+					kb = kb + player_mag / 2 -- experimentally derived constant
 				end
+				kb = kb * rate
+				kb = kb + 3 * mcl_enchanting.get_enchantment(wielditem, "knockback")
 			elseif luaentity and luaentity._knockback and die == false then
 				kb = kb + luaentity._knockback
 			elseif luaentity and luaentity._knockback and die == true then
 				kb = kb + luaentity._knockback * 0.25
 			end
+			if die then
+				kb = kb * 1.25
+				self.vl_drops_pos = mob_pos
+			end
+
+			local up = 5.25
+			-- if already in air then dont go up anymore when hit
+			if abs(v.y) > 0.1 or self.fly then up = 0 end
+
 			self._kb_turn = true
 			self:turn_by(HALFPI, .1) -- knockback turn
 			self.frame_speed_multiplier=2.3
@@ -658,7 +701,9 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 					self._kb_turn = false
 				end
 			end)
-			self.object:add_velocity(vector_new(dir.x * kb, up*2, dir.z * kb ))
+			kb = kb * 20 -- experimentally derived constant
+			self:set_velocity(0)
+			self.object:add_velocity(vector_new(dir.x * kb, up, dir.z * kb ))
 
 			self.pause_timer = 0.25
 		end
@@ -764,10 +809,41 @@ local function clear_aggro(self)
 	self.attack = nil
 	self._aggro = nil
 
-	self.v_start = false
+	self.force_attack = false
+	self.fuse = false
 	self.timer = 0
 	self.blinktimer = 0
 	self.path.way = nil
+end
+
+---Starts an explosion attack.
+---@param opts { force: boolean? }?
+function mob_class:fuse_start(opts)
+	self.fuse       = true
+	self.timer      = 0
+	self.blinktimer = 0
+	self:mob_sound("fuse", nil, false)
+	self:set_animation("fuse")
+
+	if opts and opts.force == true then
+		self.allow_fuse_reset = false
+		self.force_attack     = true
+	end
+end
+
+---Returns true if the fuse for this mob is triggered.
+---@return boolean
+function mob_class:fuse_is_triggered()
+	return self.fuse == true
+end
+
+---Resets fuse.
+function mob_class:fuse_reset()
+	self.fuse = false
+	self.timer = 0
+	self.blinktimer = 0
+	self.blinkstatus = false
+	self:remove_texture_mod("^[brighten")
 end
 
 function mob_class:do_states_attack(dtime)
@@ -812,7 +888,7 @@ function mob_class:do_states_attack(dtime)
 	local dist = vector_distance(p, s)
 
 	if self.attack_type == "explode" then
-		if target_line_of_sight then
+		if target_line_of_sight and self.allow_fuse_reset then
 			self:turn_in_direction(p.x - s.x, p.z - s.z, 1)
 		end
 
@@ -820,39 +896,33 @@ function mob_class:do_states_attack(dtime)
 		local entity_damage_radius = self.explosion_damage_radius or (node_break_radius * 2)
 
 		-- start timer when in reach and line of sight
-		if not self.v_start and dist <= self.reach and target_line_of_sight then
-			self.v_start = true
-			self.timer = 0
-			self.blinktimer = 0
-			self:mob_sound("fuse", nil, false)
-
+		if not self:fuse_is_triggered() and dist <= self.reach and target_line_of_sight then
+			self:fuse_start()
 			-- stop timer if out of reach or direct line of sight
-		elseif self.allow_fuse_reset and self.v_start
-				and (dist >= self.explosiontimer_reset_radius or not target_line_of_sight) then
-			self.v_start = false
-			self.timer = 0
-			self.blinktimer = 0
-			self.blinkstatus = false
-			self:remove_texture_mod("^[brighten")
+		elseif self:fuse_is_triggered() and self.allow_fuse_reset
+			and (dist >= self.explosiontimer_reset_radius or not target_line_of_sight)
+		then
+			self:fuse_reset()
 		end
 
 		-- walk right up to player unless the timer is active
-		if self.v_start and (self.stop_to_explode or dist < self.reach) or not target_line_of_sight then
+		if self:fuse_is_triggered() and (self.stop_to_explode or dist < self.reach) or not target_line_of_sight then
 			self:set_velocity(0)
 		else
 			self:set_velocity(self.run_velocity)
 		end
 
-		if self.animation and self.animation.run_start then
-			self:set_animation("run")
-		else
-			self:set_animation("walk")
+		if not self:fuse_is_triggered() then
+			if self.animation and self.animation.run_start then
+				self:set_animation("run")
+			else
+				self:set_animation("walk")
+			end
 		end
 
-		if self.v_start then
+		if self:fuse_is_triggered() then
 			self.timer = self.timer + dtime
 			self.blinktimer = (self.blinktimer or 0) + dtime
-			self:set_animation("fuse")
 
 			if self.blinktimer > 0.2 then
 				self.blinktimer = 0
@@ -865,22 +935,15 @@ function mob_class:do_states_attack(dtime)
 			end
 
 			if self.timer > self.explosion_timer then
-				local pos = self.object:get_pos()
-
-				if mobs_griefing and not minetest.is_protected(pos, "") then
-					mcl_explosions.explode(mcl_util.get_object_center(self.object), self.explosion_strength, { drop_chance = 1.0 }, self.object)
-				else
-					minetest.sound_play(self.sounds.explode, {
-						pos = pos,
-						gain = 1.0,
-						max_hear_distance = self.sounds.distance or 32
-					}, true)
-					self:entity_physics(pos,entity_damage_radius)
-					mcl_mobs.effect(pos, 32, "mcl_particles_smoke.png", nil, nil, node_break_radius, 1, 0)
-				end
+				local pos = mcl_util.get_object_center(self.object)
+				local info = {
+					drop_chance     = 1.0,
+					griefing        = mobs_griefing == true,
+					grief_protected = false,
+				}
+				mcl_explosions.explode(pos, self.explosion_strength, info, self.object)
 				mcl_burning.extinguish(self.object)
 				mcl_util.remove_entity(self)
-
 				return true
 			end
 		end
@@ -1038,6 +1101,11 @@ function mob_class:do_states_attack(dtime)
 			if minetest.registered_entities[self.arrow] then
 				local arrow, ent
 				local v = 1
+				local corr = vector.new(vec.x, 0, vec.z)
+				corr = corr / corr:length()
+				p = p + self.shoot_pos.x * corr
+				p.y = p.y + self.shoot_pos.y
+
 				if not self.shoot_arrow then
 					self.firing = true
 					minetest.after(1, function()

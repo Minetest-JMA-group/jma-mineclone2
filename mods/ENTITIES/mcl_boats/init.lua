@@ -133,18 +133,20 @@ end
 --
 
 local boat = {
-	physical = true,
-	pointable = true,
-	-- Warning: Do not change the position of the collisionbox top surface,
-	-- lowering it causes the boat to fall through the world if underwater
-	collisionbox = {-0.5, -0.15, -0.5, 0.5, 0.55, 0.5},
-	selectionbox = {-0.7, -0.15, -0.7, 0.7, 0.55, 0.7},
-	visual = "mesh",
-	mesh = "mcl_boats_boat.b3d",
-	textures = { "mcl_boats_texture_oak_boat.png", "blank.png" },
-	visual_size = boat_visual_size,
-	hp_max = boat_max_hp,
-	damage_texture_modifier = "^[colorize:white:0",
+	initial_properties = {
+		hp_max = boat_max_hp,
+		physical = true,
+		-- Warning: Do not change the position of the collisionbox top surface,
+		-- lowering it causes the boat to fall through the world if underwater
+		collisionbox = {-0.5, -0.15, -0.5, 0.5, 0.55, 0.5},
+		selectionbox = {-0.7, -0.15, -0.7, 0.7, 0.55, 0.7},
+		pointable = true,
+		visual = "mesh",
+		mesh = "mcl_boats_boat.b3d",
+		visual_size = boat_visual_size,
+		textures = { "mcl_boats_texture_oak_boat.png", "blank.png" },
+		damage_texture_modifier = "^[colorize:white:0",
+	},
 
 	_driver = nil, -- Attached driver (player) or nil if none
 	_passenger = nil,
@@ -445,7 +447,7 @@ cboat.collisionbox = {-0.5, -0.15, -0.5, 0.5, 0.75, 0.5}
 cboat.selectionbox = {-0.7, -0.15, -0.7, 0.7, 0.75, 0.7}
 
 minetest.register_entity("mcl_boats:chest_boat", cboat)
-mcl_entity_invs.register_inv("mcl_boats:chest_boat","Boat",27)
+mcl_entity_invs.register_inv("mcl_boats:chest_boat",S("Boat"),27)
 
 local boat_ids = { "boat", "boat_spruce", "boat_birch", "boat_jungle", "boat_acacia", "boat_dark_oak", "boat_obsidian", "boat_mangrove", "boat_cherry", "chest_boat", "chest_boat_spruce", "chest_boat_birch", "chest_boat_jungle", "chest_boat_acacia", "chest_boat_dark_oak", "chest_boat_mangrove", "chest_boat_cherry" }
 local names = { S("Oak Boat"), S("Spruce Boat"), S("Birch Boat"), S("Jungle Boat"), S("Acacia Boat"), S("Dark Oak Boat"), S("Obsidian Boat"), S("Mangrove Boat"), S("Cherry Boat"), S("Oak Chest Boat"), S("Spruce Chest Boat"), S("Birch Chest Boat"), S("Jungle Chest Boat"), S("Acacia Chest Boat"), S("Dark Oak Chest Boat"), S("Mangrove Chest Boat"), S("Cherry Chest Boat") }

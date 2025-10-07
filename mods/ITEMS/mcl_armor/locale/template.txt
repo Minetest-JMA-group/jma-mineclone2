@@ -1,4 +1,5 @@
 # textdomain: mcl_armor
+<<<<<<< HEAD
 This is a piece of equippable armor which reduces the amount of damage you receive.=
 To equip it, put it on the corresponding armor slot in your inventory menu.=
 sentry=
@@ -15,6 +16,49 @@ spire=
 silence=
 wayfinder=
 ##[ register.lua ]##
+=======
+
+This is a piece of equippable armor which reduces the amount of damage you receive.=
+
+To equip it, put it on the corresponding armor slot in your inventory menu.=
+Sentry=
+Dune=
+Coast=
+Wild=
+Tide=
+Ward=
+Vex=
+Rib=
+Snout=
+Eye=
+Spire=
+Silence=
+Wayfinder=
+##[ api.lua ]##
+Upgrade:=
+@1 Armor Trim=
+##[ register.lua ]##
+Golden Helmet=
+Golden Chestplate=
+Golden Leggings=
+Golden Boots=
+Chainmail Helmet=
+Chainmail Chestplate=
+Chainmail Leggings=
+Chainmail Boots=
+Iron Helmet=
+Iron Chestplate=
+Iron Leggings=
+Iron Boots=
+Diamond Helmet=
+Diamond Chestplate=
+Diamond Leggings=
+Diamond Boots=
+Netherite Helmet=
+Netherite Chestplate=
+Netherite Leggings=
+Netherite Boots=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Projectile Protection=
 Reduces projectile damage.=
 Blast Protection=
@@ -29,10 +73,26 @@ Aqua Affinity=
 #Translations of enchantements
 Increases underwater mining speed.=
 Curse of Binding=
+<<<<<<< HEAD
 Item cannot be removed from armor slots except due to death, breaking or in Creative Mode.=
 Thorns=
 Reflects some of the damage taken when hit, at the cost of reducing durability with each proc.=
 Elytra=
+=======
+
+Item cannot be removed from armor slots except due to death, breaking or in Creative Mode.=
+
+Thorns=
+
+Reflects some of the damage taken when hit, at the cost of reducing durability with each proc.=
+
+Elytra=
+##[ leather.lua ]##
+Leather Cap=
+Leather Tunic=
+Leather Pants=
+Leather Boots=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ trims.lua ]##
 #Translations for armor trims
 Smithing Template '@1'=

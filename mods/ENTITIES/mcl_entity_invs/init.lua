@@ -1,3 +1,5 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 mcl_entity_invs = {}
 
 local open_invs = {}
@@ -14,23 +16,41 @@ local function check_distance(inv,player,count)
 	return 0
 end
 
-local inv_callbacks = {
-	allow_take = function(inv, listname, index, stack, player)
-		return check_distance(inv,player,stack:get_count())
-	end,
-	allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
-		return check_distance(inv,player,count)
-	end,
-	allow_put = function(inv, listname, index, stack, player)
-		return check_distance(inv,player,stack:get_count())
-	end,
-}
+local function create_entity_callbacks(ent)
+	return {
+		allow_take = function(inv, listname, index, stack, player)
+			return check_distance(inv, player, stack:get_count())
+		end,
+		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+			return check_distance(inv, player, count)
+		end,
+		allow_put = function(inv, listname, index, stack, player)
+			return check_distance(inv, player, stack:get_count())
+		end,
+		on_take = function(inv, listname, index, stack, player)
+			if ent and ent.object then
+				mcl_entity_invs.save_inv(ent)
+			end
+		end,
+		on_put = function(inv, listname, index, stack, player)
+			if ent and ent.object then
+				mcl_entity_invs.save_inv(ent)
+			end
+		end,
+		on_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+			if ent and ent.object then
+				mcl_entity_invs.save_inv(ent)
+			end
+		end,
+	}
+end
 
 function mcl_entity_invs.load_inv(ent,size)
 	if not ent._inv_id then return end
 	local inv = minetest.get_inventory({type="detached", name=ent._inv_id})
 	if not inv then
-		inv =  minetest.create_detached_inventory(ent._inv_id, inv_callbacks)
+		local callbacks = create_entity_callbacks(ent)
+		inv =  minetest.create_detached_inventory(ent._inv_id, callbacks)
 		inv:set_size("main", size)
 		if ent._mcl_entity_invs_load_items then
 			local lists = ent:_mcl_entity_invs_load_items()
@@ -55,7 +75,6 @@ function mcl_entity_invs.save_inv(ent)
 		else
 			ent._items = items
 		end
-		minetest.remove_detached_inventory(ent._inv_id)
 		ent._inv = nil
 	end
 end
@@ -92,7 +111,7 @@ local function load_default_formspec (ent, text)
 			.. "list[detached:"..ent._inv_id..";main;"..spacing..",0.5;"..cols..","..rows..";]"
 			.. mcl_formspec.get_itemslot_bg(spacing,0.5,cols,rows)
 			.. "label[0,4.0;" .. minetest.formspec_escape(
-			minetest.colorize("#313131", "Inventory")) .. "]"
+			minetest.colorize("#313131", S("Inventory"))) .. "]"
 			.. "list[current_player;main;0,4.5;9,3;9]"
 			.. mcl_formspec.get_itemslot_bg(0,4.5,9,3)
 			.. "list[current_player;main;0,7.74;9,1;]"
@@ -101,7 +120,6 @@ local function load_default_formspec (ent, text)
 			.. "listring[current_player;main]"
 	return formspec
 end
-
 
 function mcl_entity_invs.show_inv_form(ent,player,text)
 	if not ent._inv_id then return end
@@ -132,6 +150,9 @@ end
 
 local function on_remove(self,killer,oldf)
 	mcl_entity_invs.save_inv(self)
+	if self._inv_id then
+		minetest.remove_detached_inventory(self._inv_id)
+	end
 	drop_inv(self)
 	if oldf then return oldf(self,killer) end
 end

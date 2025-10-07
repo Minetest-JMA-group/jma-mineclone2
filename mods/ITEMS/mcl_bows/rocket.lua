@@ -101,7 +101,8 @@ if core.get_modpath("mcl_core") and core.get_modpath("mcl_mobitems") and core.ge
 		output = "mcl_bows:rocket 1",
 		recipe = {
 			{"mcl_core:paper"},
-			{"vl_fireworks:rocket"},
+			-- THE _2 MAY HAVE TO BE REMOVED
+			{"vl_fireworks:rocket_2"},
 			{"mcl_bows:arrow"},
 		}
 	})

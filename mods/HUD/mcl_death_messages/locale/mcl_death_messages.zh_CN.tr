@@ -1,4 +1,7 @@
 # textdomain: mcl_death_messages
+
+Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.=
+
 @1 went up in flames=@1在火焰中化为灰烬
 @1 walked into fire whilst fighting @2=@1在与@2战斗时走进了火里
 @1 was struck by lightning=@1被闪电击中
@@ -53,3 +56,5 @@
 @1 was squashed by @2=@1被@2压扁了
 @1 went off with a bang=@1伴随着一声巨响消失了
 @1 went off with a bang due to a firework fired by @2 from @3=@1伴随着由@2从@3处发射的烟花的巨响消失了 
+@1 died a sweet death=
+@1 was poked to death by a sweet berry bush whilst trying to escape @2=

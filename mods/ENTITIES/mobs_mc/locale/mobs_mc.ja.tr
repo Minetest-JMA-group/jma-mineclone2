@@ -19,6 +19,7 @@ Donkey=ロバ
 Mule=ラバ
 ##[ llama.lua ]##
 Llama=ラマ
+ - Strength @1=
 ##[ ocelot.lua ]##
 Ocelot=ヤマネコ
 Cat=
@@ -67,8 +68,8 @@ Vindicator=ヴィンディケーター
 Zombie Villager=村人ゾンビ
 ##[ witch.lua ]##
 Witch=魔女
-##[ blaze.lua ]##
-Blaze=ブレイズ
+##[ elementals.lua ]##
+Fire Elemental=
 ##[ ender_dragon.lua ]##
 Ender Dragon=エンダードラゴン
 ##[ endermite.lua ]##
@@ -147,6 +148,7 @@ Baby Strider=
 
 ##### not used anymore #####
 
+Blaze=ブレイズ
 Agent=エージェント
 Creeper=クリーパー
 Enderman=エンダーマン

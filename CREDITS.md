@@ -11,6 +11,7 @@
 
 ## Previous Maintainers
 * Fleckenstein
+* kay27
 * cora
 * Nicu
 * AncientMariner
@@ -18,17 +19,16 @@
 ## Developers
 * AFCMS
 * epCode
-* SmokeyDope
+* TomCon / SmokeyDope
 * Faerraven / Michieal
 * teknomunk
-* kno10
 * AncientMariner
 
 ## Past Developers
 * jordan4ibanez
+* ryvnf
 * iliekprogrammar
 * kabou
-* kay27
 * MysticTempest
 * NO11
 * SumianVoice
@@ -38,13 +38,13 @@
 * chmodsayshello
 * MrRar
 * rudzik8
+* kno10
 
 ## Contributors
 * RandomLegoBrick
 * Code-Sploit
 * aligator
 * Rootyjr
-* ryvnf
 * bzoss
 * talamh
 * Laurent Rocher
@@ -159,6 +159,16 @@
 * grillo-delmal
 * Yoric
 * potatoalienof13
+* HalfShadow111
+* cyberonkel
+* oku
+* fancyfinn9
+* Chiragon
+* Archie
+* newrizen
+* wrrrzr
+* antimundo
+* farfind
 
 ## Music
 * Jordach for the jukebox music compilation from Big Freaking Dig
@@ -213,6 +223,7 @@
 * SumianVoice
 * thunder1035
 * Herowl
+* Chiragon
 
 ## Textures
 * XSSheep
@@ -237,6 +248,7 @@
 * NovaWostra
 * rudzik8
 * kno10
+* Chiragon
 
 ## Translations
 * Wuzzy
@@ -269,6 +281,9 @@
 * Laudrin
 * chmodsayshello
 * ninjum
+* HalfShadow111
+* newrizen
+* antimundo
 
 ## Funders
 * 40W

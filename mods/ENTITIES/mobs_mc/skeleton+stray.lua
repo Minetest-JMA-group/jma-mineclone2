@@ -75,13 +75,13 @@ local skeleton = {
 		min = 0,
 		max = 2,
 		looting = "common",},
-
-		-- Head
-		-- TODO: Only drop if killed by charged stalker
 		{name = "mcl_heads:skeleton",
 		chance = 200, -- 0.5% chance
 		min = 1,
-		max = 1,},
+		max = 1,
+		conditions = {
+			guarantee_if_killed_by = { "mobs_mc:stalker_overloaded" }
+		}},
 	},
 	animation = {
 		stand_speed = 15,
@@ -119,7 +119,13 @@ local skeleton = {
 			end
 			local dmg = math.random(2, 4)
 			local arrow = self.arrow:match("^(.+)_entity$")
-			mcl_bows.shoot_arrow(arrow, pos, dir, self.object:get_yaw(), self.object, nil, dmg)
+			local obj = mcl_bows.shoot_arrow(arrow, pos, dir, self.object:get_yaw(), self.object, nil, dmg)
+			if obj then
+				local ent = obj:get_luaentity()
+				if ent then
+					ent._plus = -2
+				end
+			end
 		end
 	end,
 	shoot_interval = 2,

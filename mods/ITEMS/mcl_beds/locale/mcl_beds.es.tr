@@ -11,7 +11,7 @@ It's too dangerous to sleep here!=¡Es muy peligroso dormir aquí!
 Leave bed=Salir de la cama
 Abort sleep=Levantarse
 Chat:=Chat:
-Send=
+Send=Enviar
 Players in bed: @1/@2=Jugadores en la cama: @1/@2
 Note: Night skip is disabled.=Nota: El salto nocturno está deshabilitado.
 You're sleeping.=Estás durmiendo.
@@ -24,12 +24,18 @@ You are missing the 'shout' privilege! It's required in order to talk in chat...
 Sorry, but you have to wait @1 seconds until you may use this button again!=¡Lo siento, pero tienes que esperar @1 segundos hasta que puedas usar este botón de nuevo!
 Hey! Would you guys mind sleeping?=¡Ey! ¿Les importaría dormir?
 ##[ api.lua ]##
-Beds allow you to sleep at night and make the time pass faster.=Las camas le permiten dormir por la noche y hacer que el tiempo pase más rápido.
-To use a bed, stand close to it and right-click the bed to sleep in it. Sleeping only works when the sun sets, at night or during a thunderstorm. The bed must also be clear of any danger.=Para usar una cama, párate cerca de ella y haz clic derecho en la cama para dormir en ella. Dormir solo funciona cuando se oculta el sol, por la noche o durante una tormenta eléctrica. La cama también debe estar libre de cualquier peligro.
+Beds allow you to sleep at night and make the time pass faster.=Las camas te permiten dormir por la noche y hacer que el tiempo pase más rápido.
+
+To use a bed, stand close to it and right-click the bed to sleep in it. Sleeping only works when the sun sets, at night or during a thunderstorm. The bed must also be clear of any danger.=Para usar una cama, acércate a ella y haz clic derecho en la cama para dormir en ella. Dormir solo funciona cuando se oculta el sol, por la noche o durante una tormenta eléctrica. La cama también debe estar libre de cualquier peligro.
+
 You have heard of other worlds in which a bed would set the start point for your next life. But this world is not one of them.=Has oído hablar de otros mundos en los que una cama establecería el punto de partida para tu próxima vida. Pero este mundo no es uno de ellos.
+
 By using a bed, you set the starting point for your next life. If you die, you will start your next life at this bed, unless it is obstructed or destroyed.=Al usar una cama, se establece como el punto de partida para tu próxima vida. Si mueres, comenzarás tu próxima vida en esta cama, a menos que esté obstruida o destruida.
+
 In this world, going to bed won't skip the night, but it will skip thunderstorms.=En este mundo, ir a la cama no se saltará la noche, pero se saltará las tormentas eléctricas.
+
 Sleeping allows you to skip the night. The night is skipped when all players in this world went to sleep. The night is skipped after sleeping for a few seconds. Thunderstorms can be skipped in the same manner.=Dormir te permite saltarte la noche. Se omite la noche cuando todos los jugadores en este mundo se fueron a dormir. La noche se salta después de dormir durante unos segundos. Las tormentas eléctricas se pueden omitir de la misma manera.
+
 Allows you to sleep=Te permite dormir
 ##[ beds.lua ]##
 Red Bed=Cama roja
@@ -55,5 +61,7 @@ Respawn Anchor=Ancla de reaparición
 
 ##### not used anymore #####
 
+
 New respawn position set! But you can only sleep at night or during a thunderstorm.=¡Nueva posición de reaparición establecida! Pero solo puedes dormir por la noche o durante tormentas eléctricas.
+
 send!=¡Enviar!

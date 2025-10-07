@@ -10,6 +10,8 @@ local explosions_mod = minetest.get_modpath("mcl_explosions")
 local spawn_mod = minetest.get_modpath("mcl_spawn")
 local pos_to_dim = minetest.get_modpath("mcl_worlds") and mcl_worlds.pos_to_dimension or function(pos) return "overworld" end
 
+local gamerule_respawnBlocksExplode = vl_tuning.setting("gamerule:respawnBlocksExplode")
+
 local function mcl_log (message)
 	mcl_util.mcl_log (message, "[Beds]")
 end
@@ -78,7 +80,7 @@ function mcl_beds.is_night(tod)
 		tod = minetest.get_timeofday()
 	end
 	tod = ( tod * 24000 ) % 24000
-	return  tod > 18541 or tod < 5458
+	return  tod > 18000 or tod < 5458
 end
 
 local function lay_down(player, pos, bed_pos, state, skip)
@@ -384,7 +386,7 @@ function mcl_beds.on_rightclick(pos, player, is_top)
 
 		minetest.remove_node(pos)
 		minetest.remove_node(string.sub(node.name, -4) == "_top" and vector.subtract(pos, dir) or vector.add(pos, dir))
-		if explosions_mod then
+		if explosions_mod and gamerule_respawnBlocksExplode.getter() then
 			mcl_explosions.explode(pos, 5, {drop_chance = 1.0, fire = true})
 		end
 		return
@@ -499,6 +501,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "mcl_beds_form" then
 		return
 	end
+
 	local custom_sleep_message
 	if fields.chatsubmit and fields.chatmessage ~= "" then
 		custom_sleep_message = fields.chatmessage

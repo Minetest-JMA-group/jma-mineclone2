@@ -1,5 +1,10 @@
 # textdomain:awards
 ##[ api.lua ]##
+<<<<<<< HEAD
+=======
+Amount of time award notification are displayed=
+Whether advancements should be announced in chat=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 @1 has made the advancement @2=
 Secret Advancement Made:=
 Goal Completed:=

@@ -4,4 +4,10 @@ Inventory=
 Zooming a map may take several seconds to generate the world, please wait.=
 The zoomed map is now ready.=
 Used to copy, lock, and zoom maps=
+<<<<<<< HEAD
 A cartography tables allows to copy, lock, and zoom maps. Locking is not yet useful, and the maximum zoom level may be restricted by server settings to limit the performance impact.=
+=======
+
+A cartography tables allows to copy, lock, and zoom maps. Locking is not yet useful, and the maximum zoom level may be restricted by server settings to limit the performance impact.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
