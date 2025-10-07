@@ -1,26 +1,43 @@
 # textdomain: mcl_potions
+Dragon's Breath=龙息
+
+This item is used in brewing and can be combined with splash potions to create lingering potions.=此物品用于酿造，可与喷溅型药水结合来制作滞留型药水。
+
 Fermented Spider Eye=发酵蛛眼
 Try different combinations to create potions.=尝试不同组合来酿造药水。
 Glass Bottle=玻璃瓶
 Liquid container=液体容器
+
 A glass bottle is used as a container for liquids and can be used to collect water directly.=玻璃瓶用作液体容器，可直接用于收集水。
+
 To collect water, use it on a cauldron with water (which removes a level of water) or any water source (which removes no water).=要收集水，可用于有水的炼药锅（这会消耗一格水）或任何水源（不会消耗水）上。
+
 Water Bottle=水瓶
 No effect=无效果
 Water bottles can be used to fill cauldrons. Drinking water has no effect.=水瓶可用于填充炼药锅。饮用水瓶里的水没有效果。
+
 Use the “Place” key to drink. Place this item on a cauldron to pour the water into the cauldron.=使用“放置”键来饮用。将此物品放置在炼药锅上可将水倒入炼药锅中。
+
 River Water Bottle=河水瓶
 River water bottles can be used to fill cauldrons. Drinking it has no effect.=河水瓶可用于填充炼药锅。饮用河水瓶里的水没有效果。
+
 Use the “Place” key to drink. Place this item on a cauldron to pour the river water into the cauldron.=使用“放置”键来饮用。将此物品放置在炼药锅上可将河水倒入炼药锅中。
+
 Splash Water Bottle=喷溅水瓶
 Extinguishes fire and hurts some mobs=可扑灭火灾并对某些生物造成伤害
+
 A throwable water bottle that will shatter on impact, where it extinguishes nearby fire and hurts mobs that are vulnerable to water.=一种可投掷的水瓶，撞击后会破碎，能扑灭附近的火并对怕水的生物造成伤害。
+
 Lingering Water Bottle=滞留水瓶
+
 A throwable water bottle that will shatter on impact, where it creates a cloud of water vapor that lingers on the ground for a while. This cloud extinguishes fire and hurts mobs that are vulnerable to water.=一种可投掷的水瓶，撞击后会破碎，产生一团水蒸气云雾，云雾会在地面停留一段时间。这团云雾能扑灭火灾并对怕水的生物造成伤害。
+
 Glistering Melon=闪烁的西瓜
+
 This shiny melon is full of tiny gold nuggets and would be nice in an item frame. It isn't edible and not useful for anything else.=这个闪闪发光的西瓜里面满是小金粒，放在物品展示框里会很不错。它不可食用，也没别的用处。 
+
 ##[ functions.lua ]##
-Invisiblity=
+Invisibility=隐身
 body is invisible=身体不可见
 Poison=中毒
 -1 HP / @1 s=每@1秒损失1点生命值
@@ -69,6 +86,7 @@ Withering=凋零
 -1 HP / @1 s, can kill=每秒损失1点生命值，可能致死
 Frost=冰冻
 -1 HP / 1 s, can kill, -@1% running speed=每秒损失1点生命值，可能致死，奔跑速度减少@1%
+Blindness=失明
 impaired sight=视力受损
 Nausea=恶心
 not feeling very well...=感觉不太舒服...
@@ -84,10 +102,14 @@ Fatigue=疲劳
 Conduit Power=潮涌能量
 +@1% mining and attack speed in water=在水中挖掘和攻击速度增加@1%
 ##[ commands.lua ]##
-<effect>|heal|list|clear|remove <duration|heal-amount|effect>|INF [<level>] [<factor>] [NOPART]=
-Add a status effect to yourself. Arguments: <effect>: name of status effect. Passing "list" as effect name lists available effects. Passing "heal" as effect name heals (or harms) by amount designed by the next parameter. Passing "clear" as effect name removes all effects. Passing "remove" as effect name removes the effect named by the next parameter. <duration>: duration in seconds. Passing "INF" as duration makes the effect infinite. (<heal-amount>: amount of healing when the effect is "heal", passing a negative value subtracts health. <effect>: name of a status effect to be removed when using "remove" as the previous parameter.) <level>: effect power determinant, bigger level results in more powerful effect for effects that depend on the level (no changes for other effects), defaults to 1, pass F to use low-level factor instead. <factor>: effect strength modifier, can mean different things depending on the effect, no changes for effects that do not depend on level/factor. NOPART at the end means no particles will be shown for this effect.=给自己添加一个状态效果。参数说明：<效果>：状态效果的名称。将“列表”作为效果名称可列出可用的效果。将“治疗”作为效果名称可按照下一个参数设定的数值进行治疗（或造成伤害）。将“清除”作为效果名称可移除所有效果。将“移除”作为效果名称可移除下一个参数所指定的效果。<持续时间>：以秒为单位的持续时间。将“无限”作为持续时间可使效果变为无限持续。（<治疗量>：当效果为“治疗”时的治疗量，输入负值则会扣除生命值。<效果>：当使用“移除”作为前一个参数时要移除的状态效果名称。）<等级>：效果强度决定因素，对于依赖等级的效果，等级越高效果越强（其他效果不受影响），默认值为1，输入F则使用低级系数。<系数>：效果强度修正值，根据不同效果有不同含义，对于不依赖等级/系数的效果无变化。末尾的“无粒子效果”表示此效果不会显示粒子效果。
+
+<effect>|heal|list|clear|remove <duration|heal-amount|effect>|INF [<level>] [<factor>] [NOPART] [<player>]=
+
+Add a status effect to yourself or another player. Arguments: <effect>: name of status effect. Passing "list" as effect name lists available effects. Passing "heal" as effect name heals (or harms) by amount designed by the next parameter. Passing "clear" as effect name removes all effects. Passing "remove" as effect name removes the effect named by the next parameter. <duration>: duration in seconds. Passing "INF" as duration makes the effect infinite. (<heal-amount>: amount of healing when the effect is "heal", passing a negative value subtracts health. <effect>: name of a status effect to be removed when using "remove" as the previous parameter.) <level>: effect power determinant, bigger level results in more powerful effect for effects that depend on the level (no changes for other effects), defaults to 1, pass F to use low-level factor instead. <factor>: effect strength modifier, can mean different things depending on the effect, no changes for effects that do not depend on level/factor. NOPART by the end means no particles will be shown for this effect. Appending a player name to any command will make it try to conduct the operation on that player rather than the command user. If the name doesn't exist, nothing happens.=
+
 Missing effect parameter!=缺少效果参数！
 Missing or invalid heal amount parameter!=缺少或无效的治疗量参数！
+Target player @1 not found!=
 Player @1 healed by @2 HP.=玩家@1回复了@2点生命值。
 Player @1 harmed by @2 HP.=玩家@1损失了@2点生命值。
 Effects cleared for player @1=玩家@1的所有效果已被清除。
@@ -102,11 +124,17 @@ Giving effect @1 to player @2 failed.=向玩家@2赋予@1效果失败。
 @1 effect on level @2 given to player @3 for @4 seconds.=将等级为@2的@1效果赋予玩家@3，持续@4秒。
 ##[ splash.lua ]##
 Use the “Punch” key to throw it.=使用“攻击”键来投掷它。
+
 A throwable potion that will shatter on impact, where it gives all nearby players and mobs a status effect or a set of status effects.=一种可投掷的药水，撞击后会破碎，使附近所有玩家和生物获得一种或一组状态效果。
+
 ##[ lingering.lua ]##
+
 A throwable potion that will shatter on impact, where it creates a magic cloud that lingers around for a while. Any player or mob inside the cloud will receive the potion's effect or set of effects, possibly repeatedly.=一种可投掷的药水，撞击后会破碎，产生一团魔法云雾，云雾会停留一段时间。处于云雾内的任何玩家或生物都可能反复获得药水的效果或一组效果。
+
 ##[ tipped_arrow.lua ]##
+
 This particular arrow is tipped and will give an effect when it hits a player or mob.=这种特制的箭带有药箭效果，射中玩家或生物时会施加一种效果。
+
 ##[ potions.lua ]##
 Use the “Place” key to drink it.=使用“放置”键来饮用它。
 Drinking a potion gives you a particular effect or set of effects.=饮用药水会赋予你一种或一组特定效果。
@@ -114,16 +142,20 @@ Drinking a potion gives you a particular effect or set of effects.=饮用药水�
 @1 Potion= @1药水
 Potion @1=药水 @1
 Strange Potion=奇怪的药水
-Splash @1=喷溅型 @1
-Lingering @1=滞留型 @1
+Splash @1 Potion @2=
+Splash @1 Potion=
+Splash Potion @1=
+Splash Strange Potion=
+Lingering @1 Potion @2=
+Lingering @1 Potion=
+Lingering Potion @1=
+Lingering Strange Potion=
 @1 Arrow @2= @1箭 @2
 @1 Arrow= @1箭
 Arrow @1=箭 @1
 Strange Tipped Arrow=奇怪的药箭
 Mighty=强效
 of Trolling=恶搞（此处按字面意思结合游戏语境推测，具体可能有特定指代）
-Dragon's Breath=龙息
-This item is used in brewing and can be combined with splash potions to create lingering potions.=此物品用于酿造，可与喷溅型药水结合来制作滞留型药水。
 Awkward=粗制
 Has an awkward taste and is used for brewing potions.=味道怪异，用于酿造药水。
 Mundane=平凡
@@ -145,7 +177,9 @@ Decreases walking speed.=降低行走速度。
 of Leaping=跳跃提升
 Increases jump strength.=增加跳跃力量。
 of Withering=凋零
+
 Applies the withering effect which deals damage at a regular interval and can kill.=施加凋零效果，会定期造成伤害并可能致死。
+
 of Poison=中毒
 Applies the poison effect which deals damage at a regular interval.=施加中毒效果，会定期造成伤害。
 of Regeneration=再生
@@ -203,5 +237,8 @@ Unknown Tipped Arrow=未知药箭
 
 ##### not used anymore #####
 
-Invisibility=隐身
-Blindness=失明
+
+Add a status effect to yourself. Arguments: <effect>: name of status effect. Passing "list" as effect name lists available effects. Passing "heal" as effect name heals (or harms) by amount designed by the next parameter. Passing "clear" as effect name removes all effects. Passing "remove" as effect name removes the effect named by the next parameter. <duration>: duration in seconds. Passing "INF" as duration makes the effect infinite. (<heal-amount>: amount of healing when the effect is "heal", passing a negative value subtracts health. <effect>: name of a status effect to be removed when using "remove" as the previous parameter.) <level>: effect power determinant, bigger level results in more powerful effect for effects that depend on the level (no changes for other effects), defaults to 1, pass F to use low-level factor instead. <factor>: effect strength modifier, can mean different things depending on the effect, no changes for effects that do not depend on level/factor. NOPART at the end means no particles will be shown for this effect.=给自己添加一个状态效果。参数说明：<效果>：状态效果的名称。将“列表”作为效果名称可列出可用的效果。将“治疗”作为效果名称可按照下一个参数设定的数值进行治疗（或造成伤害）。将“清除”作为效果名称可移除所有效果。将“移除”作为效果名称可移除下一个参数所指定的效果。<持续时间>：以秒为单位的持续时间。将“无限”作为持续时间可使效果变为无限持续。（<治疗量>：当效果为“治疗”时的治疗量，输入负值则会扣除生命值。<效果>：当使用“移除”作为前一个参数时要移除的状态效果名称。）<等级>：效果强度决定因素，对于依赖等级的效果，等级越高效果越强（其他效果不受影响），默认值为1，输入F则使用低级系数。<系数>：效果强度修正值，根据不同效果有不同含义，对于不依赖等级/系数的效果无变化。末尾的“无粒子效果”表示此效果不会显示粒子效果。
+
+Splash @1=喷溅型 @1
+Lingering @1=滞留型 @1

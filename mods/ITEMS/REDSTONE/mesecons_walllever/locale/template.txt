@@ -1,5 +1,11 @@
 # textdomain: mesecons_walllever
 Lever=
 Provides redstone power while it's turned on=
+<<<<<<< HEAD
 A lever is a redstone component which can be flipped on and off. It supplies redstone power to adjacent blocks while it is in the “on” state.=
+=======
+
+A lever is a redstone component which can be flipped on and off. It supplies redstone power to adjacent blocks while it is in the “on” state.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Use the lever to flip it on or off.=

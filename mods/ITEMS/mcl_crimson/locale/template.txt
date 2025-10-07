@@ -19,6 +19,10 @@ The stripped hyphae bark of a warped fungus=
 Warped Hyphae Wood=
 Warped Stairs=
 Warped Slab=
+<<<<<<< HEAD
+=======
+Double Warped Slab=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Crimson Fungus=
 Crimson fungus is a mushroom found in the nether's crimson forest.=
 Crimson Roots=
@@ -33,11 +37,25 @@ Crimson Hyphae Wood=
 Crimson Nylium=
 Crimson Stairs=
 Crimson Slab=
+<<<<<<< HEAD
 Crimson Door=
 Wooden doors are 2-block high barriers which can be opened or closed by hand and by a redstone signal.=
 To open or close a wooden door, rightclick it or supply its lower half with a redstone signal.=
 Crimson Trapdoor=
 Wooden trapdoors are horizontal barriers which can be opened and closed by hand or a redstone signal. They occupy the upper or lower part of a block, depending on how they have been placed. When open, they can be climbed like a ladder.=
+=======
+Double Crimson Slab=
+Crimson Door=
+
+Wooden doors are 2-block high barriers which can be opened or closed by hand and by a redstone signal.=
+
+To open or close a wooden door, rightclick it or supply its lower half with a redstone signal.=
+
+Crimson Trapdoor=
+
+Wooden trapdoors are horizontal barriers which can be opened and closed by hand or a redstone signal. They occupy the upper or lower part of a block, depending on how they have been placed. When open, they can be climbed like a ladder.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 To open or close the trapdoor, rightclick it or send a redstone signal to it.=
 Crimson Fence=
 Crimson Fence Gate=

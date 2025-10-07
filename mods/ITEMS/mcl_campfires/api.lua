@@ -5,10 +5,10 @@ local COOK_TIME = 30 -- Time it takes to cook food on a campfire.
 
 local food_entity = {nil, nil, nil, nil}
 local campfire_spots = {
-	vector.new(-0.25, -0.04, -0.25),
-	vector.new( 0.25, -0.04, -0.25),
-	vector.new( 0.25, -0.04,  0.25),
-	vector.new(-0.25, -0.04,  0.25),
+	vector.new(-0.25, -0.03125, -0.25),
+	vector.new( 0.25, -0.03125, -0.25),
+	vector.new( 0.25, -0.03125,  0.25),
+	vector.new(-0.25, -0.03125,  0.25),
 }
 
 local drop_inventory = mcl_util.drop_items_from_meta_container("main")
@@ -87,11 +87,11 @@ function mcl_campfires.take_item(pos, node, player, itemstack)
 					campfire_meta:set_string("food_x_"..tostring(space), tostring(food_entity[space]:get_pos().x))
 					campfire_meta:set_string("food_y_"..tostring(space), tostring(food_entity[space]:get_pos().y))
 					campfire_meta:set_string("food_z_"..tostring(space), tostring(food_entity[space]:get_pos().z))
+					timer:start(1) -- Start cook timer
 					break
 				end
 			end
 		end
-		timer:start(1) -- Start cook timer
 	end
 end
 

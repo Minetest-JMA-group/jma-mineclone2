@@ -9,11 +9,6 @@ local math = math
 local WATER_VISC = 1
 local LAVA_VISC = 7
 local LIGHT_LAVA = minetest.LIGHT_MAX
-local USE_TEXTURE_ALPHA = true
-
-if minetest.features.use_texture_alpha_string_modes then
-	USE_TEXTURE_ALPHA = "blend"
-end
 
 minetest.register_node("mcl_core:water_flowing", {
 	description = S("Flowing Water"),
@@ -23,12 +18,12 @@ minetest.register_node("mcl_core:water_flowing", {
 	tiles = {"mcl_core_water_flow_animation.png^[verticalframe:64:0"},
 	special_tiles = {
 		{
-			image="mcl_core_water_flow_animation.png",
+			name="mcl_core_water_flow_animation.png",
 			backface_culling=false,
 			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.5}
 		},
 		{
-			image="mcl_core_water_flow_animation.png",
+			name="mcl_core_water_flow_animation.png",
 			backface_culling=false,
 			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=1.5}
 		},
@@ -36,7 +31,7 @@ minetest.register_node("mcl_core:water_flowing", {
 	color = "#3F76E4",
 	sounds = mcl_sounds.node_sound_water_defaults(),
 	is_ground_content = false,
-	use_texture_alpha = USE_TEXTURE_ALPHA,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -84,7 +79,7 @@ S("• When water is directly below lava, the water turns into stone."),
 	color = "#3F76E4",
 	sounds = mcl_sounds.node_sound_water_defaults(),
 	is_ground_content = false,
-	use_texture_alpha = USE_TEXTURE_ALPHA,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "color",
 	palette = "mcl_core_palette_water.png",
@@ -125,12 +120,12 @@ minetest.register_node("mcl_core:lava_flowing", {
 	tiles = {"mcl_core_lava_flow_animation.png^[verticalframe:64:0"},
 	special_tiles = {
 		{
-			image="mcl_core_lava_flow_animation.png",
+			name="mcl_core_lava_flow_animation.png",
 			backface_culling=false,
 			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=6.6}
 		},
 		{
-			image="mcl_core_lava_flow_animation.png",
+			name="mcl_core_lava_flow_animation.png",
 			backface_culling=false,
 			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=6.6}
 		},
@@ -173,7 +168,7 @@ end
 
 minetest.register_node("mcl_core:lava_source", {
 	description = S("Lava Source"),
-	_doc_items_entry_name = "Lava",
+	_doc_items_entry_name = S("Lava"),
 	_doc_items_longdesc =
 S("Lava is hot and rather dangerous. Don't touch it, it will hurt you a lot and it is hard to get out.").."\n"..
 fire_text.."\n\n"..

@@ -19,6 +19,7 @@ Donkey=驴
 Mule=骡
 ##[ llama.lua ]##
 Llama=羊驼
+ - Strength @1=
 ##[ ocelot.lua ]##
 Ocelot=豹猫
 Cat=猫
@@ -67,8 +68,8 @@ Vindicator=卫道士
 Zombie Villager=僵尸村民
 ##[ witch.lua ]##
 Witch=女巫
-##[ blaze.lua ]##
-Blaze=烈焰人
+##[ elementals.lua ]##
+Fire Elemental=
 ##[ ender_dragon.lua ]##
 Ender Dragon=末影龙
 ##[ endermite.lua ]##
@@ -97,7 +98,7 @@ Stray=流浪者
 ##[ skeleton_wither.lua ]##
 Wither Skeleton=凋零骷髅
 ##[ stalker.lua ]##
-Stalker=潜影贝
+Stalker=潜行者
 Overloaded Stalker=过载潜行者
 ##[ zombie.lua ]##
 Zombie=僵尸
@@ -147,6 +148,7 @@ Baby Strider=
 
 ##### not used anymore #####
 
+Blaze=烈焰人
 Agent=智能体
 Enderman=末影人
 Baby Piglin=小猪灵

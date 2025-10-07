@@ -175,24 +175,26 @@ minetest.register_node("mcl_crimson:twisting_vines", {
 		return itemstack
 	end,
 	on_place = function(itemstack, placer, pointed_thing)
-		local under = pointed_thing.under
-		local unode = minetest.get_node(under)
-		local unode_def = minetest.registered_nodes[unode.name]
+		-- Handle node right-click handlers
+		local called
+		itemstack, called = mcl_util.handle_node_rightclick(itemstack, placer, pointed_thing)
+		if called then return itemstack end
 
+		-- Only place on top of nodes
 		local above = pointed_thing.above
+		if pointed_thing.under.y >= above.y then return end
+
+		-- Don't replace unknown nodes or nodes that are not buildable to
 		local anode = minetest.get_node(above)
 		local anode_def = minetest.registered_nodes[anode.name]
+		if not anode_def or not anode_def.buildable_to then return end
 
-		if under.y < above.y then
-			minetest.set_node(above, {name = "mcl_crimson:twisting_vines"})
-			if not minetest.is_creative_enabled(placer:get_player_name()) then
-				itemstack:take_item()
-			end
-		elseif unode_def and unode_def.on_rightclick then
-			return unode_def.on_rightclick(under, unode, placer, itemstack, pointed_thing)
-		elseif anode_def and anode_def.on_rightclick then
-			return unode_def.on_rightclick(above, anode, placer, itemstack, pointed_thing)
-		end
+		-- Place the vine
+		core.set_node(above, {name = itemstack:get_name()})
+
+		-- Take one item if not in creative mode
+		if core.is_creative_enabled(placer:get_player_name()) then return end
+		itemstack:take_item()
 		return itemstack
 	end,
 	on_dig = function(pos, node, digger)
@@ -223,6 +225,16 @@ minetest.register_node("mcl_crimson:twisting_vines", {
 		"mcl_crimson:twisting_vines",
 	},
 	_mcl_blast_resistance = 0,
+})
+
+core.register_abm({
+	label = "Twisting vines growth",
+	nodenames = "mcl_crimson:twisting_vines",
+	interval = 31,
+	chance = 11,
+	action = function(pos)
+		grow_vines(pos, 1, "mcl_crimson:twisting_vines")
+	end,
 })
 
 minetest.register_node("mcl_crimson:weeping_vines", {
@@ -270,24 +282,26 @@ minetest.register_node("mcl_crimson:weeping_vines", {
 		return itemstack
 	end,
 	on_place = function(itemstack, placer, pointed_thing)
-		local under = pointed_thing.under
-		local unode = minetest.get_node(under)
-		local unode_def = minetest.registered_nodes[unode.name]
+		-- Handle node right-click handlers
+		local called
+		itemstack, called = mcl_util.handle_node_rightclick(itemstack, placer, pointed_thing)
+		if called then return itemstack end
 
+		-- Only place under nodes
 		local above = pointed_thing.above
+		if pointed_thing.under.y <= above.y then return end
+
+		-- Don't replace unknown nodes or nodes that are not buildable to
 		local anode = minetest.get_node(above)
 		local anode_def = minetest.registered_nodes[anode.name]
+		if not anode_def or not anode_def.buildable_to then return end
 
-		if under.y > above.y then
-			minetest.set_node(above, {name = "mcl_crimson:weeping_vines"})
-			if not minetest.is_creative_enabled(placer:get_player_name()) then
-				itemstack:take_item()
-			end
-		elseif unode_def and unode_def.on_rightclick then
-			return unode_def.on_rightclick(under, unode, placer, itemstack, pointed_thing)
-		elseif anode_def and anode_def.on_rightclick then
-			return unode_def.on_rightclick(above, anode, placer, itemstack, pointed_thing)
-		end
+		-- Place the vine
+		core.set_node(above, {name = itemstack:get_name()})
+
+		-- Take one item if not in creative mode
+		if core.is_creative_enabled(placer:get_player_name()) then return end
+		itemstack:take_item()
 		return itemstack
 	end,
 	on_dig = function(pos, node, digger)
@@ -317,6 +331,16 @@ minetest.register_node("mcl_crimson:weeping_vines", {
 		"mcl_crimson:weeping_vines",
 	},
 	_mcl_blast_resistance = 0,
+})
+
+core.register_abm({
+	label = "Weeping vines growth",
+	nodenames = "mcl_crimson:weeping_vines",
+	interval = 31,
+	chance = 11,
+	action = function(pos)
+		grow_vines(pos, 1, "mcl_crimson:weeping_vines", -1)
+	end,
 })
 
 minetest.register_node("mcl_crimson:nether_sprouts", {
@@ -513,7 +537,7 @@ minetest.register_node("mcl_crimson:warped_hyphae_wood", {
 })
 
 mcl_stairs.register_stair("warped_hyphae_wood", "mcl_crimson:warped_hyphae_wood", wood_stair_groups, false, S("Warped Stairs"))
-mcl_stairs.register_slab("warped_hyphae_wood", "mcl_crimson:warped_hyphae_wood", wood_slab_groups, false, S("Warped Slab"))
+mcl_stairs.register_slab("warped_hyphae_wood", "mcl_crimson:warped_hyphae_wood", wood_slab_groups, false, S("Warped Slab"), nil, nil, nil, S("Double Warped Slab"))
 
 minetest.register_craft({
 	output = "mcl_crimson:warped_hyphae_wood 4",
@@ -776,7 +800,7 @@ minetest.register_craft({
 })
 
 mcl_stairs.register_stair("crimson_hyphae_wood", "mcl_crimson:crimson_hyphae_wood", wood_stair_groups, false, S("Crimson Stairs"))
-mcl_stairs.register_slab("crimson_hyphae_wood", "mcl_crimson:crimson_hyphae_wood", wood_slab_groups, false, S("Crimson Slab"))
+mcl_stairs.register_slab("crimson_hyphae_wood", "mcl_crimson:crimson_hyphae_wood", wood_slab_groups, false, S("Crimson Slab"), nil, nil, nil, S("Double Crimson Slab"))
 
 core.override_item("mcl_nether:netherrack", {
 	_on_bone_meal = function(itemstack, placer, pointed_thing)

@@ -143,7 +143,7 @@ function mcl_util.move_item(source_inventory, source_list, source_stack_id, dest
 	stack:take_item()
 	source_inventory:set_stack(source_list, source_stack_id, stack)
 	destination_inventory:add_item(destination_list, new_stack)
-	return true
+	return true, new_stack
 end
 
 --- Try pushing item from hopper inventory to destination inventory
@@ -174,9 +174,9 @@ function mcl_util.hopper_push(pos, dst_pos)
 	if not stack_id then return false end
 
 	-- Move the item
-	local ok = mcl_util.move_item(hop_inv, hop_list, stack_id, dst_inv, dst_list)
-	if dst_def._mcl_hoppers_on_after_push then
-		dst_def._mcl_hoppers_on_after_push(dst_pos)
+	local ok, stack = mcl_util.move_item(hop_inv, hop_list, stack_id, dst_inv, dst_list)
+	if ok and dst_def._mcl_hoppers_on_after_push then
+		dst_def._mcl_hoppers_on_after_push(dst_pos, dst_list, stack)
 	end
 
 	return ok
@@ -339,29 +339,47 @@ function mcl_util.use_item_durability(itemstack, n)
 	tt.reload_itemstack_description(itemstack) -- update tooltip
 end
 
+local function find_attacker_name(mcl_reason)
+	if not mcl_reason then
+		return nil
+	end
+	local e = mcl_reason.direct and mcl_reason.direct:get_luaentity()
+	if e and e.name then
+		return e.name
+	end
+	e = mcl_reason.source and mcl_reason.source:get_luaentity()
+	if e and e.name then
+		return e.name
+	end
+	return nil
+end
+
+---
+--- @param target core.ObjectRef
+--- @param damage number
+--- @param mcl_reason {type: string, direct: any?, source: any?}?
 function mcl_util.deal_damage(target, damage, mcl_reason)
 	local luaentity = target:get_luaentity()
+	local hp        = target:get_hp()
 
 	if luaentity then
 		if luaentity.deal_damage then
 			luaentity:deal_damage(damage, mcl_reason or {type = "generic"})
 			return
 		elseif luaentity.is_mob then
-			-- local puncher = mcl_reason and mcl_reason.direct or target
-			-- target:punch(puncher, 1.0, {full_punch_interval = 1.0, damage_groups = {fleshy = damage}}, vector.direction(puncher:get_pos(), target:get_pos()), damage)
-			if luaentity.health > 0 then
-				luaentity.health = luaentity.health - damage
-			end
+			local reason        = (mcl_reason and mcl_reason.type) or "generic"
+			local attacker_name = find_attacker_name(mcl_reason)
+			luaentity:damage_mob(reason, damage, { attacker_name = attacker_name })
 			return
 		end
-	elseif not target:is_player() then return end
+	elseif not target:is_player() then
+		return
+	end
 
 	local is_immortal = target:get_armor_groups().immortal or 0
 	if is_immortal>0 then
 		return
 	end
-
-	local hp = target:get_hp()
 
 	if hp > 0 then
 		target:set_hp(hp - damage, {_mcl_reason = mcl_reason})
@@ -823,4 +841,9 @@ function mcl_util.metadata_last_act(meta, name, delay)
 	meta:set_float(name, now)
 	return true
 end
+
+-- Functions for comparing versions. These better fit mcl_util, but are used early
+mcl_util.parse_version = mcl_vars.parse_version
+mcl_util.minimum_version = mcl_vars.minimum_version
+mcl_util.format_version = mcl_vars.format_version
 

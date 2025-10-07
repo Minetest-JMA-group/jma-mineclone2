@@ -148,7 +148,7 @@ local function drink_milk_delayed(itemstack, player, pointed_thing)
 
 	local function drink_milk(itemstack, player, pointed_thing)
 		-- Check if we were allowed to drink this (eat delay check)
-		if mcl_hunger.active and (
+		if mcl_hunger.get_active() and (
 			player:get_inventory():get_stack("main", player:get_wield_index(), itemstack) == "mcl_mobitems:milk_bucket" or
 			minetest.is_creative_enabled(player:get_player_name())
 		) then
@@ -272,23 +272,25 @@ minetest.register_craftitem("mcl_mobitems:earthen_ash",{
 	stack_max = 64,
 })
 
-minetest.register_craftitem("mcl_mobitems:blaze_rod", {
-	description = S("Blaze Rod"),
-	_doc_items_longdesc = S("This is a crafting component dropped from dead blazes."),
-	wield_image = "mcl_mobitems_blaze_rod.png",
-	inventory_image = "mcl_mobitems_blaze_rod.png",
+minetest.register_craftitem("mcl_mobitems:flaming_rod", {
+	description = S("Flaming Rod"),
+	_doc_items_longdesc = S("This is a crafting component dropped from dead fire elementals."),
+	wield_image = "vl_mobitems_flaming_rod.png",
+	inventory_image = "vl_mobitems_flaming_rod.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:blaze_rod", "mcl_mobitems:flaming_rod")
 
-minetest.register_craftitem("mcl_mobitems:blaze_powder", {
-	description = S("Blaze Powder"),
+minetest.register_craftitem("mcl_mobitems:flaming_powder", {
+	description = S("Flaming Powder"),
 	_doc_items_longdesc = S("This item is mainly used for crafting."),
-	wield_image = "mcl_mobitems_blaze_powder.png",
-	inventory_image = "mcl_mobitems_blaze_powder.png",
+	wield_image = "vl_mobitems_flaming_powder.png",
+	inventory_image = "vl_mobitems_flaming_powder.png",
 	groups = { craftitem = 1, brewitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:blaze_powder", "mcl_mobitems:flaming_powder")
 
 minetest.register_craftitem("mcl_mobitems:magma_cream", {
 	description = S("Magma Cream"),
@@ -335,14 +337,15 @@ minetest.register_craftitem("mcl_mobitems:feather", {
 	stack_max = 64,
 })
 
-minetest.register_craftitem("mcl_mobitems:rabbit_hide", {
-	description = S("Rabbit Hide"),
-	_doc_items_longdesc = S("Rabbit hide is used to create leather."),
-	wield_image = "mcl_mobitems_rabbit_hide.png",
-	inventory_image = "mcl_mobitems_rabbit_hide.png",
+minetest.register_craftitem("mcl_mobitems:leather_piece", {
+	description = S("Leather Piece"),
+	_doc_items_longdesc = S("Leather piece is a smaller piece of leather."),
+	wield_image = "mcl_mobitems_leather_piece.png",
+	inventory_image = "mcl_mobitems_leather_piece.png",
 	groups = { craftitem = 1 },
 	stack_max = 64,
 })
+core.register_alias("mcl_mobitems:rabbit_hide", "mcl_mobitems:leather_piece")
 
 minetest.register_craftitem("mcl_mobitems:rabbit_foot", {
 	description = S("Rabbit's Foot"),
@@ -499,14 +502,19 @@ minetest.register_craftitem("mcl_mobitems:glow_ink_sac", {
 minetest.register_craft({
 	output = "mcl_mobitems:leather",
 	recipe = {
-		{ "mcl_mobitems:rabbit_hide", "mcl_mobitems:rabbit_hide" },
-		{ "mcl_mobitems:rabbit_hide", "mcl_mobitems:rabbit_hide" },
+		{ "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece" },
+		{ "mcl_mobitems:leather_piece", "mcl_mobitems:leather_piece" },
 	}
 })
 
+core.register_craft({
+	output = "mcl_mobitems:leather_piece 4",
+	recipe = {{"mcl_mobitems:leather"}},
+})
+
 minetest.register_craft({
-	output = "mcl_mobitems:blaze_powder 2",
-	recipe = {{"mcl_mobitems:blaze_rod"}},
+	output = "mcl_mobitems:flaming_powder 2",
+	recipe = {{"mcl_mobitems:flaming_rod"}},
 })
 
 minetest.register_craft({
@@ -562,7 +570,7 @@ minetest.register_craft({
 minetest.register_craft({
 	type = "shapeless",
 	output = "mcl_mobitems:magma_cream",
-	recipe = {"mcl_mobitems:blaze_powder", "mcl_mobitems:slimeball"},
+	recipe = {"mcl_mobitems:flaming_powder", "mcl_mobitems:slimeball"},
 })
 
 minetest.register_craft({
@@ -602,7 +610,7 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "mcl_mobitems:blaze_rod",
+	recipe = "mcl_mobitems:flaming_rod",
 	burntime = 120,
 })
 

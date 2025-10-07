@@ -19,6 +19,7 @@ Donkey=Burro
 Mule=Mula
 ##[ llama.lua ]##
 Llama=Llama
+ - Strength @1=
 ##[ ocelot.lua ]##
 Ocelot=Ocelote
 Cat=Gato
@@ -32,16 +33,16 @@ Polar Bear=Oso polar
 Sheep=Oveja
 ##[ wolf.lua ]##
 Wolf=Lobo
-Dog=
+Dog=Perro
 ##[ squid.lua ]##
 Squid=Calamar
 ##[ villager.lua ]##
-Novice=
-Apprentice=
-Journeyman=
-Expert=
-Master=
-Unemployed=
+Novice=Novato
+Apprentice=Aprendiz
+Journeyman=Oficial
+Expert=Experto
+Master=Maestro
+Unemployed=Desempleado
 Farmer=Granjero
 Fisherman=Pescador
 Fletcher=Flechero
@@ -54,7 +55,7 @@ Butcher=Carnicero
 Weapon Smith=Herrero de armas
 Tool Smith=Herrero de herramientas
 Cleric=Clérigo
-Mason=
+Mason=Albañil
 Nitwit=Simplón
 Villager=Aldeano
 ##[ pillager.lua ]##
@@ -67,8 +68,8 @@ Vindicator=Vindicador
 Zombie Villager=Aldeano zombi
 ##[ witch.lua ]##
 Witch=Bruja
-##[ blaze.lua ]##
-Blaze=Blaze
+##[ elementals.lua ]##
+Fire Elemental=
 ##[ ender_dragon.lua ]##
 Ender Dragon=Ender Dragon
 ##[ endermite.lua ]##
@@ -105,12 +106,12 @@ Baby Zombie=Bebé Zombi
 Husk=Zombi Momificado
 Baby Husk=Bebé Zombi Momificado
 ##[ slime+magma_cube.lua ]##
-Slime - big=
-Slime - small=
-Slime - tiny=
-Magma Cube - big=
-Magma Cube - small=
-Magma Cube - tiny=
+Slime - big=Slime - grande
+Slime - small=Slime - mediano
+Slime - tiny=Slime - pequeño
+Magma Cube - big=Cubo de Magma - grande
+Magma Cube - small=Cubo de Magma - mediano
+Magma Cube - tiny=Cubo de Magma - pequeño
 Magma Cube=Cubo de Magma
 Slime=Slime
 ##[ spider.lua ]##
@@ -147,6 +148,7 @@ Baby Strider=
 
 ##### not used anymore #####
 
+Blaze=Blaze
 Agent=Agente
 Enderman=Enderman
 Baby Piglin=Piglin bebé

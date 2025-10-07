@@ -8,10 +8,22 @@ Bamboo Plank=
 Bamboo Mosaic Plank=
 ##[ bamboo_items.lua ]##
 Bamboo Door=
+<<<<<<< HEAD
 Wooden doors are 2-block high barriers which can be opened or closed by hand and by a redstone signal.=
 To open or close a wooden door, rightclick it or supply its lower half with a redstone signal.=
 Bamboo Trapdoor=
 Wooden trapdoors are horizontal barriers which can be opened and closed by hand or a redstone signal. They occupy the upper or lower part of a block, depending on how they have been placed. When open, they can be climbed like a ladder.=
+=======
+
+Wooden doors are 2-block high barriers which can be opened or closed by hand and by a redstone signal.=
+
+To open or close a wooden door, rightclick it or supply its lower half with a redstone signal.=
+
+Bamboo Trapdoor=
+
+Wooden trapdoors are horizontal barriers which can be opened and closed by hand or a redstone signal. They occupy the upper or lower part of a block, depending on how they have been placed. When open, they can be climbed like a ladder.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 To open or close the trapdoor, rightclick it or send a redstone signal to it.=
 Bamboo Stairs=
 Bamboo Slab=
@@ -23,13 +35,26 @@ Bamboo Plank Stairs=
 Bamboo Plank Slab=
 Double Bamboo Plank Slab=
 Bamboo Pressure Plate=
+<<<<<<< HEAD
 A wooden pressure plate is a redstone component which supplies its surrounding blocks with redstone power while any movable object (including dropped items, players and mobs) rests on top of it.=
+=======
+
+A wooden pressure plate is a redstone component which supplies its surrounding blocks with redstone power while any movable object (including dropped items, players and mobs) rests on top of it.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Bamboo Sign=
 Bamboo Fence=
 Bamboo Fence Gate=
 Bamboo Button=
+<<<<<<< HEAD
 ### bamboo_items.lua ###
 A bamboo button is a redstone component made out of bamboo which can be pushed to provide redstone power. When pushed, it powers adjacent redstone components for 1 second.=
+=======
+
+### bamboo_items.lua ###
+A bamboo button is a redstone component made out of bamboo which can be pushed to provide redstone power. When pushed, it powers adjacent redstone components for 1 second.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Bamboo Mosaic Stairs=
 Bamboo Mosaic Slab=
 Double Bamboo Mosaic Slab=

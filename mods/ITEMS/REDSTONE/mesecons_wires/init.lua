@@ -196,7 +196,7 @@ local function register_wires()
 
 		local groups_on = {dig_immediate = 3, mesecon_conductor_craftable = 1,
 			not_in_creative_inventory = 1, attached_node = 1, dig_by_water = 1,destroy_by_lava_flow=1, dig_by_piston = 1}
-		local groups_off = {dig_immediate = 3, mesecon_conductor_craftable = 1,
+		local groups_off = {dig_immediate = 3, mesecon_conductor_craftable = 1, brewitem = 1,
 			attached_node = 1, dig_by_water = 1,destroy_by_lava_flow=1, dig_by_piston = 1, craftitem = 1}
 		if nodeid ~= "00000000" then
 			groups_off["not_in_creative_inventory"] = 1
@@ -247,7 +247,7 @@ S("Read the help entries on the other redstone components to learn how redstone 
 		mesecon.register_node(":mesecons:wire_"..nodeid, {
 			drawtype = "nodebox",
 			paramtype = "light",
-			use_texture_alpha = minetest.features.use_texture_alpha_string_modes and "clip" or true,
+			use_texture_alpha = "clip",
 			sunlight_propagates = true,
 			selection_box = selectionbox,
 			node_box = nodebox,

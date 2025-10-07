@@ -194,7 +194,7 @@ end
 
 mcl_potions.register_effect({
 	name = "invisibility",
-	description = S("Invisiblity"),
+	description = S("Invisibility"),
 	get_tt = function(factor)
 		return S("body is invisible")
 	end,
@@ -816,7 +816,7 @@ mcl_potions.register_effect({
 
 mcl_potions.register_effect({
 	name = "blindness",
-	description = "Blindness",
+	description = S("Blindness"),
 	get_tt = function(factor)
 		return S("impaired sight")
 	end,
@@ -917,13 +917,13 @@ mcl_potions.register_effect({
 	end,
 	on_start = function(object, factor)
 		hb.change_hudbar(object, "hunger", nil, nil, "mcl_hunger_icon_foodpoison.png", nil, "mcl_hunger_bar_foodpoison.png")
-		if mcl_hunger.debug then
+		if mcl_hunger.get_debug() then
 			hb.change_hudbar(object, "exhaustion", nil, nil, nil, nil, "mcl_hunger_bar_foodpoison.png")
 		end
 	end,
 	on_load = function(object, factor) -- TODO refactor and add hunger bar modifier API
 		hb.change_hudbar(object, "hunger", nil, nil, "mcl_hunger_icon_foodpoison.png", nil, "mcl_hunger_bar_foodpoison.png")
-		if mcl_hunger.debug then
+		if mcl_hunger.get_debug() then
 			hb.change_hudbar(object, "exhaustion", nil, nil, nil, nil, "mcl_hunger_bar_foodpoison.png")
 		end
 	end,
@@ -991,6 +991,7 @@ function mcl_potions.hf_update_internal(hand, object)
 	local meta = hand:get_meta()
 	local h_fac = mcl_potions.get_total_haste(object)
 	local f_fac = mcl_potions.get_total_fatigue(object)
+	meta:set_tool_capabilities()
 	local toolcaps = hand:get_tool_capabilities()
 	meta:set_tool_capabilities(mcl_potions.apply_haste_fatigue(toolcaps, h_fac, f_fac))
 	return hand
@@ -1098,7 +1099,7 @@ function mcl_potions.update_haste_and_fatigue(player)
 		else meta:set_string("mcl_potions:fatigue", "") end
 		meta:set_tool_capabilities()
 		meta:set_string("groupcaps_hash","")
-		mcl_enchanting.update_groupcaps(item)
+		mcl_enchanting.load_enchantments(item)
 		if h_fac == 0 and f_fac == 1 then
 			player:set_wielded_item(item)
 			return
@@ -1411,7 +1412,7 @@ function mcl_potions._reset_haste_fatigue_item_meta(player)
 			meta:set_string("mcl_potions:fatigue", "")
 			meta:set_tool_capabilities()
 			meta:set_string("groupcaps_hash","")
-			mcl_enchanting.update_groupcaps(item)
+			mcl_enchanting.load_enchantments(item)
 		end
 	end
 	inv:set_lists(lists)

@@ -2,14 +2,13 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 mcl_armor.register_set({
 	name = "gold",
-	description = "Golden",
-	durability = 112,
-	durabilities = {
-		head = 70,
-		torso = 100,
- 		legs = 90,
-		feet = 85,
+	descriptions = {
+		head = S("Golden Helmet"),
+		torso = S("Golden Chestplate"),
+		legs = S("Golden Leggings"),
+		feet = S("Golden Boots"),
 	},
+	durability = 112,
 	enchantability = 25,
 	points = {
 		head = 2,
@@ -18,21 +17,20 @@ mcl_armor.register_set({
 		feet = 1,
 	},
 	craft_material = "mcl_core:gold_ingot",
-	cook_material = "mcl_core:gold_nugget",
+	cook_material = "mcl_core:gold_nugget 9",
 	sound_equip = "mcl_armor_equip_iron",
 	sound_unequip = "mcl_armor_unequip_iron",
 })
 
 mcl_armor.register_set({
 	name = "chain",
-	description = "Chain",
-	durability = 240,
-	durabilities = {
-		head = 145,
-		torso = 210,
- 		legs = 200,
-		feet = 150,
+	descriptions = {
+		head = S("Chainmail Helmet"),
+		torso = S("Chainmail Chestplate"),
+		legs = S("Chainmail Leggings"),
+		feet = S("Chainmail Boots"),
 	},
+	durability = 240,
 	enchantability = 12,
 	points = {
 		head = 2,
@@ -40,22 +38,21 @@ mcl_armor.register_set({
 		legs = 4,
 		feet = 1,
 	},
-	repair_material = "mcl_core:iron_ingot",
-	cook_material = "mcl_core:iron_nugget",
+	craft_material = "mcl_lanterns:chain",
+	cook_material = "mcl_core:iron_nugget 5",
 	sound_equip = "mcl_armor_equip_iron",
 	sound_unequip = "mcl_armor_unequip_iron",
 })
 
 mcl_armor.register_set({
 	name = "iron",
-	description = "Iron",
-	durability = 240,
-	durabilities = {
-		head = 150,
-		torso = 120,
- 		legs = 200,
-		feet = 180,
+	descriptions = {
+		head = S("Iron Helmet"),
+		torso = S("Iron Chestplate"),
+		legs = S("Iron Leggings"),
+		feet = S("Iron Boots"),
 	},
+	durability = 340,
 	enchantability = 9,
 	points = {
 		head = 2,
@@ -64,21 +61,20 @@ mcl_armor.register_set({
 		feet = 2,
 	},
 	craft_material = "mcl_core:iron_ingot",
-	cook_material = "mcl_core:iron_nugget",
+	cook_material = "mcl_core:iron_nugget 9",
 	sound_equip = "mcl_armor_equip_iron",
 	sound_unequip = "mcl_armor_unequip_iron",
 })
 
 mcl_armor.register_set({
 	name = "diamond",
-	description = "Diamond",
-	durability = 528,
-	durabilities = {
-		head = 320,
-		torso = 500,
- 		legs = 470,
-		feet = 400,
+	descriptions = {
+		head = S("Diamond Helmet"),
+		torso = S("Diamond Chestplate"),
+		legs = S("Diamond Leggings"),
+		feet = S("Diamond Boots"),
 	},
+	durability = 528,
 	enchantability = 10,
 	points = {
 		head = 3,
@@ -96,14 +92,13 @@ mcl_armor.register_set({
 
 mcl_armor.register_set({
 	name = "netherite",
-	description = "Netherite",
-	durability = 555,
-	durabilities = {
-		head = 320,
-		torso = 500,
- 		legs = 490,
-		feet = 3400,
+	descriptions = {
+		head = S("Netherite Helmet"),
+		torso = S("Netherite Chestplate"),
+		legs = S("Netherite Leggings"),
+		feet = S("Netherite Boots"),
 	},
+	durability = 555,
 	enchantability = 10,
 	points = {
 		head = 3,
@@ -230,7 +225,7 @@ minetest.register_tool("mcl_armor:elytra", {
 	_doc_items_longdesc = mcl_armor.longdesc,
 	_doc_items_usagehelp = mcl_armor.usage,
 	inventory_image = "mcl_armor_inv_elytra.png",
-	groups = {armor = 1, non_combat_armor = 1, armor_torso = 1, non_combat_torso = 1, mcl_armor_uses = 10, enchantability = -1, elytra = 1},
+	groups = {armor = 1, non_combat_armor = 1, armor_torso = 1, non_combat_torso = 1, mcl_armor_uses = 10, enchantability = -1, elytra = 1, transport=1},
 	sounds = {
 		_mcl_armor_equip = "mcl_armor_equip_leather",
 		_mcl_armor_unequip = "mcl_armor_unequip_leather",

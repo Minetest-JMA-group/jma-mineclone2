@@ -1,5 +1,11 @@
 # textdomain: mclx_core
 River Water Source=
+<<<<<<< HEAD
 River water has the same properties as water, but has a reduced flowing distance and is not renewable.=
+=======
+
+River water has the same properties as water, but has a reduced flowing distance and is not renewable.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 River Water=
 Flowing River Water=

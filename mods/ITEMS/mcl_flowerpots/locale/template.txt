@@ -1,8 +1,16 @@
 # textdomain: mcl_flowerpots
 Flower Pot=
 Can hold a small flower or plant=
+<<<<<<< HEAD
 Flower pots are decorative blocks in which flowers and other small plants can be placed.=
 Just place a plant on the flower pot. Flower pots can hold small flowers (not higher than 1 block), saplings, ferns, dead bushes, mushrooms and cacti. Rightclick a potted plant to retrieve the plant.=
+=======
+
+Flower pots are decorative blocks in which flowers and other small plants can be placed.=
+
+Just place a plant on the flower pot. Flower pots can hold small flowers (not higher than 1 block), saplings, ferns, dead bushes, mushrooms and cacti. Rightclick a potted plant to retrieve the plant.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Cactus=
 Brown Mushroom=
 Red Mushroom=

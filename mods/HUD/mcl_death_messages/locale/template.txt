@@ -1,4 +1,10 @@
 # textdomain: mcl_death_messages
+<<<<<<< HEAD
+=======
+
+Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.=
+
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 @1 went up in flames=
 @1 walked into fire whilst fighting @2=
 @1 was struck by lightning=
@@ -53,3 +59,8 @@
 @1 was squashed by @2=
 @1 went off with a bang=
 @1 went off with a bang due to a firework fired by @2 from @3=
+<<<<<<< HEAD
+=======
+@1 died a sweet death=
+@1 was poked to death by a sweet berry bush whilst trying to escape @2=
+>>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

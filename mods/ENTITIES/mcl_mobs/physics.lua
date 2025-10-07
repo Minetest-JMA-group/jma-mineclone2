@@ -1,8 +1,25 @@
+local modname = minetest.get_current_modname()
+local S = minetest.get_translator(modname)
 local math, vector, minetest, mcl_mobs = math, vector, minetest, mcl_mobs
 local mob_class = mcl_mobs.mob_class
 local validate_vector = mcl_util.validate_vector
 
-local ENTITY_CRAMMING_MAX = 24
+local gamerule_maxEntityCramming = 24
+vl_tuning.setting("gamerule:maxEntityCramming", "number", {
+	description = S("The maximum number of pushable entities a mob or player can push, before taking 6♥♥♥ entity cramming damage per half-second."),
+	default = 24,
+	formspec_desc_lines = 2,
+	set = function(val) gamerule_maxEntityCramming = val end,
+	get = function() return gamerule_maxEntityCramming end,
+})
+local gamerule_doMobLoot
+vl_tuning.setting("gamerule:doMobLoot", "bool", {
+	description = S("Whether mobs should drop items and experience orbs."),
+	default = true,
+	set = function(val) gamerule_doMobLoot = val end,
+	get = function() return gamerule_doMobLoot end,
+})
+
 local CRAMMING_DAMAGE = 3
 local DEATH_DELAY = 0.5
 local DEFAULT_FALL_SPEED = -9.81*1.5
@@ -75,37 +92,72 @@ function mob_class:object_in_range(object)
 	return p1 and p2 and (vector.distance(p1, p2) <= dist)
 end
 
-function mob_class:item_drop(cooked, looting_level)
+---Calculates the final drop chance of an item drop.
+---Returns the final drop chance or an error.
+---@param dropdef 	    table
+---@param looting_level number
+---@param attacker_name string?
+---@return number, string?
+local function calculate_drop_chance(dropdef, looting_level, attacker_name)
+	local chance = dropdef.chance
+	if type(chance) ~= "number" then
+		return 0, string.format("unsupported chance value %q", chance)
+	end
+	if dropdef.conditions and dropdef.conditions.guarantee_if_killed_by and attacker_name then
+		for _, name in ipairs(dropdef.conditions.guarantee_if_killed_by) do
+			if name == attacker_name then
+				return 1, nil
+			end
+		end
+	end
+	if dropdef.chance ~= 0 then
+		chance = 1 / chance
+	end
+	if looting_level > 0 then
+		local chance_function = dropdef.looting_chance_function
+		if chance_function then
+			chance = chance_function(looting_level)
+		elseif dropdef.looting == "rare" then
+			chance = chance + (dropdef.looting_factor or 0.01) * looting_level
+		end
+	end
+	return chance, nil
+end
 
+---Calculate and drop items.
+---@param params {
+---    cooked       : boolean?,
+---    looting_level: number?,
+---    attacker_name: string?,
+---}
+function mob_class:item_drop(params)
 	if not mobs_drop_items then return end
-
-	looting_level = looting_level or 0
 
 	if (self.child and self.type ~= "monster") then
 		return
 	end
 
-	local obj, item, num
-	local pos = self.object:get_pos()
+	local looting_level = params.looting_level or 0
+	local cooked        = params.cooked or false
+	local attacker_name = params.attacker_name or nil
 
+	local pos = self.vl_drops_pos or self.object:get_pos()
+	
 	self.drops = self.drops or {}
 
 	for n = 1, #self.drops do
 		local dropdef = self.drops[n]
-		local chance = 1 / dropdef.chance
-		local looting_type = dropdef.looting
 
-		if looting_level > 0 then
-			local chance_function = dropdef.looting_chance_function
-			if chance_function then
-				chance = chance_function(looting_level)
-			elseif looting_type == "rare" then
-				chance = chance + (dropdef.looting_factor or 0.01) * looting_level
-			end
+		local chance, error = calculate_drop_chance(dropdef, looting_level, attacker_name)
+		if error then
+			core.log("warning", string.format(
+				"error calculating drop chance of drop #%d for entity %q, falling back to 1: %s",
+				n, self.name, error))
+			chance = 1
 		end
 
 		local num = 0
-		local do_common_looting = (looting_level > 0 and looting_type == "common")
+		local do_common_looting = (looting_level > 0 and dropdef.looting == "common")
 		if random() < chance then
 			num = random(dropdef.min or 1, dropdef.max or 1)
 		elseif not dropdef.looting_ignore_chance then
@@ -117,7 +169,7 @@ function mob_class:item_drop(cooked, looting_level)
 		end
 
 		if num > 0 then
-			item = dropdef.name
+			local item = dropdef.name
 
 			if cooked then
 				local output = minetest.get_craft_result({method = "cooking", width = 1, items = {item}})
@@ -127,8 +179,7 @@ function mob_class:item_drop(cooked, looting_level)
 			end
 
 			for x = 1, num do
-				obj = minetest.add_item(pos, ItemStack(item .. " " .. 1))
-
+				local obj = minetest.add_item(pos, ItemStack(item .. " " .. 1))
 				if obj and obj:get_luaentity() then
 					obj:set_velocity(vector.new((random() - 0.5) * 1.5, 6, (random() - 0.5) * 1.5))
 				elseif obj then
@@ -139,6 +190,20 @@ function mob_class:item_drop(cooked, looting_level)
 	end
 
 	self.drops = {}
+
+	if not self.armor_list then return end
+
+	for _, item in pairs(self.armor_list) do
+		local stack = ItemStack(item)
+		if not stack:is_empty() then
+			local obj = core.add_item(pos, stack)
+			if obj and obj:get_luaentity() then
+				obj:set_velocity(vector.new((random() - 0.5) * 1.5, 6, (random() - 0.5) * 1.5))
+			elseif obj then
+				obj:remove() -- item does not exist
+			end
+		end
+	end
 end
 
 -- collision function borrowed amended from jordan4ibanez open_ai mod
@@ -185,6 +250,11 @@ end
 
 -- move mob in facing direction
 function mob_class:set_velocity(v)
+	-- Don't allow walking if not standing on something and can't fly
+	if not self.fly and v ~= 0 and not self._grounded and not self.in_water then
+		return false
+	end
+
 	local c_x, c_z = 0, 0
 	-- can mob be pushed, if so calculate direction
 	if self.pushable then
@@ -297,9 +367,17 @@ function mob_class:flight_check()
 	return not not self.fly_in[nod] -- force boolean
 end
 
--- check if mob is dead or only hurt
-function mob_class:check_for_death(cause, cmi_cause)
-
+-- Check if mob is dead or only hurt
+---@param cause     string
+---@param cmi_cause {
+--- 	type   : string?,
+--- 	pos    : {x: number, y: number, z: number}?,
+--- 	node   : core.Node?,
+--- 	puncher: core.ObjectRef?,
+---}?
+---@param info {attacker_name: string?}?
+---@return boolean
+function mob_class:check_for_death(cause, cmi_cause, info)
 	if self.state == "die" then
 		return true
 	end
@@ -359,42 +437,39 @@ function mob_class:check_for_death(cause, cmi_cause)
 		-- TODO other env damage shouldn't drop xp
 		-- "rain", "water", "drowning", "suffocation"
 
+		if not gamerule_doMobLoot then return end
+
 		-- dropped cooked item if mob died in fire or lava
 		if cause == "lava" or cause == "fire" then
-			self:item_drop(true, 0)
-		else
-			local wielditem = ItemStack()
-			if cause == "hit" then
-				local puncher = cmi_cause.puncher
-				if puncher then
-					wielditem = puncher:get_wielded_item()
-				end
-			end
-			local cooked = mcl_burning.is_burning(self.object) or mcl_enchanting.has_enchantment(wielditem, "fire_aspect")
-			local looting = mcl_enchanting.get_enchantment(wielditem, "looting")
-			self:item_drop(cooked, looting)
-
-			if ((not self.child) or self.type ~= "animal") and (minetest.get_us_time() - self.xp_timestamp <= math.huge) then
-				local pos = self.object:get_pos()
-				local xp_amount = random(self.xp_min, self.xp_max)
-
-				if not mcl_sculk.handle_death(pos, xp_amount) then
-					--minetest.log("Xp not thrown")
-					if minetest.is_creative_enabled("") ~= true then
-						mcl_experience.throw_xp(pos, xp_amount)
-					end
-				else
-					--minetest.log("xp thrown")
-				end
-			end
+			self:item_drop({ cooked = true })
+			return
 		end
 
+		local wielditem
+		if cause == "hit" and cmi_cause and cmi_cause.puncher then
+			wielditem = cmi_cause.puncher:get_wielded_item()
+		else
+			wielditem = ItemStack()
+		end
 
+		self:item_drop({
+			cooked        = mcl_burning.is_burning(self.object) or mcl_enchanting.has_enchantment(wielditem, "fire_aspect"),
+			looting       = mcl_enchanting.get_enchantment(wielditem, "looting"),
+			attacker_name = info and info.attacker_name
+		})
+		
+		if ((not self.child) or self.type ~= "animal") and (minetest.get_us_time() - self.xp_timestamp <= math.huge) then
+			local pos = self.vl_drops_pos or self.object:get_pos()
+			local xp_amount = random(self.xp_min, self.xp_max)
+
+			if not mcl_sculk.handle_death(pos, xp_amount) and minetest.is_creative_enabled("") ~= true then
+				mcl_experience.throw_xp(pos, xp_amount)
+			end
+		end
 	end
 
 	-- execute custom death function
 	if self.on_die then
-
 		local pos = self.object:get_pos()
 		local on_die_exit = self.on_die(self, pos, cmi_cause)
 		if on_die_exit ~= true then
@@ -422,7 +497,8 @@ function mob_class:check_for_death(cause, cmi_cause)
 
 	self.state = "die"
 	self.attack = nil
-	self.v_start = false
+	self.force_attack = false
+	self.fuse = false
 	self.fall_speed = DEFAULT_FALL_SPEED
 	self.timer = 0
 	self.blinktimer = 0
@@ -759,7 +835,12 @@ function mob_class:step_damage (dtime, pos)
 	end
 end
 
-function mob_class:damage_mob(reason,damage)
+---
+---@param reason string
+---@param damage number
+---@param info   {attacker_name: string?}?
+---@return boolean
+function mob_class:damage_mob(reason, damage, info)
 	if not self.health then return end
 	damage = floor(damage)
 	if damage > 0 then
@@ -767,7 +848,7 @@ function mob_class:damage_mob(reason,damage)
 
 		mcl_mobs.effect(self.object:get_pos(), 5, "mcl_particles_smoke.png", 1, 2, 2, nil)
 
-		if self:check_for_death(reason, {type = reason}) then
+		if self:check_for_death(reason, { type = reason }, info) then
 			return true
 		end
 	end
@@ -782,7 +863,7 @@ function mob_class:check_entity_cramming()
 		local l = o:get_luaentity()
 		if l and l.is_mob and l.health > 0 then table.insert(mobs,l) end
 	end
-	local clear = #mobs < ENTITY_CRAMMING_MAX
+	local clear = #mobs < gamerule_maxEntityCramming
 	local ncram = {}
 	for _,l in pairs(mobs) do
 		if l then
@@ -796,7 +877,7 @@ function mob_class:check_entity_cramming()
 		end
 	end
 	for i,l in pairs(ncram) do
-		if i > ENTITY_CRAMMING_MAX then
+		if i > gamerule_maxEntityCramming then
 			l.cram = true
 		else
 			l.cram = nil
@@ -819,8 +900,10 @@ function mob_class:falling(pos, moveresult)
 				-- when touching ground, retain a minimal gravity to keep the touching_ground flag
 				-- but also to not get upwards acceleration with large dtime when on bouncy ground
 				self.object:set_acceleration(vector.new(0, self.fall_speed * 0.01, 0))
+				self._grounded = true
 			else
 				self.object:set_acceleration(vector.new(0, self.fall_speed, 0))
+				self._grounded = false
 			end
 		else
 			-- stop accelerating once max fall speed hit
