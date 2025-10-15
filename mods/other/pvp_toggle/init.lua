@@ -28,7 +28,7 @@ local function toggle_pvp(player)
 
     if pvp_setting == "" or pvp_setting == "false" then
         player:get_meta():set_string("pvp_enabled", "true")
-        minetest.chat_send_player(player:get_player_name(), "PvP is now enabled for you.")
+        minetest.chat_send_player(player:get_player_name(), "PvP is now enabled for you, you can now be attacked by other players.")
     else
         player:get_meta():set_string("pvp_enabled", "false")
         minetest.chat_send_player(player:get_player_name(), "PvP is now disabled for you.")
