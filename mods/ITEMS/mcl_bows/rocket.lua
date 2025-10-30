@@ -30,7 +30,7 @@ local function damage_explosion(self, damagemulitplier, pos)
 end
 
 core.register_craftitem("mcl_bows:rocket", {
-	description = S("Arrow"),
+	description = S("Rocket"),
 	_tt_help = S("Ammunition").."\n"..S("Damage from bow: 1-10").."\n"..S("Damage from dispenser: 3"),
 	_doc_items_longdesc = S("Arrows are ammunition for bows and dispensers.").."\n"..
 		S("An arrow fired from a bow has a regular damage of 1-9. At full charge, there's a 20% chance of a critical hit dealing 10 damage instead. An arrow fired from a dispenser always deals 3 damage.").."\n"..
@@ -102,7 +102,7 @@ if core.get_modpath("mcl_core") and core.get_modpath("mcl_mobitems") and core.ge
 		recipe = {
 			{"mcl_core:paper"},
 			-- THE _2 MAY HAVE TO BE REMOVED
-			{"vl_fireworks:rocket_2"},
+			{"vl_fireworks:rocket"},
 			{"mcl_bows:arrow"},
 		}
 	})
