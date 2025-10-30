@@ -18,6 +18,14 @@ assert(movement.do_detached_movement)
 assert(movement.handle_cart_enter)
 assert(movement.handle_cart_leave)
 
+local minecart_despawn_time
+vl_tuning.setting("gamerule:minecartDespawnTime", "number", {
+	default = 5*60,
+	set = function(val) minecart_despawn_time = val end,
+	get = function() return minecart_despawn_time end,
+	description = "Amount of seconds before empty minecarts despawn (default: 300)",
+})
+
 -- Constants
 local MINECART_MAX_HP = 4
 local TWO_OVER_PI = 2 / math.pi
@@ -204,6 +212,9 @@ function DEFAULT_CART_DEF:on_activate(staticdata, dtime_s)
 	self._uuid = data.uuid
 	self._staticdata = data
 
+	-- Make sure despawn timer exists
+	self._despawn_timer = 0
+
 	-- Activate cart if on powered activator rail
 	if self.on_activate_by_rail then
 		local pos = self.object:get_pos()
@@ -355,6 +366,20 @@ function DEFAULT_CART_DEF:on_step(dtime)
 		end
 	end
 
+	if self.name == "mcl_minecarts:minecart" then -- Only remove regular minecarts
+		if next(self.object:get_children()) == nil then
+			-- There is nothing in the minecart
+			self._despawn_timer = self._despawn_timer + dtime
+			if self._despawn_timer > minecart_despawn_time then
+				kill_cart(self._staticdata, nil)
+			end
+		else
+			-- There is a player or entity in the minecart
+			self._despawn_timer = 0 -- TODO: Find a more efficient way to do this _once_ when an entity gets into the cart
+		end
+		core.log(self._despawn_timer)
+		core.log("> "..minecart_despawn_time)
+	end
 
 	if not staticdata.connected_at then
 		movement.do_detached_movement(self, dtime)
