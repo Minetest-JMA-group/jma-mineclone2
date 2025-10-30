@@ -377,8 +377,6 @@ function DEFAULT_CART_DEF:on_step(dtime)
 			-- There is a player or entity in the minecart
 			self._despawn_timer = 0 -- TODO: Find a more efficient way to do this _once_ when an entity gets into the cart
 		end
-		core.log(self._despawn_timer)
-		core.log("> "..minecart_despawn_time)
 	end
 
 	if not staticdata.connected_at then
