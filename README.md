@@ -1,5 +1,5 @@
 <div align="center">
-<img src="/VoxeLibre/VoxeLibre/raw/branch/master/menu/icon.png">
+<img src="/menu/icon.png">
 <h1>VoxeLibre</h1>
 <a href="https://content.luanti.org/packages/Wuzzy/mineclone2/">
 	<img src="https://content.luanti.org/packages/Wuzzy/mineclone2/shields/downloads/" alt="ContentDB">
@@ -17,7 +17,9 @@ and heavily improved. Developed by many people, see
 [`CREDITS.md`](CREDITS.md) for a complete list.
 
 > [!IMPORTANT]  
-> This repo is for the JMA Mineclone2 server. We have a number of changes to VoxeLibre's core code, which should not be overwritten if updating. A list of files is included in CONTRIBUTING_JMA.md
+> This is a fork, which runs on the JMA Mineclone2 server. We have a number of changes to VoxeLibre's core code, which should not be overwritten if updating. A list of files is included in CONTRIBUTING_JMA.md
+> 
+> Maintained and developed by fancyfinn9 and contributors
 
 
 ## About
