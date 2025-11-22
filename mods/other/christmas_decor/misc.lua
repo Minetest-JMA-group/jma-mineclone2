@@ -57,6 +57,12 @@ if depends.default and depends.dye then
 		type = "shapeless",
 		recipe = {"default:leaves", "default:leaves", "dye:red"},
 	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:mistletoe",
+		type = "shapeless",
+		recipe = {"group:leaves", "group:leaves", "mcl_farming:sweet_berry"},
+	})
 end
 
 minetest.register_node("christmas_decor:icicles_wall", {
@@ -123,6 +129,14 @@ if depends.default then
 		recipe = {
 			{"default:ice", "", "default:ice"},
 			{"default:ice", "", "default:ice"},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:icicles_hanging 4",
+		recipe = {
+			{"mcl_core:ice", "", "mcl_core:ice"},
+			{"mcl_core:ice", "", "mcl_core:ice"},
 		},
 	})
 end
@@ -248,6 +262,15 @@ if depends.dye and depends.default then
 			{"dye:yellow", "dye:black", "dye:yellow"},
 			{"dye:red", "default:wood", "dye:red"},
 			{"dye:blue", "dye:black", "dye:blue"},
+		}
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:nutcracker",
+		recipe = {
+			{"mcl_dye:yellow", "mcl_dye:black", "mcl_dye:yellow"},
+			{"mcl_dye:red", "group:wood", "mcl_dye:red"},
+			{"mcl_dye:blue", "mcl_dye:black", "mcl_dye:blue"},
 		}
 	})
 end
