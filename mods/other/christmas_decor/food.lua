@@ -18,7 +18,7 @@ minetest.register_node("christmas_decor:candycane", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_stone_defaults"),
 	on_use = minetest.item_eat(4),
 })
@@ -68,7 +68,7 @@ minetest.register_node("christmas_decor:plate_with_cookies", {
 	use_texture_alpha = "blend",
 	drawtype = "signlike",
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_glass_defaults"),
 })
 
@@ -86,7 +86,7 @@ minetest.register_node("christmas_decor:milk_glass", {
 		type = "fixed",
 		fixed = {-0.25, -0.5, -0.25, 0.25, 0.3, 0.25}
 	},
-	groups = {vessel = 1, dig_immediate = 3, attached_node = 1},
+	groups = {vessel = 1, dig_immediate = 3, attached_node = 1, handy = 1},
 	sounds = default_sounds("node_sound_glass_defaults"),
 	on_use = minetest.item_eat(4, depends.vessels and "vessels:drinking_glass"),
 })
@@ -277,7 +277,7 @@ minetest.register_node("christmas_decor:candycane_block", {
 		"christmas_decor_candycane_block.png^[transformFX", "christmas_decor_candycane_block.png^[transformFX",
 	},
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
+	groups = {snappy = 3, pickaxey = 1},
 	sounds = default_sounds("node_sound_stone_defaults"),
 })
 
@@ -285,7 +285,7 @@ minetest.register_node("christmas_decor:peppermint_block", {
 	description = "Peppermint Block",
 	tiles = {"christmas_decor_peppermint.png"},
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
+	groups = {snappy = 3, pickaxey = 1},
 	sounds = default_sounds("node_sound_stone_defaults"),
 })
 
@@ -293,7 +293,7 @@ minetest.register_node("christmas_decor:frosting_block", {
 	description = "Frosting Block",
 	tiles = {"christmas_decor_frosting.png"},
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 
@@ -446,7 +446,7 @@ minetest.register_node("christmas_decor:frosting_trim", {
 	drawtype = "signlike",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 
@@ -467,7 +467,7 @@ minetest.register_node("christmas_decor:frosting_line", {
 	drawtype = "signlike",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 
@@ -511,7 +511,7 @@ for color, hex in pairs({
 		paramtype = "light",
 		sunlight_propagates = true,
 		paramtype2 = "facedir",
-		groups = {snappy = 3},
+		groups = {snappy = 3, handy = 1},
 		sounds = default_sounds("node_sound_leaves_defaults"),
 		on_use = minetest.item_eat(2),
 	})

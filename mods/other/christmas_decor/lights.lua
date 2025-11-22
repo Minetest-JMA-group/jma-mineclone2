@@ -100,7 +100,7 @@ local function register_lights(desc, nodename, aspect, length)
 		light_source = 10,
 		paramtype2 = "wallmounted",
 		connects_to = {"group:christmas_lights"},
-		groups = {snappy = 3, christmas_lights = 1},
+		groups = {snappy = 3, christmas_lights = 1, handy = 1},
 		sounds = default_sounds("node_sound_leaves_defaults"),
 	})
 
@@ -131,7 +131,7 @@ local function register_lights(desc, nodename, aspect, length)
 		description = desc .. " Christmas Lights (pane)",
 		textures = {},
 		use_texture_alpha = "blend",
-		groups = {snappy = 3},
+		groups = {snappy = 3, handy = 1},
 		sounds = default_sounds("node_sound_leaves_defaults"),
 		recipe = {
 			{"christmas_decor:lights_" .. nodename, "christmas_decor:lights_" .. nodename, "christmas_decor:lights_" .. nodename},
@@ -229,7 +229,7 @@ minetest.register_node("christmas_decor:garland", {
 	drawtype = "signlike",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 
@@ -262,7 +262,7 @@ minetest.register_node("christmas_decor:garland_lights", {
 	paramtype = "light",
 	light_source = 8,
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 

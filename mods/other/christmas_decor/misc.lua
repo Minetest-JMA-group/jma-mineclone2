@@ -47,7 +47,7 @@ minetest.register_node("christmas_decor:mistletoe", {
 	sunlight_propagates = true,
 	paramtype = "light",
 	use_texture_alpha = "blend",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_leaves_defaults"),
 })
 
@@ -93,7 +93,7 @@ minetest.register_node("christmas_decor:icicles_wall", {
 	paramtype = "light",
 	light_source = 3,
 	paramtype2 = "wallmounted",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_glass_defaults"),
 })
 
@@ -119,7 +119,7 @@ minetest.register_node("christmas_decor:icicles_hanging", {
 	light_source = 3,
 	paramtype2 = "degrotate",
 	walkable = false,
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_glass_defaults"),
 })
 
@@ -251,7 +251,7 @@ minetest.register_node("christmas_decor:nutcracker", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
-	groups = {snappy = 3},
+	groups = {snappy = 3, handy = 1},
 	sounds = default_sounds("node_sound_wood_defaults"),
 })
 
