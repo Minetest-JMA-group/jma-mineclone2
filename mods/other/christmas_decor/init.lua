@@ -14,8 +14,8 @@ local depends = {
 	vessels = minetest.get_modpath("vessels"),
 	wool = minetest.get_modpath("wool"),
 	xpanes = minetest.global_exists("xpanes"),
-	mcl_core = minetest.global_exists("mcl_core"),
-	mineclonefood = minetest.global_exists("mineclonefood"),
+	mcl_core = minetest.get_modpath("mcl_core"),
+	mineclonefood = minetest.get_modpath("mineclonefood"),
 }
 
 local function default_sounds(name)
