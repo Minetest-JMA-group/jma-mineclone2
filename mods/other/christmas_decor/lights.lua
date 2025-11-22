@@ -21,6 +21,12 @@ if depends.dye then
 		type = "shapeless",
 		recipe = {"christmas_decor:led_white", "dye:green", "dye:blue", "dye:red"},
 	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:led_rgb",
+		type = "shapeless",
+		recipe = {"christmas_decor:led_white", "mcl_dye:green", "mcl_dye:blue", "mcl_dye:red"},
+	})
 end
 
 if depends.basic_materials then
@@ -41,6 +47,24 @@ if depends.basic_materials then
 			{"basic_materials:plastic_sheet", "basic_materials:plastic_sheet", "basic_materials:plastic_sheet"},
 			{"basic_materials:copper_strip", "basic_materials:copper_strip", "basic_materials:copper_strip"},
 			{"basic_materials:plastic_sheet", "basic_materials:plastic_sheet", "basic_materials:plastic_sheet"},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:led_white 8",
+		recipe = {
+			{"group:glass"},
+			{"mesecons:wire_00000000_off"},
+			{"mcl_nether:quartz"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:wire 16",
+		recipe = {
+			{"mcl_core:paper", "mcl_core:paper", "mcl_core:paper"},
+			{"mesecons:wire_00000000_off", "mesecons:wire_00000000_off", "mesecons:wire_00000000_off"},
+			{"mcl_core:paper", "mcl_core:paper", "mcl_core:paper"},
 		},
 	})
 end
@@ -168,14 +192,25 @@ minetest.register_craft({
 	},
 })
 
-minetest.register_craft({
-	output = "christmas_decor:lights_multicolor_bulb 6",
-	recipe = {
-		{"christmas_decor:led_rgb", "default:glass", "christmas_decor:led_rgb"},
-		{"christmas_decor:wire", "christmas_decor:wire", "christmas_decor:wire"},
-		{"christmas_decor:led_rgb", "default:glass", "christmas_decor:led_rgb"},
-	},
-})
+if depends.default then
+	minetest.register_craft({
+		output = "christmas_decor:lights_multicolor_bulb 6",
+		recipe = {
+			{"christmas_decor:led_rgb", "default:glass", "christmas_decor:led_rgb"},
+			{"christmas_decor:wire", "christmas_decor:wire", "christmas_decor:wire"},
+			{"christmas_decor:led_rgb", "default:glass", "christmas_decor:led_rgb"},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:lights_multicolor_bulb 6",
+		recipe = {
+			{"christmas_decor:led_rgb", "group:glass", "christmas_decor:led_rgb"},
+			{"christmas_decor:wire", "christmas_decor:wire", "christmas_decor:wire"},
+			{"christmas_decor:led_rgb", "group:glass", "christmas_decor:led_rgb"},
+		},
+	})
+end
 
 minetest.register_node("christmas_decor:garland", {
 	description = "Garland",
@@ -236,6 +271,13 @@ if depends.default then
 		output = "christmas_decor:garland 3",
 		recipe = {
 			{"default:pine_needles", "default:pine_needles", "default:pine_needles"},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:garland 3",
+		recipe = {
+			{"mcl_core:spruceleaves", "mcl_core:spruceleaves", "mcl_core:spruceleaves"},
 		},
 	})
 end
