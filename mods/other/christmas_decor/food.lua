@@ -100,6 +100,15 @@ if depends.default then
 			"christmas_decor:gingerbread_man", "default:glass",
 		},
 	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:plate_with_cookies",
+		type = "shapeless",
+		recipe = {
+			"christmas_decor:gingerbread_man", "christmas_decor:gingerbread_man",
+			"christmas_decor:gingerbread_man", "group:glass",
+		},
+	})
 end
 
 if depends.vessels and depends.mobs_animal and depends.bucket then
@@ -108,6 +117,12 @@ if depends.vessels and depends.mobs_animal and depends.bucket then
 		type = "shapeless",
 		recipe = {"vessels:drinking_glass", "mobs:bucket_milk"},
 		replacements = {{"mobs:bucket_milk", "bucket:bucket_empty"}},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:milk_glass",
+		type = "shapeless",
+		recipe = {"mcl_potions:glass_bottle", "mcl_mobitems:milk_bucket"},
 	})
 end
 
@@ -130,6 +145,23 @@ if depends.default then
 			{"default:steel_ingot", "", "default:steel_ingot"},
 		},
 	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:ginger",
+		recipe = {
+			{"mcl_core:paper", "mcl_cocoas:cocoa_beans", "mcl_core:paper"},
+			{"mcl_core:paper", "mcl_dye:orange", "mcl_core:paper"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:cookiecutter 1",
+		recipe = {
+			{"", "mcl_core:iron_nugget", ""},
+			{"mcl_core:iron_nugget", "mcl_core:iron_nugget", "mcl_core:iron_nugget"},
+			{"mcl_core:iron_nugget", "", "mcl_core:iron_nugget"},
+		},
+	})
 end
 
 if depends.bucket and depends.farming_redo then
@@ -138,6 +170,12 @@ if depends.bucket and depends.farming_redo then
 		type = "shapeless",
 		recipe = {"christmas_decor:ginger", "farming:flour", "bucket:bucket_water", "farming:sugar"},
 		replacements = {{"bucket:bucket_water", "bucket:bucket_empty"}},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:gingerbread_dough",
+		type = "shapeless",
+		recipe = {"christmas_decor:ginger", "mcl_farming:wheat_item", "mcl_buckets:bucket_water", "mcl_core:sugar"},
 	})
 end
 
@@ -171,6 +209,42 @@ if depends.farming_redo and depends.dye then
 			{"", "farming:sugar", ""},
 			{"dye:red", "", "dye:red"},
 			{"farming:sugar", "", ""},
+		},
+	})
+elseif depends.mcl_core and depends.mineclonefood then
+	minetest.register_craft({
+		output = "christmas_decor:candycane_edible 2",
+		recipe = {
+			{"", "mcl_core:sugar", ""},
+			{"mineclonefood:cherrysugar", "", "mineclonefood:cherrysugar"},
+			{"", "", "mcl_core:sugar"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:candycane_edible 2",
+		recipe = {
+			{"", "mcl_core:sugar", ""},
+			{"mineclonefood:cherrysugar", "", "mineclonefood:cherrysugar"},
+			{"mcl_core:sugar", "", ""},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:candycane_edible 2",
+		recipe = {
+			{"", "mcl_core:sugar", ""},
+			{"mcl_dye:red", "", "mcl_dye:red"},
+			{"", "", "mcl_core:sugar"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:candycane_edible 2",
+		recipe = {
+			{"", "mcl_core:sugar", ""},
+			{"mcl_dye:red", "", "mcl_dye:red"},
+			{"mcl_core:sugar", "", ""},
 		},
 	})
 end
@@ -255,6 +329,60 @@ if depends.farming_redo then
 			replacements = {{"bucket:bucket_water", "bucket:bucket_empty"}},
 		})
 	end
+elseif depends.mcl_core and depends.mineclonefood then
+	minetest.register_craft({
+		output = "christmas_decor:candycane_block 8",
+		recipe = {
+			{"mcl_core:sugar", "mineclonefood:cherrysugar", "mcl_core:sugar"},
+			{"mineclonefood:cherrysugar", "mcl_core:sugar", "mineclonefood:cherrysugar"},
+			{"mcl_core:sugar", "mineclonefood:cherrysugar", "mcl_core:sugar"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:peppermint_block 8",
+		recipe = {
+			{"mineclonefood:cherrysugar", "mcl_core:sugar", "mineclonefood:cherrysugar"},
+			{"mcl_core:sugar", "mineclonefood:cherrysugar", "mcl_core:sugar"},
+			{"mineclonefood:cherrysugar", "mcl_core:sugar", "mineclonefood:cherrysugar"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:frosting_block 8",
+		recipe = {
+			{"mcl_core:sugar", "mcl_core:sugar", "mcl_core:sugar"},
+			{"mcl_core:sugar", "mcl_buckets:bucket_water", "mcl_core:sugar"},
+			{"mcl_core:sugar", "mcl_core:sugar", "mcl_core:sugar"},
+		},
+	})
+elseif depends.mcl_core then
+	minetest.register_craft({
+		output = "christmas_decor:candycane_block 8",
+		recipe = {
+			{"mcl_core:sugar", "mcl_dye:red", "mcl_core:sugar"},
+			{"mcl_dye:red", "mcl_core:sugar", "mcl_dye:red"},
+			{"mcl_core:sugar", "mcl_dye:red", "mcl_core:sugar"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:peppermint_block 8",
+		recipe = {
+			{"mcl_dye:red", "mcl_core:sugar", "mcl_dye:red"},
+			{"mcl_core:sugar", "mcl_dye:red", "mcl_core:sugar"},
+			{"mcl_dye:red", "mcl_core:sugar", "mcl_dye:red"},
+		},
+	})
+
+	minetest.register_craft({
+		output = "christmas_decor:frosting_block 8",
+		recipe = {
+			{"mcl_core:sugar", "mcl_core:sugar", "mcl_core:sugar"},
+			{"mcl_core:sugar", "mcl_buckets:bucket_water", "mcl_core:sugar"},
+			{"mcl_core:sugar", "mcl_core:sugar", "mcl_core:sugar"},
+		},
+	})
 end
 
 if depends.stairs then
@@ -274,6 +402,27 @@ if depends.stairs then
 
 	local frosting_def = minetest.registered_nodes["christmas_decor:frosting_block"]
 	stairs.register_stair_and_slab("frosting_block", "christmas_decor:frosting_block",
+		frosting_def.groups, frosting_def.tiles,
+		frosting_def.description .. " Stair", frosting_def.description .. " Slab",
+		frosting_def.sounds, false
+	)
+elseif depends.mcl_core then
+	local candycane_def = minetest.registered_nodes["christmas_decor:candycane_block"]
+	mcl_stairs.register_stair_and_slab("candycane_block", "christmas_decor:candycane_block",
+		candycane_def.groups, candycane_def.tiles,
+		candycane_def.description .. " Stair", candycane_def.description .. " Slab",
+		candycane_def.sounds, false
+	)
+
+	local peppermint_def = minetest.registered_nodes["christmas_decor:peppermint_block"]
+	mcl_stairs.register_stair_and_slab("peppermint_block", "christmas_decor:peppermint_block",
+		peppermint_def.groups, peppermint_def.tiles,
+		peppermint_def.description .. " Stair", peppermint_def.description .. " Slab",
+		peppermint_def.sounds, false
+	)
+
+	local frosting_def = minetest.registered_nodes["christmas_decor:frosting_block"]
+	mcl_stairs.register_stair_and_slab("frosting_block", "christmas_decor:frosting_block",
 		frosting_def.groups, frosting_def.tiles,
 		frosting_def.description .. " Stair", frosting_def.description .. " Slab",
 		frosting_def.sounds, false
@@ -374,6 +523,15 @@ for color, hex in pairs({
 				{"", "farming:sugar", ""},
 				{"farming:sugar", "dye:" .. color:gsub("purple", "violet"), "farming:sugar"},
 				{"farming:sugar", "farming:sugar", "farming:sugar"},
+			}
+		})
+	elseif depends.mcl_core then
+		minetest.register_craft({
+			output = "christmas_decor:gumdrop_" .. color .. " 2",
+			recipe = {
+				{"", "mcl_core:sugar", ""},
+				{"mcl_core:sugar", "mcl_dye:" .. color:gsub("purple", "violet"), "mcl_core:sugar"},
+				{"mcl_core:sugar", "mcl_core:sugar", "mcl_core:sugar"},
 			}
 		})
 	end
