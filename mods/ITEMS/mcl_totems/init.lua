@@ -99,8 +99,8 @@ mcl_damage.register_modifier(function(obj, damage, reason)
 					end)
 				end
 
-				-- Set HP to exactly 1
-				return hp - 1
+				-- Set HP to exactly 10
+				return hp - 10
 			end
 		end
 	end
