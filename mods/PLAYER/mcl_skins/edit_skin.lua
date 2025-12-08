@@ -1,4 +1,5 @@
 local S = minetest.get_translator("mcl_skins")
+storage = core.get_mod_storage()
 local color_to_string = minetest.colorspec_to_colorstring
 local EDIT_SKIN_KEY = -1 -- The key used for edit skin in the mcl_skins.simple_skins table
 
