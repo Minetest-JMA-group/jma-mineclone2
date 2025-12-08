@@ -287,5 +287,11 @@
 		"name": "mclcape",
 		"mask": "mclcape_body.png",
 		"selector_func" : null
+	},
+	{
+		"type": "cape",
+		"name": "soul_creepercape",
+		"mask": "soul_creepercape_body.png",
+		"selector_func" : "return function(player) if player:is_player() then if storage:get_string(player:get_player_name()) == nil then storage:set_string(player:get_player_name(), '1') core.log(player:get_player_name()..' has claimed the Soul Creeper cape') return true elseif storage:get_string(player:get_player_name()) == '1' then return true end end end"
 	}
 ]
