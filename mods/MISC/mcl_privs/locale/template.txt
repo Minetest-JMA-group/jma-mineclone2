@@ -1,8 +1,4 @@
 # textdomain: mcl_privs
-<<<<<<< HEAD
-Can place and use advanced blocks like mob spawners, command blocks and barriers.=
-=======
 
 Can place and use advanced blocks like mob spawners, command blocks and barriers.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

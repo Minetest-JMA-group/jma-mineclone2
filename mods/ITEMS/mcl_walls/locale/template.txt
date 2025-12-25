@@ -1,11 +1,7 @@
 # textdomain: mcl_walls
-<<<<<<< HEAD
-A piece of wall. It cannot be jumped over with a simple jump. When multiple of these are placed to next to each other, they will automatically build a nice wall structure.=
-=======
 
 A piece of wall. It cannot be jumped over with a simple jump. When multiple of these are placed to next to each other, they will automatically build a nice wall structure.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ register.lua ]##
 Cobblestone Wall=
 Mossy Cobblestone Wall=

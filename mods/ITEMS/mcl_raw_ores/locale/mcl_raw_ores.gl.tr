@@ -1,15 +1,15 @@
 # textdomain: mcl_raw_ores
-Raw Iron=Ferro bruto
+Raw Iron=Ferro en bruto
 ##TODO: fuzzy matched - verify and remove the comment
-Raw iron. Mine an iron ore to get it.=Ferro bruto. Extrae un mineral de ferro para conseguilo.
-Block of Raw Iron=Bloque de ferro bruto
+Raw iron. Mine an iron ore to get it.=Ferro en bruto. Extrae un mineral de ferro para conseguilo.
+Block of Raw Iron=Bloque de ferro en bruto
 
 A block of raw iron is mostly a decorative block but also useful as a compact storage of raw iron.=
 
-Raw Gold=Ouro bruto
+Raw Gold=Ouro en bruto
 ##TODO: fuzzy matched - verify and remove the comment
-Raw gold. Mine a gold ore to get it.=Ouro bruto. Extrae un mineral de ouro para conseguilo.
-Block of Raw Gold=Bloque de ouro bruto
+Raw gold. Mine a gold ore to get it.=Ouro en bruto. Extrae un mineral de ouro para conseguilo.
+Block of Raw Gold=Bloque de ouro en bruto
 
 A block of raw gold is mostly a decorative block but also useful as a compact storage of raw gold.=
 

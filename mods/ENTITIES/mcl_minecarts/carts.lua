@@ -212,9 +212,6 @@ function DEFAULT_CART_DEF:on_activate(staticdata, dtime_s)
 	self._uuid = data.uuid
 	self._staticdata = data
 
-	-- Make sure despawn timer exists
-	self._despawn_timer = 0
-
 	-- Activate cart if on powered activator rail
 	if self.on_activate_by_rail then
 		local pos = self.object:get_pos()

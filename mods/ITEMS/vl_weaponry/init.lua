@@ -1,3 +1,5 @@
+vl_weaponry = {}
+
 local modname = core.get_current_modname()
 local modpath = core.get_modpath(modname)
 local S = core.get_translator(modname)
@@ -12,7 +14,8 @@ local spear_use = S("To throw a spear, hold it in your hand, then hold use (righ
 
 local wield_scale = mcl_vars.tool_wield_scale
 
-
+vl_weaponry.hammer_tt = hammer_tt
+vl_weaponry.spear_tt = spear_tt
 
 local spear_entity = table.copy(mcl_bows.arrow_entity)
 table.update(spear_entity,{
@@ -56,6 +59,9 @@ table.update(spear_entity._vl_projectile,{
 	pitch_offset = math.pi / 4,
 })
 
+-- Make the spear entity available to other mods as a template
+vl_weaponry.spear_entity = table.copy(spear_entity)
+
 vl_projectile.register("vl_weaponry:spear_entity", spear_entity)
 
 local SPEAR_THROW_POWER = 30
@@ -76,6 +82,11 @@ local function spear_on_place(itemstack, user, pointed_thing)
 end
 
 local function throw_spear(itemstack, user, power_factor)
+	-- These values are not available when the spear is broken (itemstack is empty).
+	-- Retrieve them before adding wear to prevent issues on final throw.
+	local texture_name = itemstack:get_name()
+	local damage = itemstack:get_definition()._mcl_spear_thrown_damage * power_factor
+
 	if not core.is_creative_enabled(user:get_player_name()) then
 		mcl_util.use_item_durability(itemstack, 1)
 	end
@@ -95,13 +106,13 @@ local function throw_spear(itemstack, user, power_factor)
 	})
 	local obj_properties = table.copy(spear_entity)
 	table.update(obj_properties, {
-		textures = {itemstack:get_name()}
+		textures = {texture_name}
 	})
 	obj:set_properties(obj_properties)
 	local le = obj:get_luaentity()
 	le._shooter = user
 	le._source_object = user
-	le._damage = itemstack:get_definition()._mcl_spear_thrown_damage * power_factor
+	le._damage = damage
 	le._is_critical = false -- TODO get from luck?
 	le._startpos = pos
 	le._collectable = true
@@ -154,7 +165,7 @@ end
 controls.register_on_release(function(player, key, time)
 	if key~="RMB" and key~="zoom" then return end
 	local wielditem = player:get_wielded_item()
-	if core.get_item_group(wielditem:get_name(), "spear") < 1 then return end
+	if core.get_item_group(wielditem:get_name(), "spear") ~= 1 then return end
 	local meta = wielditem:get_meta()
 	if not core.is_yes(meta:get("active")) then
 		reset_spear_state(player)

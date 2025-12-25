@@ -249,6 +249,9 @@ for _, item in pairs(compass_types) do
 			wield_image = string.format(img_fmt, i),
 			groups = {compass = i + 1, tool = 1, disable_repair = 1},
 		}
+		if item.name == "compass" then
+			def.groups._mcl_compass = 1
+		end
 		if i == stereotype_frame then
 			def._doc_items_longdesc = item.longdesc
 			def._doc_items_usagehelp = item.usagehelp
@@ -281,7 +284,7 @@ minetest.register_craft({ --TODO: update once echo shards are a thing
 	output = "mcl_compass:" .. random_frame .. "_recovery",
 	recipe = {
 		{"","mcl_nether:netherite_ingot",""},
-		{"mcl_core:diamondblock","group:compass","mcl_core:diamondblock"},
+		{"mcl_core:diamondblock","group:_mcl_compass","mcl_core:diamondblock"},
 		{"mcl_core:diamondblock","mcl_core:diamondblock","mcl_core:diamondblock"}
 
 	}
@@ -292,6 +295,10 @@ minetest.register_alias("mcl_compass:compass", "mcl_compass:" .. stereotype_fram
 
 minetest.register_node("mcl_compass:lodestone",{
 	description=S("Lodestone"),
+	_tt_help = S("Use with a compass"),
+	_doc_items_longdesc = S("Lodestone is a block that can be used with a compass, after which the compass points to its position."),
+	_doc_items_usagehelp = S("Rightclick the lodestone with a compass to let the compass point to its position."),
+	_doc_items_hidden = false,
 	on_rightclick = function(pos, node, player, itemstack)
 		local name = itemstack.get_name(itemstack)
 		if string_find(name,"mcl_compass:") then

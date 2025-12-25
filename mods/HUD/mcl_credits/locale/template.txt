@@ -5,11 +5,7 @@ Jump to speed up (additionally sprint)=
 ##[ people.lua ]##
 Creator of MineClone=
 Creator of VoxeLibre=
-<<<<<<< HEAD
-Maintainers=
-=======
 Maintainer=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Previous Maintainers=
 Developers=
 Past Developers=

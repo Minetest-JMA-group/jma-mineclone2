@@ -1,10 +1,6 @@
 # textdomain: mcl_loom
 Loom=
 Used to create banner designs=
-<<<<<<< HEAD
-This is the shepherd villager's work station. It is used to create banner designs.=
-=======
 
 This is the shepherd villager's work station. It is used to create banner designs.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

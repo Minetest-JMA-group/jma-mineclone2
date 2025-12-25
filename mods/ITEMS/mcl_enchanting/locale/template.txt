@@ -20,15 +20,6 @@ The target item is not enchantable.=
 Enchanted Book=
 Enchanting Table=
 Spend experience, and lapis to enchant various items.=
-<<<<<<< HEAD
-Enchanting Tables will let you enchant armors, tools, weapons, and books with various abilities. But, at the cost of some experience, and lapis lazuli.=
-Rightclick the Enchanting Table to open the enchanting menu.=
-Place a tool, armor, weapon or book into the top left slot, and then place 1-3 Lapis Lazuli in the slot to the right.=
-After placing your items in the slots, the enchanting options will be shown. Hover over the options to read what is available to you.=
-These options are randomized, and dependent on experience level; but the enchantment strength can be increased.=
-To increase the enchantment strength, place bookshelves around the enchanting table. However, you will need to keep 1 air node between the table, & the bookshelves to empower the enchanting table.=
-After finally selecting your enchantment; left-click on the selection, and you will see both the lapis lazuli and your experience levels consumed. And, an enchanted item left in its place.=
-=======
 
 Enchanting Tables will let you enchant armors, tools, weapons, and books with various abilities. But, at the cost of some experience, and lapis lazuli.=
 
@@ -44,7 +35,6 @@ To increase the enchantment strength, place bookshelves around the enchanting ta
 
 After finally selecting your enchantment; left-click on the selection, and you will see both the lapis lazuli and your experience levels consumed. And, an enchanted item left in its place.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Enchant=
 ##[ engine.lua ]##
 Inventory=
@@ -54,11 +44,6 @@ Inventory=
 Level requirement: @1=
 ##[ enchantments.lua ]##
 Bane of Arthropods=
-<<<<<<< HEAD
-Increases damage and applies Slowness IV to arthropod mobs (spiders, cave spiders, silverfish and endermites).=
-Channeling=
-Channels a bolt of lightning toward a target. Works only during thunderstorms and if target is unobstructed with opaque blocks.=
-=======
 
 Increases damage and applies Slowness IV to arthropod mobs (spiders, cave spiders, silverfish and endermites).=
 
@@ -66,7 +51,6 @@ Channeling=
 
 Channels a bolt of lightning toward a target. Works only during thunderstorms and if target is unobstructed with opaque blocks.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Curse of Vanishing=
 Item destroyed on death.=
 Depth Strider=
@@ -80,13 +64,9 @@ Arrows set target on fire.=
 Fortune=
 Increases certain block drops.=
 Frost Walker=
-<<<<<<< HEAD
-Turns water beneath the player into frosted ice and prevents the damage from magma blocks.=
-=======
 
 Turns water beneath the player into frosted ice and prevents the damage from magma blocks.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Impaling=
 Trident deals additional damage to ocean mobs.=
 Infinity=
@@ -96,7 +76,7 @@ Increases knockback.=
 Looting=
 Increases mob loot.=
 Loyalty=
-Trident returns after being thrown. Higher levels reduce return time.=
+Spear returns after being thrown. Higher levels reduce return time.=
 Luck of the Sea=
 Increases rate of good loot (enchanting books, etc.)=
 Lure=
@@ -129,3 +109,5 @@ Sweeping Edge=
 Increases sweeping attack damage.=
 Unbreaking=
 Increases item durability.=
+Swift Sneak=
+Increases movement speed while sneaking.=

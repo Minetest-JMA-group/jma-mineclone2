@@ -3,9 +3,9 @@
 mcl_fire = {}
 local DEBUG = false
 
----@class core.NodeDef
+---@class (partial) core.NodeDef
 ---@field _on_burn? fun(pos : vector.Vector)
----@field _on_ignite? fun(user : core.PlayerObjectRef, pointed_thing : core.PointedThing) : boolean|nil
+---@field _on_ignite? fun(user : core.PlayerRef, pointed_thing : core.PointedThing) : boolean?
 
 local modname = core.get_current_modname()
 local modpath = core.get_modpath(modname)
@@ -189,6 +189,9 @@ core.register_node("mcl_fire:fire", {
 			core.sound_play("fire_extinguish_flame", {pos = pos, gain = 0.25, max_hear_distance = 16}, true)
 		end
 	end,
+	on_punch = function(pos)
+		core.sound_play("fire_extinguish_flame", {pos = pos, gain = 0.15, max_hear_distance = 16}, true)
+	end,
 	drop = "",
 	sounds = {},
 	-- Turn into eternal fire on special blocks, light Nether portal (if possible), start burning timer
@@ -241,6 +244,9 @@ core.register_node("mcl_fire:eternal_fire", {
 		if get_item_group(newnode.name, "water") ~= 0 then
 			core.sound_play("fire_extinguish_flame", {pos = pos, gain = 0.25, max_hear_distance = 16}, true)
 		end
+	end,
+	on_punch = function(pos)
+		core.sound_play("fire_extinguish_flame", {pos = pos, gain = 0.15, max_hear_distance = 16}, true)
 	end,
 	-- Start burning timer and light Nether portal (if possible)
 	on_construct = function(pos)
@@ -438,6 +444,8 @@ else -- Fire enabled
 
 			-- Always age the source fire
 			local humidity_factor = consts.humidity_factor * core.get_humidity(pos)
+			if humidity_factor < 0 then humidity_factor = 0 end
+
 			age = min(255, age + random(consts.age_min, humidity_factor + consts.age_max))
 			node.param2 = age
 

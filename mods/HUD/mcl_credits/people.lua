@@ -33,9 +33,10 @@ return {
 		"AFCMS",
 		"epCode",
 		"TomCon / SmokeyDope",
-		"Faerraven / Michieal",
 		"teknomunk",
 		"AncientMariner",
+		"archie / andro",
+		"ralisv / Nixprland",
 	}},
 	{S("Past Developers"), 0xF84355, {
 		"jordan4ibanez",
@@ -52,6 +53,7 @@ return {
 		"MrRar",
 		"rudzik8",
 		"kno10",
+		"Faerraven / Michieal",
 	}},
 	{S("Contributors"), 0x52FF00, {
 		"RandomLegoBrick",
@@ -182,6 +184,12 @@ return {
 		"wrrrzr",
 		"antimundo",
 		"farfind",
+		"WolfySoy",
+		"sled314",
+		"Skivling",
+		"TANGaming",
+		"SecretVoxelPlayer",
+		"olivia-may",
 	}},
 	{S("Music"), 0xA60014, {
 		"Jordach for the jukebox music compilation from Big Freaking Dig",

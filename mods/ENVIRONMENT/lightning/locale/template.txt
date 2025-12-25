@@ -1,8 +1,4 @@
 # textdomain: lightning
-<<<<<<< HEAD
-Let lightning strike at the specified position or player. No parameter will strike yourself.=
-=======
 
 Let lightning strike at the specified position or player. No parameter will strike yourself.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

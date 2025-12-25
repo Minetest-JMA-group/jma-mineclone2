@@ -1,10 +1,6 @@
 # textdomain: mcl_target
 Target=
-<<<<<<< HEAD
-A target is a block that provides a temporary redstone charge when hit by a projectile.=
-=======
 
 A target is a block that provides a temporary redstone charge when hit by a projectile.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Throw a projectile on the target to activate it.=
