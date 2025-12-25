@@ -19,10 +19,7 @@ Donkey=
 Mule=
 ##[ llama.lua ]##
 Llama=
-<<<<<<< HEAD
-=======
  - Strength @1=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ ocelot.lua ]##
 Ocelot=
 Cat=
@@ -71,13 +68,8 @@ Vindicator=
 Zombie Villager=
 ##[ witch.lua ]##
 Witch=
-<<<<<<< HEAD
-##[ blaze.lua ]##
-Blaze=
-=======
 ##[ elementals.lua ]##
 Fire Elemental=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ ender_dragon.lua ]##
 Ender Dragon=
 ##[ endermite.lua ]##

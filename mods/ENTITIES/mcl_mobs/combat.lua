@@ -7,6 +7,7 @@ local mobs_griefing = core.settings:get_bool("mobs_griefing") ~= false
 -- pathfinding settings
 local stuck_timeout = 3 -- how long before mob gets stuck in place and starts searching
 local stuck_path_timeout = 10 -- how long will mob follow path before giving up
+local INVULNERABILITY_TIME_US = 500000
 
 local enable_pathfinding = true
 
@@ -26,6 +27,8 @@ local vector_new = vector.new
 local vector_copy = vector.copy
 local vector_distance = vector.distance
 
+local DIRECT_SIGHT_ANGLE = PI / 3 -- 60 degrees
+
 -- check if daytime and also if mob is docile during daylight hours
 function mob_class:day_docile()
 	return self.docile_by_day == true and self.time_of_day > 0.2 and self.time_of_day < 0.8
@@ -33,7 +36,7 @@ end
 
 -- get this mob to attack the object
 function mob_class:do_attack(object)
-	if self.state == "attack" or self.state == "die" then
+	if self.state == "attack" or self.state == "die" or self.state == "runaway" then
 		return
 	end
 	if object:is_player() and not damage_enabled and not self.force_attack then
@@ -49,13 +52,11 @@ function mob_class:do_attack(object)
 	--end
 end
 
-local los_switcher = false
-local height_switcher = false
-
 -- path finding and smart mob routine by rnd, line_of_sight and other edits by Elkien3
+---@param s vector mob's current position
+---@param p vector target's position or last known position of target
 function mob_class:smart_mobs(s, p, dist, dtime)
 	local s1 = self.path.lastpos
-	local target_pos = self.attack:get_pos()
 
 	-- is it becoming stuck?
 	if abs(s1.x - s.x) + abs(s1.z - s.z) < .5 then
@@ -67,17 +68,17 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 	self.path.lastpos = vector_copy(s)
 
 	local use_pathfind = false
-	local has_lineofsight = minetest.line_of_sight(vector_offset(s, 0, .5, 0), vector_offset(target_pos, 0, 1.5, 0), .2)
+	local has_lineofsight = self.target_visible(self.object, self.attack)
 
 	-- im stuck, search for path
 	if not has_lineofsight then
-		if los_switcher == true then
+		if self.path.los_switcher == true then
 			use_pathfind = true
-			los_switcher = false
+			self.path.los_switcher = false
 		end -- cannot see target!
 	else
-		if los_switcher == false then
-			los_switcher = true
+		if self.path.los_switcher == false then
+			self.path.los_switcher = true
 			use_pathfind = false
 			minetest.after(1, function(self)
 				if not self.object:get_luaentity() then return end
@@ -104,15 +105,15 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 		end, self)
 	end
 
-	if abs(s.y - target_pos.y) > self.initial_properties.stepheight then
-		if height_switcher then
+	if abs(s.y - p.y) > self.initial_properties.stepheight then
+		if self.path.height_switcher then
 			use_pathfind = true
-			height_switcher = false
+			self.path.height_switcher = false
 		end
 	else
-		if not height_switcher then
+		if not self.path.height_switcher then
 			use_pathfind = false
-			height_switcher = true
+			self.path.height_switcher = true
 		end
 	end
 
@@ -131,8 +132,7 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 		-- determine node above ground
 		if not ssight then s.y = sground.y + 1 end
 
-		local p1 = self.attack:get_pos()
-		p1 = vector_new(floor(p1.x + 0.5), floor(p1.y + 0.5), floor(p1.z + 0.5))
+		local p1 = vector_offset(p, 0.5, 0.5, 0.5)
 
 		local dropheight = 12
 		if self.fear_height ~= 0 then dropheight = self.fear_height end
@@ -151,7 +151,7 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 		if not self.path.way then
 			self.path.following = false
 
-			 -- lets make way by digging/building if not accessible
+			-- lets make way by digging/building if not accessible
 			if self.pathfinding == 2 and mobs_griefing then
 				-- is player higher than mob?
 				if s.y < p1.y then
@@ -251,6 +251,40 @@ local specific_attack = function(list, what)
 	return false
 end
 
+-- Check if target is within mob's direct sight cone
+function mob_class:target_in_direct_sight(target_pos)
+	local s = self.object:get_pos()
+	if not s or not target_pos then return false end
+
+	local yaw = self.object:get_yaw() or 0
+	local dir_to_target = atan2(target_pos.z - s.z, target_pos.x - s.x)
+	-- Convert mob yaw to same coordinate system (mob yaw 0 = +Z, we need +X based)
+	local mob_facing = yaw - HALFPI
+
+	local angle_diff = abs(dir_to_target - mob_facing)
+	-- Normalize to [0, PI]
+	while angle_diff > PI do
+		angle_diff = angle_diff - 2 * PI
+	end
+	angle_diff = abs(angle_diff)
+	
+	return angle_diff <= DIRECT_SIGHT_ANGLE
+end
+
+-- schedule an attack after a delay with some random jitter
+function mob_class:delayed_attack(target, base_delay, jitter)
+	local base = base_delay or 0.5
+	local j = jitter or 0.3
+	local delay = base + random() * j
+	core.after(delay, function(self, target)
+		if not self.object:get_luaentity() then return end
+		if not target or not target:get_pos() then return end
+		if self.state == "attack" then return end -- already attacking something
+		if not self:target_visible(self.object, target) then return end
+		self:do_attack(target)
+	end, self, target)
+end
+
 -- find someone to attack
 function mob_class:monster_attack()
 	if not damage_enabled and not self.force_attack then
@@ -261,7 +295,7 @@ function mob_class:monster_attack()
 	end
 
 	local s = self.object:get_pos()
-	local p, sp, dist
+	local p, dist
 	local player, obj, min_player
 	local type, name = "", ""
 	local min_dist = self.view_range + 1
@@ -310,13 +344,7 @@ function mob_class:monster_attack()
 				or (type == "animal" and self.attack_animals == true)
 				or (self.extra_hostile and not self.attack_exception(player))) then
 			p = player:get_pos()
-			sp = s
-
 			dist = vector_distance(p, s)
-
-			-- aim higher to make looking up hills more realistic
-			p.y = p.y + 1
-			sp.y = sp.y + 1
 
 			local attacked_p = false
 			for c=1, #blacklist_attack do
@@ -326,7 +354,7 @@ function mob_class:monster_attack()
 			end
 
 			-- choose closest player to attack
-			local line_of_sight = self:line_of_sight( sp, p, 2) == true
+			local line_of_sight = self:target_visible(self.object, player) == true
 			if dist < min_dist and not attacked_p and line_of_sight then
 				min_dist = dist
 				min_player = player
@@ -338,7 +366,14 @@ function mob_class:monster_attack()
 	end
 	-- attack player
 	if min_player then
-		self:do_attack(min_player)
+		local target_pos = min_player:get_pos()
+		if self:target_in_direct_sight(target_pos) then
+			-- Target in direct sight, attack immediately
+			self:do_attack(min_player)
+		else
+			-- Target not in direct sight, schedule delayed attack by 0.5-1.0 seconds
+			self:delayed_attack(min_player, 0.5, 0.5)
+		end
 	end
 end
 
@@ -351,7 +386,7 @@ function mob_class:npc_attack()
 		return
 	end
 
-	local p, sp, obj, min_player
+	local p, obj, min_player
 	local s = self.object:get_pos()
 	local min_dist = self.view_range + 1
 	local objs = minetest.get_objects_inside_radius(s, self.view_range)
@@ -361,15 +396,9 @@ function mob_class:npc_attack()
 
 		if obj and obj.type == "monster" then
 			p = obj.object:get_pos()
-			sp = s
-
 			local dist = vector_distance(p, s)
 
-			-- aim higher to make looking up hills more realistic
-			p.y = p.y + 1
-			sp.y = sp.y + 1
-
-			if dist < min_dist and self:line_of_sight( sp, p, 2) == true then
+			if dist < min_dist and self:target_visible(self.object, obj.object) then
 				min_dist = dist
 				min_player = obj.object
 			end
@@ -377,7 +406,14 @@ function mob_class:npc_attack()
 	end
 
 	if min_player then
-		self:do_attack(min_player)
+		local target_pos = min_player:get_pos()
+		if self:target_in_direct_sight(target_pos) then
+			-- Target in direct sight, attack immediately
+			self:do_attack(min_player)
+		else
+			-- Target not in direct sight, delay attack by 0.2-0.5 seconds
+			self:delayed_attack(min_player, 0.2, 0.3)
+		end
 	end
 end
 
@@ -459,23 +495,32 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 	local mob_pos = self.object:get_pos()
 	local player_pos = hitter:get_pos()
 	local weapon = hitter:get_wielded_item()
+	local time_now = core.get_us_time()
+
+	-- check for invulnerability time in microseconds (0.5 second)
+	local time_diff = time_now - self.invul_timestamp
+	if time_diff <= INVULNERABILITY_TIME_US and time_diff >= 0 then return end
 
 	if is_player then
 		-- is mob out of reach?
 		if (vector.distance(mob_pos, player_pos) - self._avg_radius) > (weapon:get_definition().range or 3) then
 			return
 		end
+
 		-- is mob protected?
 		if self.protected and minetest.is_protected(mob_pos, hitter:get_player_name()) then return end
 
 		mcl_potions.update_haste_and_fatigue(hitter)
+
+		self.xp_timestamp = time_now
+	else
+		-- set/update 'drop xp' timestamp if hit by a player's projectiles
+		local hitter_le = hitter:get_luaentity()
+		local hitter_le_owner = hitter_le and hitter_le._owner
+		if hitter_le_owner and core.get_player_by_name(hitter_le_owner) then
+			self.xp_timestamp = time_now
+		end
 	end
-
-	local time_now = minetest.get_us_time()
-	local time_diff = time_now - self.invul_timestamp
-
-	-- check for invulnerability time in microseconds (0.5 second)
-	if time_diff <= 500000 and time_diff >= 0 then return end
 
 	-- custom punch function
 	if self.do_punch then
@@ -491,19 +536,14 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 		return
 	end
 
-	local time_now = minetest.get_us_time()
-
-	if is_player then
-		if minetest.is_creative_enabled(hitter:get_player_name()) then self.health = 0 end
-		-- set/update 'drop xp' timestamp if hitted by player
-		self.xp_timestamp = time_now
-	end
-
 	-- punch interval
 	local punch_interval = 1.4
 
-	-- exhaust attacker
 	if is_player then
+		-- Instant kill mobs in creative
+		if core.is_creative_enabled(hitter:get_player_name()) then self.health = 0 end
+
+		-- exhaust attacker
 		mcl_hunger.exhaust(hitter:get_player_name(), mcl_hunger.EXHAUST_ATTACK)
 	end
 
@@ -516,7 +556,6 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 	if tflp == 0 then
 		tflp = 0.2
 	end
-
 
 	for group,_ in pairs((tool_capabilities.damage_groups or {}) ) do
 		tmp = tflp / (tool_capabilities.full_punch_interval or 1.4)
@@ -536,6 +575,13 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 		if fire_aspect_level > 0 then
 			mcl_burning.set_on_fire(self.object, fire_aspect_level * 4)
 		end
+
+		if (self.armor.arthropod or 0) > 0 then
+			local bane_level = mcl_enchanting.get_enchantment(weapon, "bane_of_arthropods")
+			if bane_level > 0 then
+				mcl_potions.give_effect_by_level("slowness", self.object, 4, 1 + 0.5 * bane_level)
+			end
+		end
 	end
 
 	-- check for tool immunity or special damage
@@ -554,6 +600,7 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 
 	if tool_capabilities then
 		punch_interval = tool_capabilities.full_punch_interval or 1.4
+		if punch_interval == 0 then punch_interval = 0.001 end -- minimal interval, needed to avoid crash due to 0/0 NaN
 	end
 
 	if not tflp then
@@ -814,6 +861,7 @@ local function clear_aggro(self)
 	self.timer = 0
 	self.blinktimer = 0
 	self.path.way = nil
+	self.path.last_seen_target_pos = nil
 end
 
 ---Starts an explosion attack.
@@ -867,25 +915,40 @@ function mob_class:do_states_attack(dtime)
 		return
 	end
 
-	local target_line_of_sight = self:target_visible(s)
+	local target_line_of_sight = self:target_visible(self.object, self.attack)
 
-	if not target_line_of_sight then
-		if self.target_time_lost then
-			local time_since_seen = os.time() - self.target_time_lost
-			if time_since_seen > TIME_TO_FORGET_TARGET then
+	if target_line_of_sight then
+		self.path.last_seen_target_pos = vector_copy(p)
+		self.target_time_lost = nil
+	else
+		if not self.target_time_lost then
+			self.target_time_lost = os.time()
+		end
+
+		-- Check if we should give up pursuit
+		local time_since_seen = os.time() - self.target_time_lost
+		if time_since_seen > TIME_TO_FORGET_TARGET then
+			self.target_time_lost = nil
+			clear_aggro(self)
+			return
+		end
+
+		if self.path.last_seen_target_pos then
+			local dist_to_last_seen = vector_distance(s, self.path.last_seen_target_pos)
+			if dist_to_last_seen < 0.5 then
 				self.target_time_lost = nil
 				clear_aggro(self)
 				return
 			end
-		else
-			self.target_time_lost = os.time()
+			-- Pursue last seen position
+			p = self.path.last_seen_target_pos
 		end
-	else
-		self.target_time_lost = nil
 	end
 
-	-- calculate distance from mob and enemy
+	-- calculate distance from mob to enemy and last seen position
 	local dist = vector_distance(p, s)
+	local actual_target_pos = self.attack:get_pos()
+	local actual_dist = actual_target_pos and vector_distance(actual_target_pos, s) or math.huge
 
 	if self.attack_type == "explode" then
 		if target_line_of_sight and self.allow_fuse_reset then
@@ -906,8 +969,12 @@ function mob_class:do_states_attack(dtime)
 		end
 
 		-- walk right up to player unless the timer is active
-		if self:fuse_is_triggered() and (self.stop_to_explode or dist < self.reach) or not target_line_of_sight then
+		if self:fuse_is_triggered() and (self.stop_to_explode or dist < self.reach) then
 			self:set_velocity(0)
+		elseif not target_line_of_sight and self.path.last_seen_target_pos then
+			-- Lost sight but have last seen position, keep pursuing
+			self:set_velocity(self.run_velocity)
+			self:turn_in_direction(p.x - s.x, p.z - s.z, 4)
 		else
 			self:set_velocity(self.run_velocity)
 		end
@@ -1020,12 +1087,13 @@ function mob_class:do_states_attack(dtime)
 					self:set_animation("walk")
 				end
 			end
-		else -- rnd: if inside reach range
+		elseif target_line_of_sight and actual_dist <= self.reach then
+			-- rnd: if inside reach range and visible
 			self.path.stuck = false
 			self.path.stuck_timer = 0
 			self.path.following = false -- not stuck anymore
 
-			self:set_velocity( 0)
+			self:set_velocity(0)
 
 			local attack_frequency = self.attack_frequency or 1
 
@@ -1039,7 +1107,7 @@ function mob_class:do_states_attack(dtime)
 						self:set_animation("punch")
 					end
 
-					if self:line_of_sight(vector_offset(p, 0, .5, 0), vector_offset(s, 0, .5, 0)) == true then
+					if self:line_of_sight(vector_offset(actual_target_pos, 0, .5, 0), vector_offset(s, 0, .5, 0)) == true then
 						self:mob_sound("attack")
 
 						-- punch player (or what player is attached to)
@@ -1057,7 +1125,7 @@ function mob_class:do_states_attack(dtime)
 						end
 					end
 				else
-					self.custom_attack(self, p)
+					self.custom_attack(self, actual_target_pos)
 				end
 			end
 		end

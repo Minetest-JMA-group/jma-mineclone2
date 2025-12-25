@@ -625,12 +625,8 @@ local anvildef = {
 			-- Limit name length
 			local set_name = string.sub(fields.name, 1, MAX_NAME_LENGTH)
 
-			-- Parse color blocks
-			set_name = parse_color_blocks(set_name)
-
 			meta:set_string("set_name", set_name)
 			update_anvil_slots(meta)
-
 			meta:set_string("formspec", get_anvil_formspec(set_name))
 		end
 	end,

@@ -1,12 +1,8 @@
 # textdomain: mcl_itemframes
 Item frames are decorative blocks in which items can be placed.=
-<<<<<<< HEAD
-Just place any item on the item frame. Use the item frame again to retrieve the item.=
-=======
 
 Just place any item on the item frame. Use the item frame again to retrieve the item.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ register.lua ]##
 Item Frame=
 Can hold an item=

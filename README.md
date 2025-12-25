@@ -1,5 +1,5 @@
 <div align="center">
-<img src="/menu/icon.png">
+<img src="/VoxeLibre/VoxeLibre/raw/branch/master/menu/icon.png">
 <h1>VoxeLibre</h1>
 <a href="https://content.luanti.org/packages/Wuzzy/mineclone2/">
 	<img src="https://content.luanti.org/packages/Wuzzy/mineclone2/shields/downloads/" alt="ContentDB">

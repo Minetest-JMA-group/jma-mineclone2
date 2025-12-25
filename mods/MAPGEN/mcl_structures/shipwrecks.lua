@@ -118,7 +118,7 @@ mcl_structures.register_structure("shipwreck",{
 					{ itemstring = "mcl_armor:chestplate_leather_enchanted", weight = 3, func = function(stack, pr)
 							mcl_enchanting.enchant_uniform_randomly(stack, {"soul_speed"}) end },
 					{ itemstring = "mcl_armor:leggings_leather_enchanted", weight = 3, func = function(stack, pr)
-							mcl_enchanting.enchant_uniform_randomly(stack, {"soul_speed"}) end },
+							mcl_enchanting.enchant_uniform_randomly(stack, {"soul_speed", "swift_sneak"}) end },
 					{ itemstring = "mcl_armor:boots_leather_enchanted", weight = 3, func = function(stack, pr)
 							mcl_enchanting.enchant_uniform_randomly(stack, {"soul_speed"}) end },
 					{ itemstring = "mcl_bamboo:bamboo", weight = 2, amount_min = 1, amount_max = 3 },
@@ -151,6 +151,7 @@ mcl_structures.register_structure("shipwreck",{
 					{ itemstring = "mcl_compass:compass", weight = 1, amount_min = 1, amount_max = 1 },
 					{ itemstring = "mcl_maps:empty_map", weight = 1, amount_min = 1, amount_max = 1 },
 					{ itemstring = "mcl_armor:coast", weight = 20, amount_min = 2, amount_max = 2},
+					{ itemstring = "vl_tridents:trident", weight = 0.5, amount_min = 1, amount_max = 1 },
 				}
 			},
 		}
