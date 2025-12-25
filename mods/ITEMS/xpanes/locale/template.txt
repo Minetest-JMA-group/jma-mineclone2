@@ -1,11 +1,4 @@
 # textdomain: xpanes
-<<<<<<< HEAD
-Glass panes are thin layers of glass which neatly connect to their neighbors as you build them.=
-Stained glass panes are thin layers of stained glass which neatly connect to their neighbors as you build them. They come in many different colors.=
-Stained Glass Pane=
-Iron Bars=
-Iron bars neatly connect to their neighbors as you build them.=
-=======
 
 Glass panes are thin layers of glass which neatly connect to their neighbors as you build them.=
 
@@ -16,7 +9,6 @@ Iron Bars=
 Iron bars neatly connect to their neighbors as you build them.=
 Gold Bars=
 Gold bars neatly connect to their neighbors as you build them.=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Glass Pane=
 Red Stained Glass Pane=
 Green Stained Glass Pane=

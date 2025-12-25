@@ -1,9 +1,4 @@
 # textdomain: mcl_hunger
-Food=
-Saturation=
-Exhaust.=
-<<<<<<< HEAD
-=======
 ##[ commands.lua ]##
 [on|off]=
 Toggle hunger and starvation mechanics=
@@ -30,4 +25,3 @@ Player not found.=
 Hunger level is required.=
 Hunger parameter must be a whole number from 0 to 20.=
 Done!=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

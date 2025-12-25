@@ -1,12 +1,8 @@
 # textdomain: mcl_monster_eggs
 Hides a silverfish=
-<<<<<<< HEAD
-An infested block is a block from which a silverfish will pop out when it is broken. It looks identical to its normal counterpart.=
-=======
 
 An infested block is a block from which a silverfish will pop out when it is broken. It looks identical to its normal counterpart.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Infested Stone=
 Infested Cobblestone=
 Infested Stone Bricks=

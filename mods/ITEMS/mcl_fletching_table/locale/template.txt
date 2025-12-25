@@ -1,10 +1,6 @@
 # textdomain: mcl_fletching_table
 Fletching Table=
 A fletching table=
-<<<<<<< HEAD
-This is the fletcher villager's work station. It currently has no use beyond decoration.=
-=======
 
 This is the fletcher villager's work station. It currently has no use beyond decoration.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f

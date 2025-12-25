@@ -91,10 +91,7 @@ end
 -- Reset HUD bars after food poisoning
 
 function mcl_hunger.reset_bars_poison_hunger(player)
-	hb.change_hudbar(player, "hunger", nil, nil, "hbhunger_icon.png", nil, "hbhunger_bar.png")
-	if mcl_hunger.get_debug() then
-		hb.change_hudbar(player, "exhaustion", nil, nil, nil, nil, "mcl_hunger_bar_exhaustion.png")
-	end
+	vl_hudbars.set_icon(player, "hunger", "hbhunger_icon.png")
 end
 
 local poisonrandomizer = PseudoRandom(os.time())
@@ -134,7 +131,7 @@ function mcl_hunger.item_eat(hunger_change, replace_with_item, poisontime, poiso
 					mcl_hunger.set_hunger(user, h, false)
 				end
 
-				hb.change_hudbar(user, "hunger", h)
+				vl_hudbars.change_value(user, "hunger", h)
 				mcl_hunger.update_saturation_hud(user, mcl_hunger.get_saturation(user), h)
 			end
 			-- Poison
@@ -188,7 +185,7 @@ function mcl_hunger.eat_effects(user, itemname, pos, hunger_change, item_def, pi
 				texture = def.wield_image
 			end
 			-- Special item definition field: _food_particles
-			-- If false, force item to not spawn any food partiles when eaten
+			-- If false, force item to not spawn any food particles when eaten
 			if def._food_particles ~= false and texture and texture ~= "" then
 				local v = user:get_velocity() or user:get_player_velocity()
 				for i = 0, math.min(math.max(8, hunger_change*2), 25) do
@@ -206,7 +203,7 @@ function mcl_hunger.eat_effects(user, itemname, pos, hunger_change, item_def, pi
 			end
 			core.sound_play("mcl_hunger_bite", {
 				max_hear_distance = 12,
-				gain = 1.0,
+				gain = 0.33,
 				pitch = pitch or 1 + math.random(-10, 10)*0.005,
 				object = user,
 			}, true)

@@ -1,3 +1,4 @@
+---
 
 name: "Feature request"
 about: "File a feature request"

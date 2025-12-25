@@ -1,22 +1,4 @@
 # textdomain: mcl_armor
-<<<<<<< HEAD
-This is a piece of equippable armor which reduces the amount of damage you receive.=
-To equip it, put it on the corresponding armor slot in your inventory menu.=
-sentry=
-dune=
-coast=
-wild=
-tide=
-ward=
-vex=
-rib=
-snout=
-eye=
-spire=
-silence=
-wayfinder=
-##[ register.lua ]##
-=======
 
 This is a piece of equippable armor which reduces the amount of damage you receive.=
 
@@ -58,7 +40,6 @@ Netherite Helmet=
 Netherite Chestplate=
 Netherite Leggings=
 Netherite Boots=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 Projectile Protection=
 Reduces projectile damage.=
 Blast Protection=
@@ -73,12 +54,6 @@ Aqua Affinity=
 #Translations of enchantements
 Increases underwater mining speed.=
 Curse of Binding=
-<<<<<<< HEAD
-Item cannot be removed from armor slots except due to death, breaking or in Creative Mode.=
-Thorns=
-Reflects some of the damage taken when hit, at the cost of reducing durability with each proc.=
-Elytra=
-=======
 
 Item cannot be removed from armor slots except due to death, breaking or in Creative Mode.=
 
@@ -92,7 +67,6 @@ Leather Cap=
 Leather Tunic=
 Leather Pants=
 Leather Boots=
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
 ##[ trims.lua ]##
 #Translations for armor trims
 Smithing Template '@1'=

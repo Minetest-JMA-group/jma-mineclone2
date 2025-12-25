@@ -3,10 +3,6 @@ Stone Cutter=
 Switch stack size=
 Inventory=
 Used to cut stone like materials.=
-<<<<<<< HEAD
-Stonecutters are used to create stairs and slabs from stone like materials. It is also the jobsite for the Stone Mason Villager.=
-=======
 
 Stonecutters are used to create stairs and slabs from stone like materials. It is also the jobsite for the Stone Mason Villager.=
 
->>>>>>> fc7bddf16f0af0f22de88c837139118b55e9f02f
