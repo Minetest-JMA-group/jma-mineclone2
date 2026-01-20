@@ -366,6 +366,8 @@ function DEFAULT_CART_DEF:on_step(dtime)
 	if self.name == "mcl_minecarts:minecart" then -- Only remove regular minecarts
 		if next(self.object:get_children()) == nil then
 			-- There is nothing in the minecart
+			if not self._despawn_timer then self._despawn_timer = 0 end
+			
 			self._despawn_timer = self._despawn_timer + dtime
 			if self._despawn_timer > minecart_despawn_time then
 				kill_cart(self._staticdata, nil)
