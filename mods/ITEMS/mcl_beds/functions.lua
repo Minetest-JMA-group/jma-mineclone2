@@ -514,11 +514,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.chat_send_player(player_name,S("Sorry, but you have to wait @1 seconds until you may use this button again!", tostring(time_to_wait)))
 			return
 		end
-		local player_xban_entry
-		if xban then
-			player_xban_entry = xban.find_entry(player_name)
-		end
-		if (not exceeded_rate_limit(player_name)) and (shout_priv_check(player)) and (player_xban_entry and (player_xban_entry.muted ~= true)) then
+		local player_is_muted = minetest.global_exists("simplemod") and simplemod.is_muted_name(player_name)
+		if (not exceeded_rate_limit(player_name)) and (shout_priv_check(player)) and (not player_is_muted) then
 			chatbuttonused = true
 			local message = custom_sleep_message or S("Hey! Would you guys mind sleeping?")
 			if block_msgs then
