@@ -68,6 +68,11 @@ local function play()
 			local pos1         = player1:get_pos()
 			local dimension    = mcl_worlds.pos_to_dimension(pos1)
 
+			-- Ensure player has a fear entry
+			if not listeners[player1_name] then
+				reset_fear(player1_name)
+			end
+
 			if (dimension == "overworld") then
 
 				-- Underground
@@ -75,41 +80,44 @@ local function play()
 					local fear      = listeners[player1_name].fear
 					local light_lvl = core.get_node_light(pos1)
 
-					-- Mapping light level to extra fear
-					new_fear = fear + slope * (max_light_lvl - light_lvl)
+					-- Only calculate fear if we have a valid light level
+					if light_lvl then
+						-- Mapping light level to extra fear
+						local new_fear = fear + slope * (max_light_lvl - light_lvl)
 
-					-- Nothing special, just set new fear
-					if (new_fear < seconds_in_pitch_black_before_sound) then
+						-- Nothing special, just set new fear
+						if (new_fear < seconds_in_pitch_black_before_sound) then
 
-						listeners[player1_name].fear = new_fear
+							listeners[player1_name].fear = new_fear
 
-					-- Play cave sound
-					else
-						reset_fear(player1_name)
+						-- Play cave sound
+						else
+							reset_fear(player1_name)
 
-						local sound = pick_sound()
-						if sound then
+							local sound = pick_sound()
+							if sound then
 
-							play_sound(sound, player1_name)
+								play_sound(sound, player1_name)
 
-							-- Also play the same sound for nearby players
-							for _, player2 in pairs(core.get_connected_players()) do
-								repeat
-								if player2 == player1 then
-									break
-								end
-
-								if not player2:get_meta():get("vl_cavesounds:disable") then
-
-									local player2_name = player2:get_player_name()
-									local pos2         = player2:get_pos()
-
-									if vector.distance(pos2, pos1) < max_same_sound_for_other_players_distance then
-										reset_fear(player2_name)
-										play_sound(sound, player2_name)
+								-- Also play the same sound for nearby players
+								for _, player2 in pairs(core.get_connected_players()) do
+									repeat
+									if player2 == player1 then
+										break
 									end
+
+									if not player2:get_meta():get("vl_cavesounds:disable") then
+
+										local player2_name = player2:get_player_name()
+										local pos2         = player2:get_pos()
+
+										if vector.distance(pos2, pos1) < max_same_sound_for_other_players_distance then
+											reset_fear(player2_name)
+											play_sound(sound, player2_name)
+										end
+									end
+									until true
 								end
-								until true
 							end
 						end
 					end
