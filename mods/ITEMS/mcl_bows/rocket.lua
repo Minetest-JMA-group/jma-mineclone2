@@ -96,16 +96,29 @@ end
 
 vl_projectile.register("mcl_bows:rocket_entity", rocket_entity)
 
-if core.get_modpath("mcl_core") and core.get_modpath("mcl_mobitems") and core.get_modpath("vl_fireworks") then
-	core.register_craft({
-		output = "mcl_bows:rocket 1",
-		recipe = {
-			{"mcl_core:paper"},
-			{"vl_fireworks:rocket_2"},
-			{"mcl_bows:arrow"},
-		}
-	})
-end
+local rocket_arrow_craft_items = {
+    paper = "mcl_core:paper",
+    rocket = "vl_fireworks:rocket",
+    arrow = "mcl_bows:arrow",
+}
+
+core.register_on_mods_loaded(function()
+    for _, craft_item_name in pairs(rocket_arrow_craft_items) do
+        if core.registered_craftitems[craft_item_name] == nil then
+            core.log("error", "[mcl_bows] Missing craft item: " .. craft_item_name)
+            return
+        end
+    end
+
+    core.register_craft({
+        output = "mcl_bows:rocket 1",
+        recipe = {
+            {rocket_arrow_craft_items.paper},
+            {rocket_arrow_craft_items.rocket},
+            {rocket_arrow_craft_items.arrow},
+        }
+    })
+end)
 
 if minetest.get_modpath("doc_identifier") then
 	doc.sub.identifier.register_object("mcl_bows:rocket_entity", "craftitems", "mcl_bows:rocket")
