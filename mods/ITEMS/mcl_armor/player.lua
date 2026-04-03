@@ -103,6 +103,10 @@ local function limit_put(player, inventory, index, stack, count)
 	end
 end
 
+function mcl_armor.pub_limit_put(player, inventory, index, stack, count)
+	return limit_put(player, inventory, index, stack, count)
+end
+
 local function limit_take(player, inventory, index, stack, count)
 	if mcl_enchanting.has_enchantment(stack, "curse_of_binding") and not minetest.is_creative_enabled(player:get_player_name()) then
 		return 0
@@ -172,4 +176,8 @@ end)
 
 minetest.register_on_leaveplayer(function(player)
 	mcl_armor.player_view_range_factors[player] = nil
+end)
+
+core.register_on_respawnplayer(function(player)
+	mcl_armor.update(player)
 end)
