@@ -361,18 +361,24 @@ function mob_class:monster_attack()
 			end
 		end
 	end
+
 	if not min_player and #blacklist_attack > 0 then
-		min_player=blacklist_attack[random(#blacklist_attack)]
+		local candidate = blacklist_attack[random(#blacklist_attack)]
+		if self:target_visible(self.object, candidate) then
+			min_player = candidate
+		end
 	end
 	-- attack player
 	if min_player then
 		local target_pos = min_player:get_pos()
-		if self:target_in_direct_sight(target_pos) then
-			-- Target in direct sight, attack immediately
-			self:do_attack(min_player)
-		else
-			-- Target not in direct sight, schedule delayed attack by 0.5-1.0 seconds
-			self:delayed_attack(min_player, 0.5, 0.5)
+		if target_pos then
+			if self:target_in_direct_sight(target_pos) then
+				-- Target in direct sight, attack immediately
+				self:do_attack(min_player)
+			else
+				-- Target not in direct sight, schedule delayed attack by 0.5-1.0 seconds
+				self:delayed_attack(min_player, 0.5, 0.5)
+			end
 		end
 	end
 end
@@ -576,12 +582,10 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 			mcl_burning.set_on_fire(self.object, fire_aspect_level * 4)
 		end
 
-		if type(self.armor) == "table" then
-			if (self.armor.arthropod or 0) > 0 then
-				local bane_level = mcl_enchanting.get_enchantment(weapon, "bane_of_arthropods")
-				if bane_level > 0 then
-					mcl_potions.give_effect_by_level("slowness", self.object, 4, 1 + 0.5 * bane_level)
-				end
+		if ((type(self.armor) == "table" and self.armor.arthropod) or 0) > 0 then
+			local bane_level = mcl_enchanting.get_enchantment(weapon, "bane_of_arthropods")
+			if bane_level > 0 then
+				mcl_potions.give_effect_by_level("slowness", self.object, 4, 1 + 0.5 * bane_level)
 			end
 		end
 	end
