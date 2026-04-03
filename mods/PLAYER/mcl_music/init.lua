@@ -16,9 +16,10 @@ local hailing_forest = "Jester-Hailing_Forest"
 local lonely_blossom = "exhale_and_tim_unwin-lonely_blossom"
 local valley_of_ghosts = "exhale_and_tim_unwin-valley_of_ghosts"
 local farmer = "exhale_and_tim_unwin-farmer"
+local hope = "fancyfinn9-hope"
 
 local scenario_to_base_track = {
-	["overworld"]	= {pianowtune, never_grow_up, flock_of_one, gift, hailing_forest, lonely_blossom, farmer},
+	["overworld"]	= {pianowtune, never_grow_up, flock_of_one, gift, hailing_forest, lonely_blossom, farmer, hope},
 	["nether"]	= {nether_tune, valley_of_ghosts},
 	["end"]		= {end_tune},
 	["mining"]	= {odd_block},
