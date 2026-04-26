@@ -1,5 +1,6 @@
 local S = minetest.get_translator("mcl_skins")
 local color_to_string = minetest.colorspec_to_colorstring
+local storage = core.get_mod_storage()
 local EDIT_SKIN_KEY = -1 -- The key used for edit skin in the mcl_skins.simple_skins table
 
 mcl_skins = {
@@ -110,7 +111,21 @@ function mcl_skins.register_item(item)
 		local func = item.selector_func
 
 		if type(func) == "string" then
-			func = loadstring(func)()
+			local chunk, err = loadstring(func)
+			if not chunk then
+				core.log("error", "[mcl_skins] Failed to compile selector_func for cape " ..
+					tostring(item.name) .. ": " .. tostring(err))
+				func = nil
+			else
+				local ok, loaded = pcall(chunk)
+				if ok and type(loaded) == "function" then
+					func = loaded
+				else
+						core.log("error", "[mcl_skins] Invalid selector_func for cape " ..
+						tostring(item.name) .. ": expected function")
+					func = nil
+				end
+			end
 		end
 
 		table.insert(mcl_skins.cape, {name=item.name, selector_func=func, mask=item.mask})
@@ -238,13 +253,28 @@ minetest.register_on_leaveplayer(function(player)
 	mcl_skins.player_formspecs[player] = nil
 end)
 
+local function cape_selector_allows(cape, player)
+	if type(cape.selector_func) == "nil" then
+		return true
+	end
+
+	local ok, allowed = pcall(cape.selector_func, player)
+	if not ok then
+		core.log("error", "[mcl_skins] selector_func failed for cape " ..
+			tostring(cape.name) .. ": " .. tostring(allowed))
+		return false
+	end
+
+	return allowed and true or false
+end
+
 local function calculate_page_count(tab, player)
 	if tab == "skin" then
 		return math.ceil((#mcl_skins.simple_skins + 2) / 8)
 	elseif tab == "cape" then
 		local player_capes = 0
 		for _, cape in pairs(mcl_skins.cape) do
-			if type(cape.selector_func) == "nil" or cape.selector_func(player) then
+			if cape_selector_allows(cape, player) then
 				player_capes = player_capes + 1
 			end
 		end
@@ -359,7 +389,7 @@ function mcl_skins.show_formspec(player, active_tab, page_num)
 		local possize = {{"6,2;1,2", "5.5,4.2;2,0.8"}, {"9,2;1,2","8.5,4.2;2,0.8"}, {"6,7;1,2","5.5,9.2;2,0.8"}, {"9,7;1,2","8.5,9.2;2,0.8"},{"12,7;1,2","11.5,9.2;2,0.8"}}
 		local player_capes = {} -- contains all capes the player is allowed to wear
 		for _, cape in pairs (mcl_skins.cape) do
-			if type(cape.selector_func) == "nil" or cape.selector_func(player) then
+			if cape_selector_allows(cape, player) then
 				table.insert(player_capes, cape)
 			end
 		end
@@ -751,4 +781,3 @@ minetest.register_on_respawnplayer(function(player)
 		mcl_skins.update_player_skin(player) -- ensures players have their cape again after dying with an elytra
 	end
 end)
-
