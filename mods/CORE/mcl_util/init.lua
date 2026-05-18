@@ -810,7 +810,14 @@ function mcl_util.get_active_object_id(obj)
 	return le._active_object_id
 end
 function mcl_util.get_active_object_id_from_uuid(uuid)
-	return uuid_to_aoid_cache[uuid] or scan_active_objects() or uuid_to_aoid_cache[uuid]
+	local aoid = uuid_to_aoid_cache[uuid] or scan_active_objects() or uuid_to_aoid_cache[uuid]
+	local le = aoid and minetest.luaentities[aoid]
+	if le and le._uuid == uuid then
+		return aoid
+	end
+	-- Drop stale cache entries (AOID reused or entity gone).
+	uuid_to_aoid_cache[uuid] = nil
+	return nil
 end
 
 --- @param uuid string
@@ -849,4 +856,3 @@ end
 mcl_util.parse_version = mcl_vars.parse_version
 mcl_util.minimum_version = mcl_vars.minimum_version
 mcl_util.format_version = mcl_vars.format_version
-

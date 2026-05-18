@@ -300,7 +300,9 @@ local def_hopper = {
 
 		-- Only pull to containers
 		if cart and cart.groups and (cart.groups.container or 0) ~= 0 then
-			cart:add_node_watch(pos)
+			if cart.add_node_watch then
+				cart:add_node_watch(pos)
+			end
 			hopper_pull_from_mc(cart, pos)
 		end
 	end,
@@ -309,14 +311,18 @@ local def_hopper = {
 
 		-- Only push to containers
 		if cart and cart.groups and (cart.groups.container or 0) ~= 0 then
-			cart:add_node_watch(pos)
+			if cart.add_node_watch then
+				cart:add_node_watch(pos)
+			end
 			hopper_push_to_mc(cart, pos)
 		end
 	end,
 	_mcl_minecarts_on_leave_above = function(pos, cart, next_dir)
 		if not cart then return end
 
-		cart:remove_node_watch(pos)
+		if cart.remove_node_watch then
+			cart:remove_node_watch(pos)
+		end
 	end,
 	_mcl_minecarts_node_on_step = function(pos, cart, dtime, cartdata)
 		if not cart then
@@ -327,7 +333,9 @@ local def_hopper = {
 		local cart_pos = mcl_minecarts.get_cart_position(cartdata)
 		if not cart_pos then return false end
 		if vector.distance(cart_pos, pos) > 1.5 then
-			cart:remove_node_watch(pos)
+			if cart.remove_node_watch then
+				cart:remove_node_watch(pos)
+			end
 			return
 		end
 		if vector.direction(pos,cart_pos).y > 0 then
@@ -549,14 +557,18 @@ local def_hopper_side = {
 
 		-- Only push to containers
 		if cart and cart.groups and (cart.groups.container or 0) ~= 0 then
-			cart:add_node_watch(pos)
+			if cart.add_node_watch then
+				cart:add_node_watch(pos)
+			end
 			hopper_pull_from_mc(cart, pos)
 		end
 	end,
 	_mcl_minecarts_on_leave_below = function(pos, cart, next_dir)
 		if not cart then return end
 
-		cart:remove_node_watch(pos)
+		if cart.remove_node_watch then
+			cart:remove_node_watch(pos)
+		end
 	end,
 	_mcl_minecarts_on_enter_side = function(pos, cart, next_dir, rail_pos)
 		-- Hopper is to the side of the minecart
@@ -579,7 +591,9 @@ local def_hopper_side = {
 
 		-- Only push to containers
 		if cart.groups and (cart.groups.container or 0) ~= 0 then
-			cart:add_node_watch(pos)
+			if cart.add_node_watch then
+				cart:add_node_watch(pos)
+			end
 		end
 
 		hopper_push_to_mc(cart, pos)
@@ -587,7 +601,9 @@ local def_hopper_side = {
 	_mcl_minecarts_on_leave_side = function(pos, cart, next_dir)
 		if not cart then return end
 
-		cart:remove_node_watch(pos)
+		if cart.remove_node_watch then
+			cart:remove_node_watch(pos)
+		end
 	end,
 	_mcl_minecarts_node_on_step = function(pos, cart, dtime, cartdata)
 		if not cart then return end
@@ -595,7 +611,9 @@ local def_hopper_side = {
 		local cart_pos = mcl_minecarts.get_cart_position(cartdata)
 		if not cart_pos then return false end
 		if vector.distance(cart_pos, pos) > 1.5 then
-			cart:remove_node_watch(pos)
+			if cart.remove_node_watch then
+				cart:remove_node_watch(pos)
+			end
 			return false
 		end
 
