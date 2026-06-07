@@ -10,11 +10,13 @@ are so many weird tables below.
 
 -- for farming modification
 local function has_value(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
+	if tab then
+	    for index, value in ipairs(tab) do
+	        if value == val then
+	            return true
+	        end
+	    end
+	end
 
     return false
 end
