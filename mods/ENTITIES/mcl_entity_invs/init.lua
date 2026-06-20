@@ -67,7 +67,9 @@ end
 function mcl_entity_invs.save_inv(ent)
 	if ent._inv then
 		local items = {}
-		for i,it in ipairs(ent._inv:get_list("main")) do
+		local list = ent._inv:get_list("main")
+		if not list then return end
+		for i,it in ipairs(list) do
 			items[i] = it:to_string()
 		end
 		if ent._mcl_entity_invs_save_items then
