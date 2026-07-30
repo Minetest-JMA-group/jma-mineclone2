@@ -71,6 +71,17 @@ minetest.register_entity(":__builtin:falling_node", {
 			self.object:remove()
 			return
 		end
+		-- Check if the original position was inside a protected area.
+		-- If so, drop as item and skip the fall entirely.
+		local ppos = self.object and self.object:get_pos()
+		if ppos and minetest.is_protected and minetest.is_protected(vector.round(ppos), "") then
+			local drops = minetest.get_node_drops(node.name, "")
+			for _, dropped_item in pairs(drops) do
+				minetest.add_item(ppos, dropped_item)
+			end
+			self.object:remove()
+			return
+		end
 		-- Change falling node if definition tells us to
 		if def._mcl_falling_node_alternative then
 			node.name = def._mcl_falling_node_alternative
@@ -199,16 +210,24 @@ minetest.register_entity(":__builtin:falling_node", {
 				end
 				local def = minetest.registered_nodes[self.node.name]
 				if def then
-					minetest.add_node(np, self.node)
-					if def._mcl_after_falling then
-						def._mcl_after_falling(np, get_falling_depth(self))
-					end
-					if self.meta then
-						local meta = minetest.get_meta(np)
-						meta:from_table(self.meta)
-					end
-					if def.sounds and def.sounds.place and def.sounds.place.name then
-						minetest.sound_play(def.sounds.place, {pos = np}, true)
+					if minetest.is_protected and minetest.is_protected(np, "") then
+						-- Protected area: can't place node, drop as items instead
+						local drops = minetest.get_node_drops(self.node.name, "")
+						for _, dropped_item in pairs(drops) do
+							minetest.add_item(np, dropped_item)
+						end
+					else
+						minetest.add_node(np, self.node)
+						if def._mcl_after_falling then
+							def._mcl_after_falling(np, get_falling_depth(self))
+						end
+						if self.meta then
+							local meta = minetest.get_meta(np)
+							meta:from_table(self.meta)
+						end
+						if def.sounds and def.sounds.place and def.sounds.place.name then
+							minetest.sound_play(def.sounds.place, {pos = np}, true)
+						end
 					end
 				end
 			else
@@ -240,12 +259,20 @@ minetest.register_entity(":__builtin:falling_node", {
 				npos3.y = npos3.y - 1
 				local def = minetest.registered_nodes[self.node.name]
 				if def then
-					minetest.add_node(npos3, self.node)
-					if def._mcl_after_falling then
-						def._mcl_after_falling(npos3, get_falling_depth(self))
-					end
-					if def.sounds and def.sounds.place and def.sounds.place.name then
-						minetest.sound_play(def.sounds.place, {pos = np}, true)
+					if minetest.is_protected and minetest.is_protected(npos3, "") then
+						-- Protected area: can't place node, drop as items instead
+						local drops = minetest.get_node_drops(self.node.name, "")
+						for _, dropped_item in pairs(drops) do
+							minetest.add_item(npos3, dropped_item)
+						end
+					else
+						minetest.add_node(npos3, self.node)
+						if def._mcl_after_falling then
+							def._mcl_after_falling(npos3, get_falling_depth(self))
+						end
+						if def.sounds and def.sounds.place and def.sounds.place.name then
+							minetest.sound_play(def.sounds.place, {pos = np}, true)
+						end
 					end
 				end
 				deal_falling_damage(self, dtime)
