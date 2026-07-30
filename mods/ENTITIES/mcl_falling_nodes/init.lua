@@ -64,8 +64,15 @@ minetest.register_entity(":__builtin:falling_node", {
 	meta = {},
 	set_node = function(self, node, meta)
 		local def = minetest.registered_nodes[node.name]
+		if not def then
+			-- Don't allow unknown nodes to fall
+			minetest.log("info", "Unknown falling node removed at "..
+				minetest.pos_to_string(self.object:get_pos()))
+			self.object:remove()
+			return
+		end
 		-- Change falling node if definition tells us to
-		if def and def._mcl_falling_node_alternative then
+		if def._mcl_falling_node_alternative then
 			node.name = def._mcl_falling_node_alternative
 		end
 		local glow
@@ -231,9 +238,9 @@ minetest.register_entity(":__builtin:falling_node", {
 				-- of smoothly fall on the fence post.
 				local npos3 = table.copy(npos)
 				npos3.y = npos3.y - 1
-				minetest.add_node(npos3, self.node)
 				local def = minetest.registered_nodes[self.node.name]
 				if def then
+					minetest.add_node(npos3, self.node)
 					if def._mcl_after_falling then
 						def._mcl_after_falling(npos3, get_falling_depth(self))
 					end
