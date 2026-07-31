@@ -201,28 +201,37 @@ minetest.register_entity(":__builtin:falling_node", {
 			local nd = minetest.registered_nodes[n2.name]
 			--if n2.name == "mcl_portals:portal_end" then
 			-- TODO: Teleport falling node.
-            if (nd and nd.buildable_to == true) or minetest.get_item_group(self.node.name, "crush_after_fall") ~= 0 then
+			local place_pos
+			if (nd and nd.buildable_to == true) or minetest.get_item_group(self.node.name, "crush_after_fall") ~= 0 then
 				-- Replace destination node if it's buildable to
 				minetest.remove_node(np)
 				-- Run script hook
 				for _, callback in pairs(minetest.registered_on_dignodes) do
 					callback(np, n2)
 				end
+				place_pos = np
+			else
+				-- Destination is solid (e.g. ground). Place above it instead.
+				place_pos = {x = np.x, y = np.y + 1, z = np.z}
+			end
+			local n_above = minetest.registered_nodes[minetest.get_node(place_pos).name]
+			if not n_above or n_above.buildable_to or n_above.name == "air" then
 				local def = minetest.registered_nodes[self.node.name]
 				if def then
-					if minetest.is_protected and minetest.is_protected(np, "") then
+					if minetest.is_protected and minetest.is_protected(place_pos, "") then
 						-- Protected area: can't place node, drop as items instead
 						local drops = minetest.get_node_drops(self.node.name, "")
 						for _, dropped_item in pairs(drops) do
-							minetest.add_item(np, dropped_item)
+							minetest.add_item(place_pos, dropped_item)
 						end
 					else
-						minetest.add_node(np, self.node)
+						minetest.remove_node(place_pos)
+						minetest.add_node(place_pos, self.node)
 						if def._mcl_after_falling then
-							def._mcl_after_falling(np, get_falling_depth(self))
+							def._mcl_after_falling(place_pos, get_falling_depth(self))
 						end
 						if self.meta then
-							local meta = minetest.get_meta(np)
+							local meta = minetest.get_meta(place_pos)
 							meta:from_table(self.meta)
 						end
 						if def.sounds and def.sounds.place and def.sounds.place.name then
@@ -231,10 +240,10 @@ minetest.register_entity(":__builtin:falling_node", {
 					end
 				end
 			else
-				-- Drop the *falling node* as an item if the destination node is NOT buildable to
+				-- Can't place the node (target already occupied and above is full)
 				local drops = minetest.get_node_drops(self.node.name, "")
 				for _, dropped_item in pairs(drops) do
-					minetest.add_item(np, dropped_item)
+					minetest.add_item(place_pos, dropped_item)
 				end
 			end
 			deal_falling_damage(self, dtime)
