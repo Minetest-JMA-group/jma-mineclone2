@@ -42,11 +42,7 @@ dofile(modpath.."/api_helpers.lua")
 
 -- Table Save Load Functions
 function awards.save()
-	local file = io.open(minetest.get_worldpath().."/awards.txt", "w")
-	if file then
-		file:write(minetest.serialize(awards.players))
-		file:close()
-	end
+	core.safe_file_write(minetest.get_worldpath().."/awards.txt", minetest.serialize(awards.players))
 end
 
 function awards.init()

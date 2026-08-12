@@ -611,11 +611,15 @@ do
 		io.close(file)
 		if string then
 			local savetable = minetest.deserialize(string)
-			for name, players_stored_data in pairs(savetable.players_stored_data) do
-				doc.data.players[name] = {}
-				doc.data.players[name].stored_data = players_stored_data
+			if type(savetable) == "table" and type(savetable.players_stored_data) == "table" then
+				for name, players_stored_data in pairs(savetable.players_stored_data) do
+					doc.data.players[name] = {}
+					doc.data.players[name].stored_data = players_stored_data
+				end
+				minetest.log("action", "[doc] doc.mt successfully read.")
+			else
+				minetest.log("error", "[doc] doc.mt is corrupted or unreadable, starting with empty player data.")
 			end
-			minetest.log("action", "[doc] doc.mt successfully read.")
 		end
 	end
 end
@@ -630,10 +634,7 @@ function doc.save_to_file()
 	local savestring = minetest.serialize(savetable)
 
 	local filepath = minetest.get_worldpath().."/doc.mt"
-	local file = io.open(filepath, "w")
-	if file then
-		file:write(savestring)
-		io.close(file)
+	if core.safe_file_write(filepath, savestring) then
 		minetest.log("action", "[doc] Wrote player data into "..filepath..".")
 	else
 		minetest.log("error", "[doc] Failed to write player data into "..filepath..".")
