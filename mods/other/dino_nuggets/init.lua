@@ -1,3 +1,5 @@
+local S = core.get_translator(core.get_current_modname())
+
 core.register_craftitem("dino_nuggets:stegosaurus", {
 	description = S("Dino Nuggets"),
 	_doc_items_longdesc = S("Dino Nuggets are made from cooked chicken. Very tasty!"),
