@@ -4,9 +4,11 @@
 [submodule "mods/shared"]
 	path = mods/shared
 	url = https://codeberg.org/Luanti-JMA-group/jma-shared
+	ignore = all
 [submodule "mods/shared_private"]
 	path = mods/shared_private
 	ignore = all
 [submodule "mods/noctf"]
 	path = mods/noctf
 	url = https://codeberg.org/Luanti-JMA-group/jma-noctf
+	ignore = all
