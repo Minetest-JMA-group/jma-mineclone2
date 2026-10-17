@@ -1,12 +1,6 @@
-[submodule "mods/extras"]
-	path = mods/extras
-	ignore = all
 [submodule "mods/shared"]
 	path = mods/shared
 	url = https://codeberg.org/Luanti-JMA-group/jma-shared
-	ignore = all
-[submodule "mods/shared_private"]
-	path = mods/shared_private
 	ignore = all
 [submodule "mods/noctf"]
 	path = mods/noctf
