@@ -72,6 +72,7 @@ This section describes parts of the API related to defining and managing effects
         dur = float -- duration of the effect in seconds, may be infinite
         timer = float -- how much of the duration (in seconds) has already elapsed
         no_particles = bool -- if this is true, no particles signifying this effect will appear
+        no_save = bool -- if this is true, the effect is not saved to player metadata
 
         -- player-only fields
         hud_index = int -- position in the HUD used by this effect (icon, level, timer) - probably meaningless outside mcl_potions
@@ -114,10 +115,10 @@ This section describes parts of the API related to defining and managing effects
 * `predicate` – `function(object, effect_name)` - return `true` if `object` resists effect of the ID `effect_name`
 
 
-`mcl_potions.give_effect(name, object, factor, duration, no_particles)` – attempts to give effect of the ID `name` to the `object` with the provided `factor` and `duration`. If `no_particles` is `true`, no particles will be emitted from the object when under the effect. If the effect is not registered, target is invalid (or resistant), or the same effect with more potency is already applied to the target, this function does nothing and returns `false`. On success, this returns `true`.
+`mcl_potions.give_effect(name, object, factor, duration, no_particles, no_save)` – attempts to give effect of the ID `name` to the `object` with the provided `factor` and `duration`. If `no_particles` is `true`, no particles will be emitted from the object when under the effect. If `no_save` is `true`, the effect is not written to player metadata, so it ends when the player logs out. This is sticky: once an effect is granted with `no_save`, refreshing it later without the flag does not make it persist. If the effect is not registered, target is invalid (or resistant), or the same effect with more potency is already applied to the target, this function does nothing and returns `false`. On success, this returns `true`.
 
 
-`mcl_potions.give_effect_by_level(name, object, level, duration, no_particles)` – attempts to give effect of the ID `name` to the `object` with the provided `level` and `duration`. If `no_particles` is `true`, no particles will be emitted from the object when under the effect. This converts `level` to factor and calls `mcl_potions.give_effect()` internally, returning the return value of that function. `level` equal to `0` is no-op.
+`mcl_potions.give_effect_by_level(name, object, level, duration, no_particles, no_save)` – attempts to give effect of the ID `name` to the `object` with the provided `level` and `duration`. If `no_particles` is `true`, no particles will be emitted from the object when under the effect. If `no_save` is `true`, the effect is not written to player metadata, so it ends when the player logs out. This is sticky: once an effect is granted with `no_save`, refreshing it later without the flag does not make it persist. This converts `level` to factor and calls `mcl_potions.give_effect()` internally, returning the return value of that function. `level` equal to `0` is no-op.
 
 
 `mcl_potions.healing_func(object, hp)` – attempts to heal the `object` by `hp`. Negative `hp` harms magically instead.

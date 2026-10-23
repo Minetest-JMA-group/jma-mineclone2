@@ -1437,8 +1437,14 @@ function mcl_potions._save_player_effects(player)
 	local meta = player:get_meta()
 
 	for name, effect in pairs(registered_effects) do
-		if effect.on_save_effect and EF[name][player] then effect.on_save_effect(player) end
-		meta:set_string("mcl_potions:_EF_"..name, minetest.serialize(EF[name][player]))
+		local vals = EF[name][player]
+		if vals and vals.no_save then
+			-- Clear instead of leaving an older snapshot for the next join
+			meta:set_string("mcl_potions:_EF_"..name, "")
+		else
+			if effect.on_save_effect and vals then effect.on_save_effect(player) end
+			meta:set_string("mcl_potions:_EF_"..name, minetest.serialize(vals))
+		end
 	end
 end
 
@@ -1802,11 +1808,11 @@ local function target_valid(object, name)
 		and registered_effects[name].res_condition(object)) then return true end
 end
 
-function mcl_potions.give_effect(name, object, factor, duration, no_particles)
+function mcl_potions.give_effect(name, object, factor, duration, no_particles, no_save)
 	local edef = registered_effects[name]
 	if not edef or not target_valid(object, name) then return false end
 	if not EF[name][object] then
-		local vals = {dur = duration, timer = 0, no_particles = no_particles}
+		local vals = {dur = duration, timer = 0, no_particles = no_particles, no_save = no_save}
 		if edef.uses_factor then vals.factor = factor end
 		if edef.on_hit_timer then
 			if edef.timer_uses_factor then vals.step = factor
@@ -1823,6 +1829,8 @@ function mcl_potions.give_effect(name, object, factor, duration, no_particles)
 		if not edef.uses_factor or (edef.uses_factor and
 			(not edef.inv_factor and factor >= present.factor
 			or edef.inv_factor and factor <= present.factor)) then
+				-- Sticky: an effect granted as runtime-only stays runtime-only
+				if no_save then present.no_save = true end
 				if duration == "INF" then
 					present.dur = math.huge
 				else
@@ -1844,17 +1852,17 @@ function mcl_potions.give_effect(name, object, factor, duration, no_particles)
 	return true
 end
 
-function mcl_potions.give_effect_by_level(name, object, level, duration, no_particles)
+function mcl_potions.give_effect_by_level(name, object, level, duration, no_particles, no_save)
 	if level == 0 then return false end
 	if not registered_effects[name] then
 		minetest.log("warning", "[mcl_potions] Trying to give unknown effect "..tostring(name))
 		return false
 	end
 	if not registered_effects[name].uses_factor then
-		return mcl_potions.give_effect(name, object, 0, duration, no_particles)
+		return mcl_potions.give_effect(name, object, 0, duration, no_particles, no_save)
 	end
 	local factor = registered_effects[name].level_to_factor(level)
-	return mcl_potions.give_effect(name, object, factor, duration, no_particles)
+	return mcl_potions.give_effect(name, object, factor, duration, no_particles, no_save)
 end
 
 function mcl_potions.healing_func(object, hp)
