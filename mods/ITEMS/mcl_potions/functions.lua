@@ -1823,15 +1823,16 @@ function mcl_potions.give_effect(name, object, factor, duration, no_particles)
 		if not edef.uses_factor or (edef.uses_factor and
 			(not edef.inv_factor and factor >= present.factor
 			or edef.inv_factor and factor <= present.factor)) then
-				present.dur = math.max(duration, present.dur - present.timer)
+				if duration == "INF" then
+					present.dur = math.huge
+				else
+					present.dur = math.max(duration, present.dur - present.timer)
+				end
 				present.timer = 0
 				if edef.uses_factor then
 					present.factor = factor
 					if edef.timer_uses_factor then present.step = factor end
 					if edef.on_start then edef.on_start(object, factor) end
-				end
-				if duration == "INF" then
-					present.dur = math.huge
 				end
 		else
 			return false
