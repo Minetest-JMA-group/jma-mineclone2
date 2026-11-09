@@ -263,10 +263,18 @@ Returns true if cart1 and cart2 are a part of the same train and false otherwise
 `mcl_minecarts.link_cart_ahead(cart_data, cart_ahead_data)`
 
 Given two carts, link them together into a train, with the second cart ahead of the first.
+Returns true on success, or false if the carts are the same, the connecting ends are
+occupied, the carts already belong to the same train, or the combined train would
+exceed `MAX_TRAIN_LENGTH`.
 
 `mcl_minecarts.train_cars(cart_data)`
 
-Use to iterate over all carts in a train. Expected usage:
+Use to iterate over all carts in a train.
+
+Traversal disconnects missing or nonreciprocal links and splits cycles or trains
+exceeding `MAX_TRAIN_LENGTH`. Repaired links are saved, and carts are preserved.
+
+Expected usage:
 
 `for cart in mcl_minecarts.train_cars(cart) do --[[ code ]] end`
 

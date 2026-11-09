@@ -17,9 +17,7 @@ elseif minetest.get_modpath("vl_physics") then
 end
 local FRICTION = mod.FRICTION
 local OFF_RAIL_FRICTION = mod.OFF_RAIL_FRICTION
-local MAX_TRAIN_LENGTH = mod.MAX_TRAIN_LENGTH
 local SPEED_MAX = 10
-local train_length = mod.train_length
 local update_train = mod.update_train
 local reverse_train = mod.reverse_train
 local link_cart_ahead = mod.link_cart_ahead
@@ -184,8 +182,7 @@ local function handle_cart_collision(cart1_staticdata, prev_pos, next_dir)
 	local m1 = cart1_staticdata.mass
 	local m2 = cart2_staticdata.mass
 
-	if ENABLE_TRAINS and u2 == 0 and u1 < 4 and train_length(cart1_staticdata) < MAX_TRAIN_LENGTH then
-		link_cart_ahead(cart1_staticdata, cart2_staticdata)
+	if ENABLE_TRAINS and u2 == 0 and u1 < 4 and link_cart_ahead(cart1_staticdata, cart2_staticdata) then
 		cart2_staticdata.dir = mcl_minecarts.get_rail_direction(cart2_staticdata.connected_at, cart1_staticdata.dir)
 		cart2_staticdata.velocity = cart1_staticdata.velocity
 		return

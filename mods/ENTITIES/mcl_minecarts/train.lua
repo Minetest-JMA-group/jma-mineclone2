@@ -5,14 +5,34 @@ local get_cart_data = mod.get_cart_data
 local save_cart_data = mod.save_cart_data
 local MAX_TRAIN_LENGTH = mod.MAX_TRAIN_LENGTH
 
+-- Remove one link without disturbing a neighbor's link to a different cart.
+local function unlink(cart, field, opposite)
+	local uuid = cart[field]
+	local neighbor = get_cart_data(uuid)
+	cart[field] = nil
+	if neighbor and neighbor[opposite] == cart.uuid then
+		neighbor[opposite] = nil
+		save_cart_data(neighbor.uuid)
+	end
+	save_cart_data(cart.uuid)
+	minetest.log("warning", "[mcl_minecarts] Removed invalid or overlong train link: cart #" ..
+		cart.uuid .. " " .. field .. " cart #" .. uuid)
+end
+
 -- Follow .behind to the back end of a train
 local function find_back(start)
 	assert(start)
 
+	local length = 1
 	while start.behind do
 		local nxt = get_cart_data(start.behind)
-		if not nxt then return start end
+		-- Bounding the search also breaks cycles in saved train data.
+		if not nxt or nxt.ahead ~= start.uuid or length >= MAX_TRAIN_LENGTH then
+			unlink(start, "behind", "ahead")
+			return start
+		end
 		start = nxt
+		length = length + 1
 	end
 	return start
 end
@@ -29,7 +49,13 @@ function mod.train_cars(staticdata)
 
 		local ret = back
 		if back.ahead then
-			back = get_cart_data(back.ahead)
+			local nxt = get_cart_data(back.ahead)
+			if not nxt or nxt.behind ~= back.uuid or limit == 0 then
+				unlink(back, "ahead", "behind")
+				back = nil
+			else
+				back = nxt
+			end
 		else
 			back = nil
 		end
@@ -128,10 +154,25 @@ function mod.update_train(staticdata)
 end
 
 function mod.link_cart_ahead(staticdata, ca_staticdata)
+	if staticdata.uuid == ca_staticdata.uuid or staticdata.ahead or ca_staticdata.behind then
+		return false
+	end
+
+	local length = 0
+	for cart in train_cars(staticdata) do
+		if cart.uuid == ca_staticdata.uuid then return false end
+		length = length + 1
+	end
+	for _ in train_cars(ca_staticdata) do
+		length = length + 1
+		if length > MAX_TRAIN_LENGTH then return false end
+	end
+
 	minetest.log("action","Linking cart #"..staticdata.uuid.." to cart #"..ca_staticdata.uuid)
 
 	staticdata.ahead = ca_staticdata.uuid
 	ca_staticdata.behind = staticdata.uuid
+	return true
 end
 
 function mod.reverse_train(cart)
